@@ -59,6 +59,7 @@ Then, generate a **new, complete single HTML file** containing all HTML, CSS, an
    - All code must be in one HTML file.
    - CSS must be in a \`<style>\` tag within the \`<head>\`.
    - JavaScript must be in a \`<script>\` tag just before the closing \`<\/body>\` tag.
+   - Use \`<canvas>\` for rendering the game.
 
 2. **Design & Aesthetics**
    - Create a **modern**, clean, and **visually attractive** game.
