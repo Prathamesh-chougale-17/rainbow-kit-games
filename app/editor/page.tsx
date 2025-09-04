@@ -354,7 +354,7 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen flex-col bg-background text-foreground">
+    <div className="flex h-[calc(100vh-4rem)] flex-col bg-background text-foreground">
       <Header
         onExport={handleExport}
         onShare={handleShare}
