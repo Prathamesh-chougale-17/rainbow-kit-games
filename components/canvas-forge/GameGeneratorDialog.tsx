@@ -4,7 +4,7 @@ import * as React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Bot, Loader2 } from "lucide-react";
+import { Bot, Loader2, Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { generateGame } from "@/lib/actions";
+import { generateGame, refinePromptAction } from "@/lib/actions";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 import { toast } from "sonner";
 
@@ -38,13 +38,51 @@ interface GameGeneratorDialogProps {
 export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerated }: GameGeneratorDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
-  
+  const [isRefining, setIsRefining] = React.useState(false);
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       prompt: "",
     },
   });
+
+  const handleRefinePrompt = async () => {
+    const currentPrompt = form.getValues("prompt");
+    if (currentPrompt.length < 10) {
+      form.setError("prompt", {
+        type: "manual",
+        message: "Please enter a game idea of at least 10 characters to refine.",
+      });
+      return;
+    }
+
+    setIsRefining(true);
+    try {
+      const result = await refinePromptAction({ 
+        prompt: currentPrompt,
+        isGameGenerated: isGameGenerated,
+      });
+      form.setValue("prompt", result.refinedPrompt, { shouldValidate: true });
+      toast.success(
+        "Prompt Refined!",
+        {
+          description: "Your game idea has been enhanced with more detail.",
+        }
+      );
+    } catch (error) {
+      console.error(error);
+      toast.error(
+        "Refinement Failed",
+        {
+          description: "There was an error refining the prompt. Please try again.",
+        }
+      );
+    } finally {
+      setIsRefining(false);
+    }
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsGenerating(true);
@@ -58,7 +96,12 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
       form.reset();
     } catch (error) {
       console.error(error);
-      toast.error("There was an error generating the game. Please try again.");
+      toast.error(
+        "Generation Failed",
+        {
+          description: "There was an error generating the game. Please try again.",
+        }
+      );
     } finally {
       setIsGenerating(false);
     }
@@ -84,7 +127,29 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
                 name="prompt"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>{isGameGenerated ? 'Feedback or Refinements' : 'Game Idea'}</FormLabel>
+                    <div className="flex justify-between items-center">
+                      <FormLabel>{isGameGenerated ? 'Feedback or Refinements' : 'Game Idea'}</FormLabel>
+                      <Button
+                        type="button"
+                        variant="link"
+                        size="sm"
+                        onClick={handleRefinePrompt}
+                        disabled={isRefining || isGenerating}
+                        className="h-auto p-0 text-accent transition-all hover:text-primary"
+                      >
+                        {isRefining ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Refining...
+                          </>
+                        ) : (
+                          <>
+                             <Sparkles className="mr-2 h-4 w-4" />
+                            Refine
+                          </>
+                        )}
+                      </Button>
+                    </div>
                     <FormControl>
                       <Textarea
                         placeholder={isGameGenerated 
@@ -100,7 +165,7 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={isGenerating}>
+              <Button type="submit" disabled={isGenerating || isRefining}>
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
