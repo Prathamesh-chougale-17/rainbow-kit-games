@@ -1,102 +1,97 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { ArrowRight } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <div className="min-h-screen bg-background text-foreground">
+      <main className="mx-auto px-6 py-20">
+        <section className="grid lg:grid-cols-2 gap-12 items-center">
+          <div>
+            <p className="inline-flex items-center rounded-full bg-accent/10 text-accent-foreground px-3 py-1 text-xs font-medium">New • AI-assisted game generator</p>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+            <h1 className="mt-6 text-4xl md:text-5xl font-bold leading-tight">Build playable browser games instantly — using clear prompts</h1>
+
+            <p className="mt-4 text-lg text-muted-foreground max-w-xl">Describe the game you want and let the generator create the code. Tweak, refine, and iterate — then export or play immediately.</p>
+
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Button asChild>
+                <Link href="#get-started" className="flex items-center gap-2">
+                  <ArrowRight className="size-4" />
+                  Try the generator
+                </Link>
+              </Button>
+
+              <a href="#features" className="inline-flex items-center rounded-full px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground border border-transparent hover:bg-muted/50">
+                See features
+              </a>
+            </div>
+
+            <div className="mt-8 grid grid-cols-2 gap-3 max-w-md">
+              <div className="p-3 rounded-lg border bg-muted/5">
+                <h4 className="font-semibold">Exportable code</h4>
+                <p className="text-sm text-muted-foreground">Download a working React/TS game bundle.</p>
+              </div>
+              <div className="p-3 rounded-lg border bg-muted/5">
+                <h4 className="font-semibold">Refine prompts</h4>
+                <p className="text-sm text-muted-foreground">Iterate quickly using AI feedback and previews.</p>
+              </div>
+            </div>
+          </div>
+
+          <div aria-hidden className="rounded-2xl overflow-hidden bg-gradient-to-br from-indigo-600/20 to-rose-400/10 p-6 shadow-lg">
+            <div className="aspect-[16/9] rounded-xl bg-gradient-to-br from-indigo-800/40 to-transparent flex items-center justify-center">
+              {/* Placeholder illustration */}
+              <div className="text-center">
+                <div className="mx-auto mb-4 h-36 w-64 rounded-md bg-white/5" />
+                <p className="text-sm text-muted-foreground">Live preview of generated game (playable in the editor)</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section id="features" className="mt-20">
+          <h2 className="text-2xl font-bold">What you'll get</h2>
+          <p className="mt-2 text-muted-foreground max-w-2xl">Handy features designed for fast experimentation and deployment.</p>
+
+          <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="p-6 rounded-xl border bg-background/50 shadow-sm">
+              <h3 className="font-semibold">Live Editor</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Edit code and see a live preview side-by-side.</p>
+            </div>
+            <div className="p-6 rounded-xl border bg-background/50 shadow-sm">
+              <h3 className="font-semibold">AI Refinements</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Ask the model to tweak difficulty, controls, visuals and more.</p>
+            </div>
+            <div className="p-6 rounded-xl border bg-background/50 shadow-sm">
+              <h3 className="font-semibold">One-click Export</h3>
+              <p className="mt-2 text-sm text-muted-foreground">Export a runnable project or embed the game wherever you like.</p>
+            </div>
+          </div>
+        </section>
+
+        <section id="get-started" className="mt-20 py-12 rounded-2xl bg-gradient-to-r from-accent/6 to-transparent border">
+          <div className="max-w-4xl mx-auto text-center">
+            <h3 className="text-2xl font-semibold">Ready to create?</h3>
+            <p className="mt-2 text-muted-foreground">Start by describing a simple game idea — we'll do the rest.</p>
+            <div className="mt-6 flex items-center justify-center gap-3">
+              <Button asChild>
+                <Link href="#" className="flex items-center gap-2">Open Generator</Link>
+              </Button>
+              <a href="#features" className="text-sm text-muted-foreground underline underline-offset-4">View details</a>
+            </div>
+          </div>
+        </section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="border-t border-border mt-20 bg-background/50">
+        <div className="mx-auto max-w-6xl px-6 py-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground">© {new Date().getFullYear()} Game Hub — Built with Tailwind & AI</div>
+          <div className="flex items-center gap-4">
+            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Privacy</Link>
+            <Link href="#" className="text-sm text-muted-foreground hover:text-foreground">Terms</Link>
+          </div>
+        </div>
       </footer>
     </div>
   );
