@@ -13,9 +13,16 @@ interface HeaderProps {
   isGameGenerated: boolean;
 }
 
-export function Header({ onExport, onShare, onGenerate, html, isGameGenerated }: HeaderProps) {
+export function Header({
+  onExport,
+  onShare,
+  onGenerate,
+  html,
+  isGameGenerated,
+}: HeaderProps) {
   const iconClass = "mr-2 h-4 w-4 drop-shadow-[0_0_2px_hsl(var(--accent))]";
-  const buttonClass = "transition-all hover:text-accent hover:drop-shadow-[0_0_4px_hsl(var(--accent))]";
+  const buttonClass =
+    "transition-all hover:text-accent hover:drop-shadow-[0_0_4px_hsl(var(--accent))]";
 
   return (
     <header className="flex h-16 items-center justify-between p-4">
@@ -26,17 +33,17 @@ export function Header({ onExport, onShare, onGenerate, html, isGameGenerated }:
         </h1>
       </div>
       <div className="flex items-center gap-2">
-        <GameGeneratorDialog 
+        <GameGeneratorDialog
           onGenerate={onGenerate}
           html={html}
           isGameGenerated={isGameGenerated}
         >
-           <Button variant="ghost" className={buttonClass}>
+          <Button variant="ghost" className={buttonClass}>
             <Bot className={iconClass} />
-            {isGameGenerated ? 'Refine Game' : 'Generate Game'}
+            {isGameGenerated ? "Refine Game" : "Generate Game"}
           </Button>
         </GameGeneratorDialog>
-        
+
         <Button variant="ghost" onClick={onShare} className={buttonClass}>
           <Share2 className={iconClass} />
           Share

@@ -30,15 +30,17 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar navItems={[
-          { title: "Home", href: "/" },
-          { title: "About", href: "/about" },
-          { title: "Contact", href: "/contact" },
-          { title: "Games", href: "/games" },
-          { title: "Editor", href: "/editor" },
-          { title: "Market Place", href: "/marketplace" },
-          { title: "Community", href: "/community" },
-        ]} />
+        <Navbar
+          navItems={[
+            { title: "Home", href: "/" },
+            { title: "About", href: "/about" },
+            { title: "Contact", href: "/contact" },
+            { title: "Games", href: "/games" },
+            { title: "Editor", href: "/editor" },
+            { title: "Market Place", href: "/marketplace" },
+            { title: "Community", href: "/community" },
+          ]}
+        />
         {children}
         <Toaster />
       </body>

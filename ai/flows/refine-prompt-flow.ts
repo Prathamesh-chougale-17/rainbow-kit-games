@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 /**
  * @fileOverview Refines a user's game idea into a more detailed prompt for the game generation AI.
@@ -8,28 +8,37 @@
  * - RefinePromptOutput - The return type for the refinePrompt function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "genkit";
 
 const RefinePromptInputSchema = z.object({
-  prompt: z.string().describe('The user-provided game idea or concept.'),
-  isGameGenerated: z.boolean().optional().describe('A flag to indicate if a game has already been generated.'),
+  prompt: z.string().describe("The user-provided game idea or concept."),
+  isGameGenerated: z
+    .boolean()
+    .optional()
+    .describe("A flag to indicate if a game has already been generated."),
 });
 export type RefinePromptInput = z.infer<typeof RefinePromptInputSchema>;
 
 const RefinePromptOutputSchema = z.object({
-  refinedPrompt: z.string().describe('The refined, detailed prompt suitable for the game generation AI.'),
+  refinedPrompt: z
+    .string()
+    .describe(
+      "The refined, detailed prompt suitable for the game generation AI.",
+    ),
 });
 export type RefinePromptOutput = z.infer<typeof RefinePromptOutputSchema>;
 
-export async function refinePrompt(input: RefinePromptInput): Promise<RefinePromptOutput> {
+export async function refinePrompt(
+  input: RefinePromptInput,
+): Promise<RefinePromptOutput> {
   return refinePromptFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'refinePrompt',
-  input: {schema: RefinePromptInputSchema},
-  output: {schema: RefinePromptOutputSchema},
+  name: "refinePrompt",
+  input: { schema: RefinePromptInputSchema },
+  output: { schema: RefinePromptOutputSchema },
   prompt: `You are an expert prompt engineer for a game-generating AI.
 
 {{#if isGameGenerated}}
@@ -59,12 +68,12 @@ The final output should be only the refined prompt, ready to be fed into the gam
 
 const refinePromptFlow = ai.defineFlow(
   {
-    name: 'refinePromptFlow',
+    name: "refinePromptFlow",
     inputSchema: RefinePromptInputSchema,
     outputSchema: RefinePromptOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );

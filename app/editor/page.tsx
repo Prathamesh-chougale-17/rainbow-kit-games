@@ -1,7 +1,11 @@
 "use client";
 
 import React from "react";
-import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/components/ui/resizable";
 import { Header } from "@/components/canvas-forge/Header";
 import { CodeEditor } from "@/components/canvas-forge/CodeEditor";
 import { Preview } from "@/components/canvas-forge/Preview";
@@ -315,12 +319,16 @@ export default function Home() {
         if (data.html) {
           setHtml(data.html);
           setIsGameGenerated(true);
-          toast.success("Project Loaded: Shared project has been loaded into the editor.");
+          toast.success(
+            "Project Loaded: Shared project has been loaded into the editor.",
+          );
         }
       }
     } catch (error) {
       console.error("Failed to load project from URL hash", error);
-      toast.error("Error Loading Project: Could not load project from the shared link.");
+      toast.error(
+        "Error Loading Project: Could not load project from the shared link.",
+      );
     }
   }, [toast]);
 
@@ -334,7 +342,9 @@ export default function Home() {
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-    toast.success("Export Successful: Your project has been downloaded as an HTML file.");
+    toast.success(
+      "Export Successful: Your project has been downloaded as an HTML file.",
+    );
   };
 
   const handleShare = () => {
@@ -342,7 +352,9 @@ export default function Home() {
     const encoded = btoa(JSON.stringify(data));
     const url = `${window.location.origin}${window.location.pathname}#${encoded}`;
     navigator.clipboard.writeText(url);
-    toast.success("Link Copied: A shareable link has been copied to your clipboard.");
+    toast.success(
+      "Link Copied: A shareable link has been copied to your clipboard.",
+    );
   };
 
   const handleGenerate = (output: GenerateGameCodeOutput) => {
@@ -363,9 +375,16 @@ export default function Home() {
         isGameGenerated={isGameGenerated}
       />
       <main className="flex-1 overflow-hidden p-4 pt-0">
-        <ResizablePanelGroup direction="horizontal" className="h-full rounded-lg border">
+        <ResizablePanelGroup
+          direction="horizontal"
+          className="h-full rounded-lg border"
+        >
           <ResizablePanel defaultSize={50}>
-            <CodeEditor language="HTML" value={html} onChange={handleCodeChange} />
+            <CodeEditor
+              language="HTML"
+              value={html}
+              onChange={handleCodeChange}
+            />
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel defaultSize={50}>

@@ -1,4 +1,4 @@
-'use server';
+"use server";
 
 /**
  * @fileOverview Generates game code from a user prompt.
@@ -8,29 +8,48 @@
  * - GenerateGameCodeOutput - The return type for the generateGameCode function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { ai } from "@/ai/genkit";
+import { z } from "genkit";
 
 const GenerateGameCodeInputSchema = z.object({
-  prompt: z.string().describe('A description of the game concept or feedback for refinement.'),
-  previousHtml: z.string().optional().describe('The full HTML (including CSS and JS) of the previous game version.'),
+  prompt: z
+    .string()
+    .describe("A description of the game concept or feedback for refinement."),
+  previousHtml: z
+    .string()
+    .optional()
+    .describe(
+      "The full HTML (including CSS and JS) of the previous game version.",
+    ),
 });
 export type GenerateGameCodeInput = z.infer<typeof GenerateGameCodeInputSchema>;
 
 const GenerateGameCodeOutputSchema = z.object({
-  html: z.string().describe('The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.'),
-  description: z.string().describe('A summary of the changes made to the code in this generation step, explaining what was created or modified.'),
+  html: z
+    .string()
+    .describe(
+      "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.",
+    ),
+  description: z
+    .string()
+    .describe(
+      "A summary of the changes made to the code in this generation step, explaining what was created or modified.",
+    ),
 });
-export type GenerateGameCodeOutput = z.infer<typeof GenerateGameCodeOutputSchema>;
+export type GenerateGameCodeOutput = z.infer<
+  typeof GenerateGameCodeOutputSchema
+>;
 
-export async function generateGameCode(input: GenerateGameCodeInput): Promise<GenerateGameCodeOutput> {
+export async function generateGameCode(
+  input: GenerateGameCodeInput,
+): Promise<GenerateGameCodeOutput> {
   return generateGameCodeFlow(input);
 }
 
 const prompt = ai.definePrompt({
-  name: 'generateGameCodePrompt',
-  input: {schema: GenerateGameCodeInputSchema},
-  output: {schema: GenerateGameCodeOutputSchema},
+  name: "generateGameCodePrompt",
+  input: { schema: GenerateGameCodeInputSchema },
+  output: { schema: GenerateGameCodeOutputSchema },
   prompt: `You are an expert game developer and front-end designer.
 
 Your task is to create or improve a complete browser-based 2D game within a single HTML file. The CSS must be inside a <style> tag in the <head>, and the JavaScript must be inside a <script> tag at the end of the <body>. The game must be visually polished, functional on first load, and support both keyboard and mobile (touch) controls.
@@ -107,12 +126,12 @@ HTML:
 
 const generateGameCodeFlow = ai.defineFlow(
   {
-    name: 'generateGameCodeFlow',
+    name: "generateGameCodeFlow",
     inputSchema: GenerateGameCodeInputSchema,
     outputSchema: GenerateGameCodeOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
+  async (input) => {
+    const { output } = await prompt(input);
     return output!;
-  }
+  },
 );

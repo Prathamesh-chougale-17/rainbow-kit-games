@@ -1,10 +1,10 @@
 "use client";
 
-import * as React from 'react';
-import dynamic from 'next/dynamic';
-import { Skeleton } from '@/components/ui/skeleton';
+import * as React from "react";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const MonacoEditor = dynamic(() => import('@monaco-editor/react'), {
+const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   ssr: false,
   loading: () => <Skeleton className="h-full w-full" />,
 });
@@ -25,7 +25,9 @@ export function CodeEditor({ language, value, onChange }: CodeEditorProps) {
   return (
     <div className="flex h-full flex-col bg-[#1e1e1e]">
       <div className="flex h-10 flex-shrink-0 items-center justify-between px-4">
-        <h3 className={`font-medium ${languageColors[lang] || "text-foreground"}`}>
+        <h3
+          className={`font-medium ${languageColors[lang] || "text-foreground"}`}
+        >
           {language}
         </h3>
       </div>
@@ -39,7 +41,7 @@ export function CodeEditor({ language, value, onChange }: CodeEditorProps) {
           options={{
             minimap: { enabled: false },
             fontSize: 14,
-            wordWrap: 'on',
+            wordWrap: "on",
             scrollBeyondLastLine: false,
             automaticLayout: true,
           }}

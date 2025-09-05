@@ -16,7 +16,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { generateGame, refinePromptAction } from "@/lib/actions";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
@@ -35,7 +42,12 @@ interface GameGeneratorDialogProps {
   isGameGenerated: boolean;
 }
 
-export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerated }: GameGeneratorDialogProps) {
+export function GameGeneratorDialog({
+  onGenerate,
+  children,
+  html,
+  isGameGenerated,
+}: GameGeneratorDialogProps) {
   const [isOpen, setIsOpen] = React.useState(false);
   const [isGenerating, setIsGenerating] = React.useState(false);
   const [isRefining, setIsRefining] = React.useState(false);
@@ -52,42 +64,37 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
     if (currentPrompt.length < 10) {
       form.setError("prompt", {
         type: "manual",
-        message: "Please enter a game idea of at least 10 characters to refine.",
+        message:
+          "Please enter a game idea of at least 10 characters to refine.",
       });
       return;
     }
 
     setIsRefining(true);
     try {
-      const result = await refinePromptAction({ 
+      const result = await refinePromptAction({
         prompt: currentPrompt,
         isGameGenerated: isGameGenerated,
       });
       form.setValue("prompt", result.refinedPrompt, { shouldValidate: true });
-      toast.success(
-        "Prompt Refined!",
-        {
-          description: "Your game idea has been enhanced with more detail.",
-        }
-      );
+      toast.success("Prompt Refined!", {
+        description: "Your game idea has been enhanced with more detail.",
+      });
     } catch (error) {
       console.error(error);
-      toast.error(
-        "Refinement Failed",
-        {
-          description: "There was an error refining the prompt. Please try again.",
-        }
-      );
+      toast.error("Refinement Failed", {
+        description:
+          "There was an error refining the prompt. Please try again.",
+      });
     } finally {
       setIsRefining(false);
     }
   };
 
-
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsGenerating(true);
     try {
-      const result = await generateGame({ 
+      const result = await generateGame({
         prompt: values.prompt,
         previousHtml: isGameGenerated ? html : undefined,
       });
@@ -96,12 +103,10 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
       form.reset();
     } catch (error) {
       console.error(error);
-      toast.error(
-        "Generation Failed",
-        {
-          description: "There was an error generating the game. Please try again.",
-        }
-      );
+      toast.error("Generation Failed", {
+        description:
+          "There was an error generating the game. Please try again.",
+      });
     } finally {
       setIsGenerating(false);
     }
@@ -114,11 +119,13 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>{isGameGenerated ? 'Refine Your Game' : 'Game Generator'}</DialogTitle>
+              <DialogTitle>
+                {isGameGenerated ? "Refine Your Game" : "Game Generator"}
+              </DialogTitle>
               <DialogDescription>
-                {isGameGenerated 
-                  ? 'Describe the changes or new features you want to add.' 
-                  : 'Describe the game you want to create, and let AI build the code for you.'}
+                {isGameGenerated
+                  ? "Describe the changes or new features you want to add."
+                  : "Describe the game you want to create, and let AI build the code for you."}
               </DialogDescription>
             </DialogHeader>
             <div className="grid gap-4 py-4">
@@ -128,7 +135,11 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex justify-between items-center">
-                      <FormLabel>{isGameGenerated ? 'Feedback or Refinements' : 'Game Idea'}</FormLabel>
+                      <FormLabel>
+                        {isGameGenerated
+                          ? "Feedback or Refinements"
+                          : "Game Idea"}
+                      </FormLabel>
                       <Button
                         type="button"
                         variant="link"
@@ -144,7 +155,7 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
                           </>
                         ) : (
                           <>
-                             <Sparkles className="mr-2 h-4 w-4" />
+                            <Sparkles className="mr-2 h-4 w-4" />
                             Refine
                           </>
                         )}
@@ -152,9 +163,11 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
                     </div>
                     <FormControl>
                       <Textarea
-                        placeholder={isGameGenerated 
-                          ? "e.g., Make the paddle smaller and the ball faster."
-                          : "e.g., A simple breakout-style game with a paddle and a ball."}
+                        placeholder={
+                          isGameGenerated
+                            ? "e.g., Make the paddle smaller and the ball faster."
+                            : "e.g., A simple breakout-style game with a paddle and a ball."
+                        }
                         className="resize-none"
                         {...field}
                       />
@@ -174,7 +187,7 @@ export function GameGeneratorDialog({ onGenerate, children, html, isGameGenerate
                 ) : (
                   <>
                     <Bot className="mr-2 h-4 w-4" />
-                    {isGameGenerated ? 'Refine Code' : 'Generate Code'}
+                    {isGameGenerated ? "Refine Code" : "Generate Code"}
                   </>
                 )}
               </Button>
