@@ -281,19 +281,6 @@ export default function GameEditor() {
     }
   };
 
-  const handleShare = () => {
-    if (navigator.share && currentGameId) {
-      navigator.share({
-        title: title,
-        text: `Check out my game: ${title}`,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Game link copied to clipboard!");
-    }
-  };
-
   const srcDoc = React.useMemo(() => {
     return html;
   }, [html]);
@@ -303,7 +290,6 @@ export default function GameEditor() {
       {/* Header */}
       <Header
         onGenerate={handleGenerate}
-        onShare={handleShare}
         onSave={handleSave}
         onPublishMarketplace={handlePublishToMarketplace}
         onPublishCommunity={handlePublishToCommunity}

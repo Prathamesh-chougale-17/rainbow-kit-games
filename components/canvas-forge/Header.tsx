@@ -1,16 +1,10 @@
-"use client";
-
-import React, { useState, useEffect, useRef } from "react";
+import React from "react";
 import {
   Bot,
-  Download,
-  Share2,
   Code,
   ShoppingCart,
   Users,
   Save,
-  Link,
-  ArrowLeft,
   Edit,
 } from "lucide-react";
 import { Input } from "@/components/ui/input";
@@ -19,7 +13,6 @@ import { GameGeneratorDialog } from "./GameGeneratorDialog";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 
 interface HeaderProps {
-  onShare: () => void;
   onGenerate: (output: GenerateGameCodeOutput) => void;
   onSave?: () => void;
   onPublishMarketplace?: () => void;
@@ -33,7 +26,6 @@ interface HeaderProps {
 }
 
 export function Header({
-  onShare,
   onGenerate,
   onSave,
   onPublishMarketplace,
@@ -147,11 +139,6 @@ export function Header({
             )}
           </>
         )}
-
-        <Button variant="ghost" onClick={onShare} className={buttonClass}>
-          <Share2 className={iconClass} />
-          Share
-        </Button>
       </div>
     </header>
   );
