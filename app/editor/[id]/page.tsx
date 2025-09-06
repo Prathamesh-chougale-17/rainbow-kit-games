@@ -193,6 +193,32 @@ export default function GameEditor() {
     }
   };
 
+  const handleUnpublish = async (type: "marketplace" | "community") => {
+    if (!currentGameId) {
+      toast.error("Please save your game first");
+      return;
+    }
+
+    try {
+      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+      const response = await fetch("/api/games/unpublish", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId: currentGameId, type, walletAddress }),
+      });
+      const result = await response.json();
+      if (result.success) {
+        toast.success("Unpublished successfully");
+        loadGame(currentGameId);
+      } else {
+        throw new Error(result.error || "Failed to unpublish");
+      }
+    } catch (error) {
+      console.error("Unpublish error:", error);
+      toast.error("Failed to unpublish");
+    }
+  };
+
   const handlePublishToMarketplace = async () => {
     if (!currentGameId) {
       toast.error("Please save your game first");
@@ -295,7 +321,10 @@ export default function GameEditor() {
         showPublishButtons={!!currentGameId}
         isSaving={isSaving}
         title={title}
-        onTitleChange={(t) => setTitle(t)}
+  onTitleChange={(t) => setTitle(t)}
+  isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
+  isPublishedToCommunity={currentGame?.isPublishedToCommunity}
+  onUnpublish={handleUnpublish}
       />
 
       {/* Main Editor */}

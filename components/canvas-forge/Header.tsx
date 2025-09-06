@@ -6,7 +6,10 @@ import {
   Users,
   Save,
   Edit,
+  CheckCircle,
+  XCircle,
 } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
@@ -23,6 +26,9 @@ interface HeaderProps {
   isSaving?: boolean;
   title?: string;
   onTitleChange?: (title: string) => void;
+  isPublishedToMarketplace?: boolean;
+  isPublishedToCommunity?: boolean;
+  onUnpublish?: (type: "marketplace" | "community") => Promise<void> | void;
 }
 
 export function Header({
@@ -36,6 +42,9 @@ export function Header({
   isSaving = false,
   title,
   onTitleChange,
+  isPublishedToMarketplace = false,
+  isPublishedToCommunity = false,
+  onUnpublish,
 }: HeaderProps) {
   const iconClass = "mr-2 h-4 w-4 drop-shadow-[0_0_2px_hsl(var(--accent))]";
   const buttonClass =
@@ -118,24 +127,125 @@ export function Header({
         {showPublishButtons && (
           <>
             {onPublishMarketplace && (
-              <Button
-                variant="ghost"
-                onClick={onPublishMarketplace}
-                className={buttonClass}
-              >
-                <ShoppingCart className={iconClass} />
-                Publish to Marketplace
-              </Button>
+              <div className="flex items-center">
+                {isPublishedToMarketplace ? (
+                  <div className="flex items-center gap-2">
+                    {onUnpublish && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" className={buttonClass}>
+                            <XCircle className={iconClass} />
+                            Unpublish from Marketplace
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Unpublish from Marketplace</DialogTitle>
+                          </DialogHeader>
+                          <p>
+                            Are you sure you want to unpublish this game from the
+                            Marketplace? This will remove it from the public
+                            marketplace listing.
+                          </p>
+                          <DialogFooter className="mt-4">
+                            <Button
+                              variant="ghost"
+                              onClick={() => onUnpublish("marketplace")}
+                            >
+                              Yes, unpublish
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                ) : (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" className={buttonClass}>
+                        <ShoppingCart className={iconClass} />
+                        Publish to Marketplace
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Publish to Marketplace</DialogTitle>
+                      </DialogHeader>
+                      <p>Are you sure you want to publish this game to the Marketplace?</p>
+                      <DialogFooter className="mt-4">
+                        <Button variant="ghost" onClick={onPublishMarketplace}>
+                          Yes, publish
+                        </Button>
+                        {onUnpublish && isPublishedToMarketplace && (
+                          <Button variant="ghost" onClick={() => onUnpublish("marketplace")}>
+                            Unpublish
+                          </Button>
+                        )}
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             )}
             {onPublishCommunity && (
-              <Button
-                variant="ghost"
-                onClick={onPublishCommunity}
-                className={buttonClass}
-              >
-                <Users className={iconClass} />
-                Publish to Community
-              </Button>
+              <div className="flex items-center">
+                {isPublishedToCommunity ? (
+                  <div className="flex items-center gap-2">
+                    {onUnpublish && (
+                      <Dialog>
+                        <DialogTrigger asChild>
+                          <Button variant="ghost" className={buttonClass}>
+                            <XCircle className={iconClass} />
+                            Unpublish from Community
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent>
+                          <DialogHeader>
+                            <DialogTitle>Unpublish from Community</DialogTitle>
+                          </DialogHeader>
+                          <p>
+                            Are you sure you want to unpublish this game from the
+                            Community? This will remove it from community listings.
+                          </p>
+                          <DialogFooter className="mt-4">
+                            <Button
+                              variant="ghost"
+                              onClick={() => onUnpublish("community")}
+                            >
+                              Yes, unpublish
+                            </Button>
+                          </DialogFooter>
+                        </DialogContent>
+                      </Dialog>
+                    )}
+                  </div>
+                ) : (
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button variant="ghost" className={buttonClass}>
+                        <Users className={iconClass} />
+                        Publish to Community
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Publish to Community</DialogTitle>
+                      </DialogHeader>
+                      <p>Are you sure you want to publish this game to the Community?</p>
+                      <DialogFooter className="mt-4">
+                        <Button variant="ghost" onClick={onPublishCommunity}>
+                          Yes, publish
+                        </Button>
+                        {onUnpublish && isPublishedToCommunity && (
+                          <Button variant="ghost" onClick={() => onUnpublish("community")}>
+                            Unpublish
+                          </Button>
+                        )}
+                      </DialogFooter>
+                    </DialogContent>
+                  </Dialog>
+                )}
+              </div>
             )}
           </>
         )}
