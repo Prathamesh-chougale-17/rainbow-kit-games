@@ -1,27 +1,10 @@
 "use client";
 
-import {
-  Calendar,
-  Code,
-  Edit,
-  Play,
-  Plus,
-  ShoppingCart,
-  Trash2,
-  Users,
-} from "lucide-react";
+import { Code, Plus, ShoppingCart, Users } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   Dialog,
   DialogClose,
@@ -31,6 +14,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { GameCard } from "@/components/ui/game-card";
 
 interface Game {
   _id?: string;
@@ -40,7 +24,11 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: number[];
+  versions: Array<{
+    version: number;
+    ipfsCid: string;
+    createdAt: Date;
+  }>;
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -81,14 +69,6 @@ export default function EditorDashboard() {
   React.useEffect(() => {
     loadGames();
   }, [loadGames]);
-
-  const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   const openDeleteDialog = (gameId: string) => {
     setSelectedGameToDelete(gameId);
@@ -201,104 +181,12 @@ export default function EditorDashboard() {
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {games.map((game) => (
-              <Card
-                className="transition-shadow hover:shadow-lg"
+              <GameCard
                 key={game.gameId}
-              >
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 space-y-1">
-                      <CardTitle className="line-clamp-1">
-                        {game.title}
-                      </CardTitle>
-                      <CardDescription className="line-clamp-2">
-                        {game.description || "No description provided"}
-                      </CardDescription>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {/* Status Badges */}
-                  <div className="flex flex-wrap gap-1">
-                    {game.isPublishedToMarketplace && (
-                      <Badge className="text-xs" variant="default">
-                        <ShoppingCart className="mr-1 h-3 w-3" />
-                        Marketplace
-                      </Badge>
-                    )}
-                    {game.isPublishedToCommunity && (
-                      <Badge className="text-xs" variant="secondary">
-                        <Users className="mr-1 h-3 w-3" />
-                        Community
-                      </Badge>
-                    )}
-                    {game.originalGameId && (
-                      <Badge className="text-xs" variant="outline">
-                        Fork
-                      </Badge>
-                    )}
-                  </div>
-
-                  {/* Tags */}
-                  {game.tags && game.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {game.tags.slice(0, 3).map((tag) => (
-                        <Badge className="text-xs" key={tag} variant="outline">
-                          {tag}
-                        </Badge>
-                      ))}
-                      {game.tags.length > 3 && (
-                        <Badge className="text-xs" variant="outline">
-                          +{game.tags.length - 3}
-                        </Badge>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Stats */}
-                  <div className="grid grid-cols-2 gap-3 text-muted-foreground text-sm">
-                    <div className="flex items-center gap-1">
-                      <Code className="h-3 w-3" />v{game.currentVersion}
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3" />
-                      {game.forkCount} forks
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Calendar className="h-3 w-3" />
-                      {formatDate(game.updatedAt)}
-                    </div>
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2">
-                    <Link className="flex-1" href={`/editor/${game.gameId}`}>
-                      <Button
-                        className="w-full gap-2"
-                        size="sm"
-                        variant="default"
-                      >
-                        <Edit className="h-3 w-3" />
-                        Edit
-                      </Button>
-                    </Link>
-                    {game.isPublishedToMarketplace && (
-                      <Link href={`/marketplace/${game.gameId}`}>
-                        <Button size="sm" variant="outline">
-                          <Play className="h-3 w-3" />
-                        </Button>
-                      </Link>
-                    )}
-                    <Button
-                      onClick={() => openDeleteDialog(game.gameId)}
-                      size="sm"
-                      variant="outline"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
+                game={game}
+                variant="editor"
+                onDelete={openDeleteDialog}
+              />
             ))}
           </div>
         )}

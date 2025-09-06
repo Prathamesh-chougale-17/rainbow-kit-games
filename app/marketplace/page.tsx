@@ -1,28 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
-import {
-  Play,
-  Search,
-  Calendar,
-  User,
-  Star,
-  Download,
-  Share2,
-  Store,
-} from "lucide-react";
+import { Search, Store } from "lucide-react";
 import Link from "next/link";
+import * as React from "react";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { GameCard } from "@/components/ui/game-card";
+import { Input } from "@/components/ui/input";
 
 interface Game {
   _id?: string;
@@ -32,7 +16,11 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: any[];
+  versions: Array<{
+    version: number;
+    ipfsCid: string;
+    createdAt: Date;
+  }>;
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -50,52 +38,43 @@ export default function MarketplacePage() {
   const [page, setPage] = React.useState(1);
 
   React.useEffect(() => {
-    loadMarketplaceGames();
-  }, [page, searchQuery]);
+    const loadMarketplaceGames = async () => {
+      try {
+        setLoading(true);
 
-  const loadMarketplaceGames = async () => {
-    try {
-      const params = new URLSearchParams({
-        page: page.toString(),
-        limit: "12",
-      });
+        const params = new URLSearchParams({
+          page: page.toString(),
+          limit: "12",
+        });
 
-      if (searchQuery) {
-        params.append("search", searchQuery);
-      }
+        if (searchQuery) {
+          params.append("search", searchQuery);
+        }
 
-      const response = await fetch(`/api/marketplace?${params}`);
-      const result = await response.json();
+        const response = await fetch(`/api/marketplace?${params}`);
+        const result = await response.json();
 
-      if (result.success) {
-        setGames(result.games);
-      } else {
+        if (result.success) {
+          setGames(result.games);
+        } else {
+          toast.error("Failed to load marketplace games");
+          setGames([]);
+        }
+      } catch (error) {
+        console.error("Load marketplace games error:", error);
         toast.error("Failed to load marketplace games");
+        setGames([]);
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Load marketplace games error:", error);
-      toast.error("Failed to load marketplace games");
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+
+    void loadMarketplaceGames();
+  }, [page, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    loadMarketplaceGames();
-  };
-
-  const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
-  const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
   };
 
   if (loading) {
@@ -162,78 +141,17 @@ export default function MarketplacePage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {games.map((game) => (
-            <Card
+            <GameCard
               key={game.gameId}
-              className="hover:shadow-lg transition-shadow group"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
-                    <CardTitle className="line-clamp-1 group-hover:text-primary transition-colors">
-                      {game.title}
-                    </CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {game.description || "No description provided"}
-                    </CardDescription>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Tags */}
-                {game.tags && game.tags.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
-                    {game.tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
-                        {tag}
-                      </Badge>
-                    ))}
-                    {game.tags.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
-                        +{game.tags.length - 3}
-                      </Badge>
-                    )}
-                  </div>
-                )}
-
-                {/* Stats */}
-                <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <User className="h-3 w-3" />
-                    {formatWalletAddress(game.walletAddress)}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(game.marketplacePublishedAt || game.createdAt)}
-                  </div>
-                </div>
-
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Link href={`/marketplace/${game.gameId}`} className="flex-1">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full gap-2"
-                    >
-                      <Play className="h-3 w-3" />
-                      Play Game
-                    </Button>
-                  </Link>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => {
-                      navigator.clipboard.writeText(
-                        `${window.location.origin}/marketplace/${game.gameId}`,
-                      );
-                      toast.success("Game link copied!");
-                    }}
-                  >
-                    <Share2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+              game={game}
+              variant="marketplace"
+              onShare={(gameId) => {
+                navigator.clipboard.writeText(
+                  `${window.location.origin}/marketplace/${gameId}`,
+                );
+                toast.success("Game link copied!");
+              }}
+            />
           ))}
         </div>
       )}

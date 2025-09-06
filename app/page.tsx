@@ -9,13 +9,61 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
+import { ContactForm } from "@/components/contact-form";
+import { MagicCard } from "@/components/magicui/magic-card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { FeatureCard } from "@/components/ui/feature-card";
+
+const features = [
+  {
+    icon: Zap,
+    title: "AI-Powered Generation",
+    description:
+      "Describe your game idea and let AI generate the complete HTML5 game code instantly",
+    iconColor: "text-yellow-500",
+    gradientColor: "#eab308",
+  },
+  {
+    icon: Cloud,
+    title: "IPFS Version Control",
+    description:
+      "Every game version is stored on IPFS via Pinata, ensuring permanent and decentralized storage",
+    iconColor: "text-blue-500",
+    gradientColor: "#3b82f6",
+  },
+  {
+    icon: Shield,
+    title: "Wallet Authentication",
+    description:
+      "Secure ownership and management of your games using blockchain wallet authentication",
+    iconColor: "text-green-500",
+    gradientColor: "#10b981",
+  },
+  {
+    icon: ShoppingCart,
+    title: "Game Marketplace",
+    description:
+      "Publish your games to the marketplace for players to discover and enjoy",
+    iconColor: "text-purple-500",
+    gradientColor: "#8b5cf6",
+  },
+  {
+    icon: Users,
+    title: "Developer Community",
+    description:
+      "Share your games with developers, get feedback, and collaborate on improvements",
+    iconColor: "text-orange-500",
+    gradientColor: "#f97316",
+  },
+  {
+    icon: GitFork,
+    title: "Fork & Improve",
+    description:
+      "Fork community games to learn, modify, and create your own improved versions",
+    iconColor: "text-pink-500",
+    gradientColor: "#ec4899",
+  },
+];
 
 export default function Home() {
   return (
@@ -90,71 +138,36 @@ export default function Home() {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <Card>
-              <CardHeader>
-                <Zap className="size-8 text-yellow-500 mb-2" />
-                <CardTitle>AI-Powered Generation</CardTitle>
-                <CardDescription>
-                  Describe your game idea and let AI generate the complete HTML5
-                  game code instantly
-                </CardDescription>
-              </CardHeader>
-            </Card>
+            {features.map((feature) => (
+              <FeatureCard
+                key={feature.title}
+                icon={feature.icon}
+                title={feature.title}
+                description={feature.description}
+                iconColor={feature.iconColor}
+                gradientColor={feature.gradientColor}
+              />
+            ))}
+          </div>
+        </section>
 
-            <Card>
-              <CardHeader>
-                <Cloud className="size-8 text-blue-500 mb-2" />
-                <CardTitle>IPFS Version Control</CardTitle>
-                <CardDescription>
-                  Every game version is stored on IPFS via Pinata, ensuring
-                  permanent and decentralized storage
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Shield className="size-8 text-green-500 mb-2" />
-                <CardTitle>Wallet Authentication</CardTitle>
-                <CardDescription>
-                  Secure ownership and management of your games using blockchain
-                  wallet authentication
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <ShoppingCart className="size-8 text-purple-500 mb-2" />
-                <CardTitle>Game Marketplace</CardTitle>
-                <CardDescription>
-                  Publish your games to the marketplace for players to discover
-                  and enjoy
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <Users className="size-8 text-orange-500 mb-2" />
-                <CardTitle>Developer Community</CardTitle>
-                <CardDescription>
-                  Share your games with developers, get feedback, and
-                  collaborate on improvements
-                </CardDescription>
-              </CardHeader>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <GitFork className="size-8 text-pink-500 mb-2" />
-                <CardTitle>Fork & Improve</CardTitle>
-                <CardDescription>
-                  Fork community games to learn, modify, and create your own
-                  improved versions
-                </CardDescription>
-              </CardHeader>
-            </Card>
+        {/* Contact Section */}
+        <section className="mb-20">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Have questions or feedback? We'd love to hear from you. Reach out
+              and let us know how we can help.
+            </p>
+          </div>
+          <div className="flex justify-center">
+            <MagicCard
+              className="p-0"
+              gradientColor="#6366f1"
+              gradientOpacity={0.1}
+            >
+              <ContactForm />
+            </MagicCard>
           </div>
         </section>
 
