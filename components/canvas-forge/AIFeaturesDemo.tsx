@@ -1,6 +1,19 @@
 "use client";
 
+import {
+  BarChart3,
+  CheckCircle,
+  Clock,
+  Lightbulb,
+  Shuffle,
+  Wand2,
+  XCircle,
+  Zap,
+} from "lucide-react";
 import * as React from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -8,36 +21,24 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
-  Lightbulb,
-  Shuffle,
-  Zap,
-  BarChart3,
-  Wand2,
-  Clock,
-  CheckCircle,
-  XCircle,
-} from "lucide-react";
-import {
+  generateGameEnhanced,
   generateGameIdeaAction,
   generateGameVariationsAction,
-  generateGameEnhanced,
 } from "@/lib/actions-enhanced";
 import type {
-  GameIdea,
-  GameVariation,
   GameGenerationResult,
+  GameIdea,
+  GameMetrics,
+  GameVariation,
 } from "@/types/ai-sdk";
-import { toast } from "sonner";
 
 export function AIFeaturesDemo() {
   const [isLoading, setIsLoading] = React.useState(false);
   const [gameIdea, setGameIdea] = React.useState<GameIdea | null>(null);
   const [variations, setVariations] = React.useState<GameVariation[]>([]);
-  const [metrics, setMetrics] = React.useState<any>(null);
+  const [metrics, setMetrics] = React.useState<GameMetrics | null>(null);
 
   const handleGenerateIdea = async () => {
     setIsLoading(true);
@@ -47,7 +48,7 @@ export function AIFeaturesDemo() {
       toast.success("Game Idea Generated!", {
         description: idea.title,
       });
-    } catch (error) {
+    } catch {
       toast.error("Failed to generate game idea");
     } finally {
       setIsLoading(false);
@@ -64,7 +65,7 @@ export function AIFeaturesDemo() {
       toast.success("Variations Generated!", {
         description: `${vars.length} unique variations created`,
       });
-    } catch (error) {
+    } catch {
       toast.error("Failed to generate variations");
     } finally {
       setIsLoading(false);
@@ -83,7 +84,7 @@ export function AIFeaturesDemo() {
       toast.success("Generation Test Complete!", {
         description: `Completed in ${result.metrics.duration}ms`,
       });
-    } catch (error) {
+    } catch {
       toast.error("Generation test failed");
     } finally {
       setIsLoading(false);

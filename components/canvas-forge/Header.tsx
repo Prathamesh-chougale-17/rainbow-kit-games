@@ -1,26 +1,25 @@
-import React from "react";
 import {
   Bot,
   Code,
+  Edit,
+  Save,
   ShoppingCart,
   Users,
-  Save,
-  Edit,
-  CheckCircle,
   XCircle,
 } from "lucide-react";
+import React from "react";
+import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-  DialogFooter,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
-import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 
 interface HeaderProps {
   onGenerate: (output: GenerateGameCodeOutput) => void;
