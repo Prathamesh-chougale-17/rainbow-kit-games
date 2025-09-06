@@ -7,27 +7,45 @@ export const pinata = new PinataSDK({
   pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL!,
 });
 
-// Helper function to upload game file to IPFS
+// Helper function to upload game file to IPFS using direct API
 export async function uploadGameToIPFS(gameHtml: string, metadata: any) {
   try {
-    // Create a file from the HTML string
-    const gameFile = new File([gameHtml], `${metadata.title || 'game'}.html`, {
-      type: 'text/html',
+    // Create FormData for the upload
+    const formData = new FormData();
+    const gameBlob = new Blob([gameHtml], { type: 'text/html' });
+    formData.append('file', gameBlob, `${metadata.title || 'game'}.html`);
+    
+    // Add metadata
+    const pinataMetadata = JSON.stringify({
+      name: `${metadata.title || 'game'}.html`,
+      keyvalues: {
+        type: 'game',
+        title: metadata.title || 'Untitled Game',
+        wallet: metadata.wallet || '',
+      }
+    });
+    formData.append('pinataMetadata', pinataMetadata);
+
+    // Upload to Pinata using direct API
+    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.PINATA_JWT}`,
+      },
+      body: formData,
     });
 
-    // Upload the file to IPFS
-    const { cid } = await pinata.upload.file(gameFile);
-    
-    // Get the public URL
-    const url = await pinata.gateways.createSignedURL({
-      cid,
-      expires: 86400 * 365, // 1 year
-    });
+    if (!response.ok) {
+      throw new Error(`Pinata upload failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    const url = `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${result.IpfsHash}`;
     
     return {
-      cid,
+      cid: result.IpfsHash,
       url,
-      size: gameFile.size,
+      size: result.PinSize,
     };
   } catch (error) {
     console.error('Error uploading to IPFS:', error);
@@ -38,45 +56,42 @@ export async function uploadGameToIPFS(gameHtml: string, metadata: any) {
 // Helper function to upload JSON metadata to IPFS
 export async function uploadMetadataToIPFS(metadata: any) {
   try {
-    const metadataFile = new File(
-      [JSON.stringify(metadata, null, 2)], 
-      'metadata.json', 
-      { type: 'application/json' }
-    );
-
-    const { cid } = await pinata.upload.file(metadataFile);
-    const url = await pinata.gateways.createSignedURL({
-      cid,
-      expires: 86400 * 365, // 1 year
+    // Create FormData for the upload
+    const formData = new FormData();
+    const metadataString = JSON.stringify(metadata, null, 2);
+    const metadataBlob = new Blob([metadataString], { type: 'application/json' });
+    formData.append('file', metadataBlob, 'metadata.json');
+    
+    // Add pinata metadata
+    const pinataMetadata = JSON.stringify({
+      name: 'metadata.json',
+      keyvalues: {
+        type: 'metadata',
+        wallet: metadata.wallet || '',
+      }
     });
+    formData.append('pinataMetadata', pinataMetadata);
+
+    // Upload to Pinata using direct API
+    const response = await fetch('https://api.pinata.cloud/pinning/pinFileToIPFS', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${process.env.PINATA_JWT}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      throw new Error(`Pinata upload failed: ${response.statusText}`);
+    }
+
+    const result = await response.json();
+    const url = `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${result.IpfsHash}`;
     
     return {
-      cid,
+      cid: result.IpfsHash,
       url,
-      size: metadataFile.size,
-    };
-  } catch (error) {
-    console.error('Error uploading metadata to IPFS:', error);
-    throw new Error('Failed to upload metadata to IPFS');
-  }
-}
-
-// Helper function to upload JSON metadata to IPFS
-export async function uploadMetadataToIPFS(metadata: any) {
-  try {
-    const metadataFile = new File(
-      [JSON.stringify(metadata, null, 2)], 
-      'metadata.json', 
-      { type: 'application/json' }
-    );
-
-    const upload = await pinata.upload.file(metadataFile);
-    const url = await pinata.gateways.convert(upload.IpfsHash);
-    
-    return {
-      cid: upload.IpfsHash,
-      url,
-      size: upload.PinSize,
+      size: result.PinSize,
     };
   } catch (error) {
     console.error('Error uploading metadata to IPFS:', error);
