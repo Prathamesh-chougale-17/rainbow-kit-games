@@ -10,7 +10,7 @@ import {
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import * as React from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -23,7 +23,7 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 
-interface Game {
+type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -40,7 +40,7 @@ interface Game {
   originalGameId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export default function CommunityPage() {
   const [games, setGames] = React.useState<Game[]>([]);
@@ -68,8 +68,7 @@ export default function CommunityPage() {
       } else {
         toast.error("Failed to load community games");
       }
-    } catch (error) {
-      console.error("Load community games error:", error);
+    } catch {
       toast.error("Failed to load community games");
     } finally {
       setLoading(false);
@@ -100,9 +99,9 @@ export default function CommunityPage() {
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
             <p className="text-muted-foreground">Loading community games...</p>
           </div>
         </div>
@@ -111,11 +110,11 @@ export default function CommunityPage() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="flex items-center gap-2 font-bold text-3xl tracking-tight">
             <Users className="h-8 w-8 text-blue-600" />
             Game Community
           </h1>
@@ -129,27 +128,27 @@ export default function CommunityPage() {
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
+      <form className="flex max-w-md gap-2" onSubmit={handleSearch}>
         <Input
-          type="text"
-          placeholder="Search community games..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search community games..."
+          type="text"
+          value={searchQuery}
         />
-        <Button type="submit" size="icon">
+        <Button size="icon" type="submit">
           <Search className="h-4 w-4" />
         </Button>
       </form>
 
       {/* Games Grid */}
       {games.length === 0 ? (
-        <div className="text-center py-12">
-          <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">
+        <div className="py-12 text-center">
+          <Users className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+          <h3 className="mb-2 font-semibold text-xl">
             No community games found
           </h3>
-          <p className="text-muted-foreground mb-6">
+          <p className="mb-6 text-muted-foreground">
             {searchQuery
               ? "Try a different search term"
               : "Be the first to share a game with the community!"}
@@ -159,20 +158,20 @@ export default function CommunityPage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {games.map((game) => (
             <Card
+              className="group transition-shadow hover:shadow-lg"
               key={game.gameId}
-              className="hover:shadow-lg transition-shadow group"
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
-                    <CardTitle className="line-clamp-1 group-hover:text-primary transition-colors">
+                  <div className="flex-1 space-y-1">
+                    <CardTitle className="line-clamp-1 transition-colors group-hover:text-primary">
                       {game.title}
                       {game.originalGameId && (
-                        <Badge variant="outline" className="ml-2 text-xs">
-                          <GitFork className="h-3 w-3 mr-1" />
+                        <Badge className="ml-2 text-xs" variant="outline">
+                          <GitFork className="mr-1 h-3 w-3" />
                           Fork
                         </Badge>
                       )}
@@ -188,12 +187,12 @@ export default function CommunityPage() {
                 {game.tags && game.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
                     {game.tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
+                      <Badge className="text-xs" key={tag} variant="secondary">
                         {tag}
                       </Badge>
                     ))}
                     {game.tags.length > 3 && (
-                      <Badge variant="secondary" className="text-xs">
+                      <Badge className="text-xs" variant="secondary">
                         +{game.tags.length - 3}
                       </Badge>
                     )}
@@ -201,7 +200,7 @@ export default function CommunityPage() {
                 )}
 
                 {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
+                <div className="grid grid-cols-2 gap-3 text-muted-foreground text-sm">
                   <div className="flex items-center gap-1">
                     <User className="h-3 w-3" />
                     {formatWalletAddress(game.walletAddress)}
@@ -221,11 +220,11 @@ export default function CommunityPage() {
 
                 {/* Actions */}
                 <div className="flex gap-2">
-                  <Link href={`/community/${game.gameId}`} className="flex-1">
+                  <Link className="flex-1" href={`/community/${game.gameId}`}>
                     <Button
-                      variant="default"
-                      size="sm"
                       className="w-full gap-2"
+                      size="sm"
+                      variant="default"
                     >
                       <Eye className="h-3 w-3" />
                       View & Fork
@@ -242,13 +241,13 @@ export default function CommunityPage() {
       {games.length === 12 && (
         <div className="flex justify-center gap-2 pt-6">
           <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            variant="outline"
           >
             Previous
           </Button>
-          <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
+          <Button onClick={() => setPage((p) => p + 1)} variant="outline">
             Next
           </Button>
         </div>

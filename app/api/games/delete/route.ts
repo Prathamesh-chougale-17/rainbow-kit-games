@@ -5,10 +5,10 @@ export async function POST(request: NextRequest) {
   try {
     const { gameId, walletAddress } = await request.json();
 
-    if (!gameId || !walletAddress) {
+    if (!(gameId && walletAddress)) {
       return NextResponse.json(
         { error: "Missing required fields" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     if (!deleted) {
       return NextResponse.json(
         { success: false, error: "Failed to delete game" },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
       {
         error: error instanceof Error ? error.message : "Failed to delete game",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

@@ -9,8 +9,8 @@
  */
 
 import { generateObject } from "ai";
-import { aiModel } from "@/ai/config";
 import { z } from "zod";
+import { aiModel } from "@/ai/config";
 
 const RefinePromptInputSchema = z.object({
   prompt: z.string().describe("The user-provided game idea or concept."),
@@ -25,7 +25,7 @@ const RefinePromptOutputSchema = z.object({
   refinedPrompt: z
     .string()
     .describe(
-      "The refined, detailed prompt suitable for the game generation AI.",
+      "The refined, detailed prompt suitable for the game generation AI."
     ),
 });
 export type RefinePromptOutput = z.infer<typeof RefinePromptOutputSchema>;
@@ -47,8 +47,8 @@ Refine this feedback into a direct instruction for the AI. For example:
 - If the user says "the player can move off the screen", you should output "Add boundary checks to prevent the player from moving outside the game canvas."
 
 The final output should be only the refined prompt, ready to be fed into the game generation AI.`;
-  } else {
-    return `${basePrompt}
+  }
+  return `${basePrompt}
 
 Your task is to take a user's simple game idea and expand it into a detailed, structured prompt. The refined prompt should guide the AI to create a polished, playable game within a single HTML file using HTML Canvas for rendering.
 
@@ -62,11 +62,10 @@ Refine this idea into a detailed prompt. The refined prompt must include:
 5. **UI Elements**: Specify the necessary UI components like a start screen, a score display, lives/health indicator, and a game-over screen with a restart button.
 
 The final output should be only the refined prompt, ready to be fed into the game generation AI.`;
-  }
 }
 
 export async function refinePrompt(
-  input: RefinePromptInput,
+  input: RefinePromptInput
 ): Promise<RefinePromptOutput> {
   try {
     const prompt = createRefinePrompt(input);
@@ -82,7 +81,7 @@ export async function refinePrompt(
   } catch (error) {
     console.error("Error refining prompt:", error);
     throw new Error(
-      "Failed to refine prompt. The AI model might be unavailable.",
+      "Failed to refine prompt. The AI model might be unavailable."
     );
   }
 }

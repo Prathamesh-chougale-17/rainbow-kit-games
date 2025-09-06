@@ -14,7 +14,7 @@ export async function GET() {
         headers: {
           Authorization: `Bearer ${process.env.PINATA_JWT}`,
         },
-      },
+      }
     );
 
     console.log("Pinata test response status:", response.status);

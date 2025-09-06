@@ -18,16 +18,15 @@ const GenerateGameCodeInputSchema = z.object({
 });
 
 export async function generateGame(
-  input: GenerateGameCodeInput,
+  input: GenerateGameCodeInput
 ): Promise<GenerateGameCodeOutput> {
   const validatedInput = GenerateGameCodeInputSchema.parse(input);
   try {
     const result = await generateGameCode(validatedInput);
     return result;
-  } catch (error) {
-    console.error("Error generating game code:", error);
+  } catch {
     throw new Error(
-      "Failed to generate game. The AI model might be unavailable.",
+      "Failed to generate game. The AI model might be unavailable."
     );
   }
 }
@@ -41,16 +40,15 @@ const RefinePromptInputSchema = z.object({
 });
 
 export async function refinePromptAction(
-  input: RefinePromptInput,
+  input: RefinePromptInput
 ): Promise<RefinePromptOutput> {
   const validatedInput = RefinePromptInputSchema.parse(input);
   try {
     const result = await refinePrompt(validatedInput);
     return result;
-  } catch (error) {
-    console.error("Error refining prompt:", error);
+  } catch {
     throw new Error(
-      "Failed to refine prompt. The AI model might be unavailable.",
+      "Failed to refine prompt. The AI model might be unavailable."
     );
   }
 }

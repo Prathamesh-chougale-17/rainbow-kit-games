@@ -7,13 +7,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-interface FeatureCardProps {
+type FeatureCardProps = {
   icon: LucideIcon;
   title: string;
   description: string;
   iconColor: string;
   gradientColor: string;
-}
+};
 
 export function FeatureCard({
   icon: Icon,
@@ -28,7 +28,7 @@ export function FeatureCard({
       gradientColor={gradientColor}
       gradientOpacity={0.1}
     >
-      <Card className="bg-transparent border-transparent shadow-none">
+      <Card className="border-transparent bg-transparent shadow-none">
         <CardHeader>
           <Icon className={`size-8 ${iconColor} mb-2`} />
           <CardTitle>{title}</CardTitle>

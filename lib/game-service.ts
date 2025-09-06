@@ -1,7 +1,13 @@
 import type { Filter } from "mongodb";
+import {
+  MAX_SEARCH_RESULTS,
+  VERSION_ID_RANDOM_END,
+  VERSION_ID_RANDOM_LENGTH,
+  VERSION_ID_RANDOM_START,
+} from "./constants";
 import client from "./mongodb";
 
-export interface GameVersion {
+export type GameVersion = {
   _id?: string;
   versionId: string;
   gameId: string;
@@ -14,9 +20,9 @@ export interface GameVersion {
   ipfsUrl: string; // Now required - all games must be on IPFS
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-export interface Game {
+export type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -34,16 +40,16 @@ export interface Game {
   originalOwner?: string; // wallet address from which this game was forked
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-export interface Publication {
+export type Publication = {
   _id?: string;
   gameId: string;
   version: number;
   type: "marketplace" | "community";
   publishedAt: Date;
   publishedBy: string; // wallet address
-}
+};
 
 class GameService {
   private db() {
@@ -61,7 +67,7 @@ class GameService {
     originalGameId?: string;
     originalOwner?: string;
   }): Promise<Game> {
-    const gameId = `game_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+    const gameId = `game_${Date.now()}_${Math.random().toString(VERSION_ID_RANDOM_LENGTH).substring(VERSION_ID_RANDOM_START, VERSION_ID_RANDOM_END)}`;
 
     const game: Game = {
       ...gameData,
@@ -69,8 +75,8 @@ class GameService {
       currentVersion: 0,
       versions: [],
       forkCount: 0,
-      isPublishedToMarketplace: gameData.isPublishedToMarketplace || false,
-      isPublishedToCommunity: gameData.isPublishedToCommunity || false,
+      isPublishedToMarketplace: gameData.isPublishedToMarketplace ?? false,
+      isPublishedToCommunity: gameData.isPublishedToCommunity ?? false,
       originalOwner: gameData.originalOwner,
       createdAt: new Date(),
       updatedAt: new Date(),
@@ -86,17 +92,19 @@ class GameService {
     versionData: Omit<
       GameVersion,
       "_id" | "versionId" | "gameId" | "version" | "createdAt" | "updatedAt"
-    >,
+    >
   ): Promise<GameVersion> {
     const game = await this.getGameById(gameId);
-    if (!game) throw new Error("Game not found");
+    if (!game) {
+      throw new Error("Game not found");
+    }
 
     // Validate IPFS data is provided
-    if (!versionData.ipfsCid || !versionData.ipfsUrl) {
+    if (!(versionData.ipfsCid && versionData.ipfsUrl)) {
       throw new Error("IPFS CID and URL are required for all game versions");
     }
 
-    const versionId = `version_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const versionId = `version_${Date.now()}_${Math.random().toString(VERSION_ID_RANDOM_LENGTH).substring(VERSION_ID_RANDOM_START, VERSION_ID_RANDOM_END)}`;
     const version = game.currentVersion + 1;
 
     const gameVersion: GameVersion = {
@@ -119,12 +127,8 @@ class GameService {
             currentVersion: version,
             updatedAt: new Date(),
           },
-        },
+        }
       );
-
-    console.log(
-      `Game version ${version} added successfully with IPFS CID: ${versionData.ipfsCid}`,
-    );
     return gameVersion;
   }
 
@@ -153,7 +157,7 @@ class GameService {
             ...updates,
             updatedAt: new Date(),
           },
-        },
+        }
       );
     return result.matchedCount > 0;
   }
@@ -162,7 +166,7 @@ class GameService {
   async publishToMarketplace(
     gameId: string,
     version: number,
-    walletAddress: string,
+    walletAddress: string
   ): Promise<boolean> {
     const game = await this.getGameById(gameId);
     if (!game || game.walletAddress !== walletAddress) {
@@ -180,7 +184,7 @@ class GameService {
             marketplacePublishedAt: new Date(),
             updatedAt: new Date(),
           },
-        },
+        }
       );
 
     // Record publication
@@ -202,7 +206,7 @@ class GameService {
   async publishToCommunity(
     gameId: string,
     version: number,
-    walletAddress: string,
+    walletAddress: string
   ): Promise<boolean> {
     const game = await this.getGameById(gameId);
     if (!game || game.walletAddress !== walletAddress) {
@@ -220,7 +224,7 @@ class GameService {
             communityPublishedAt: new Date(),
             updatedAt: new Date(),
           },
-        },
+        }
       );
 
     // Record publication
@@ -239,10 +243,7 @@ class GameService {
   }
 
   // Get marketplace games
-  async getMarketplaceGames(
-    limit: number = 20,
-    skip: number = 0,
-  ): Promise<Game[]> {
+  async getMarketplaceGames(limit = 20, skip = 0): Promise<Game[]> {
     return await this.db()
       .collection<Game>("games")
       .find({ isPublishedToMarketplace: true })
@@ -253,10 +254,7 @@ class GameService {
   }
 
   // Get community games
-  async getCommunityGames(
-    limit: number = 20,
-    skip: number = 0,
-  ): Promise<Game[]> {
+  async getCommunityGames(limit = 20, skip = 0): Promise<Game[]> {
     return await this.db()
       .collection<Game>("games")
       .find({ isPublishedToCommunity: true })
@@ -271,10 +269,12 @@ class GameService {
     originalGameId: string,
     walletAddress: string,
     newTitle: string,
-    ipfsResult: { cid: string; url: string; size: number },
+    ipfsResult: { cid: string; url: string; size: number }
   ): Promise<Game> {
     const originalGame = await this.getGameById(originalGameId);
-    if (!originalGame) throw new Error("Original game not found");
+    if (!originalGame) {
+      throw new Error("Original game not found");
+    }
 
     // Increment fork count
     await this.db()
@@ -282,9 +282,10 @@ class GameService {
       .updateOne({ gameId: originalGameId }, { $inc: { forkCount: 1 } });
 
     // Get the latest version
-    const latestVersion =
-      originalGame.versions[originalGame.versions.length - 1];
-    if (!latestVersion) throw new Error("No versions found for original game");
+    const latestVersion = originalGame.versions.at(-1);
+    if (!latestVersion) {
+      throw new Error("No versions found for original game");
+    }
 
     // Create new game
     const forkedGame = await this.createGame({
@@ -314,10 +315,12 @@ class GameService {
   async forkGame(
     originalGameId: string,
     walletAddress: string,
-    newTitle?: string,
+    newTitle?: string
   ): Promise<Game> {
     const originalGame = await this.getGameById(originalGameId);
-    if (!originalGame) throw new Error("Original game not found");
+    if (!originalGame) {
+      throw new Error("Original game not found");
+    }
 
     // Increment fork count
     await this.db()
@@ -325,9 +328,10 @@ class GameService {
       .updateOne({ gameId: originalGameId }, { $inc: { forkCount: 1 } });
 
     // Get the latest version
-    const latestVersion =
-      originalGame.versions[originalGame.versions.length - 1];
-    if (!latestVersion) throw new Error("No versions found for original game");
+    const latestVersion = originalGame.versions.at(-1);
+    if (!latestVersion) {
+      throw new Error("No versions found for original game");
+    }
 
     // Create new game
     const forkedGame = await this.createGame({
@@ -356,7 +360,7 @@ class GameService {
   // Search games
   async searchGames(
     query: string,
-    type?: "marketplace" | "community",
+    type?: "marketplace" | "community"
   ): Promise<Game[]> {
     let filter: Filter<Game> = {
       $or: [
@@ -376,14 +380,16 @@ class GameService {
       .collection<Game>("games")
       .find(filter)
       .sort({ updatedAt: -1 })
-      .limit(50)
+      .limit(MAX_SEARCH_RESULTS)
       .toArray();
   }
 
   // Delete a game (owner only)
   async deleteGame(gameId: string, walletAddress: string): Promise<boolean> {
     const game = await this.getGameById(gameId);
-    if (!game) throw new Error("Game not found");
+    if (!game) {
+      throw new Error("Game not found");
+    }
     if (game.walletAddress !== walletAddress) {
       throw new Error("Unauthorized: only the owner can delete this game");
     }

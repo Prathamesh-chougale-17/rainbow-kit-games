@@ -181,10 +181,10 @@ export default function EditorDashboard() {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {games.map((game) => (
               <GameCard
-                key={game.gameId}
                 game={game}
-                variant="editor"
+                key={game.gameId}
                 onDelete={openDeleteDialog}
+                variant="editor"
               />
             ))}
           </div>

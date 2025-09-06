@@ -10,7 +10,7 @@ import {
   Wand2,
   Zap,
 } from "lucide-react";
-import * as React from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -91,7 +91,7 @@ export function EnhancedGameGeneratorDialog({
   const [activeTab, setActiveTab] = React.useState("generate");
   const [gameIdeas, setGameIdeas] = React.useState<GameIdea[]>([]);
   const [gameVariations, setGameVariations] = React.useState<GameVariation[]>(
-    [],
+    []
   );
   const [generationMetrics, setGenerationMetrics] =
     React.useState<GameMetrics | null>(null);
@@ -121,7 +121,7 @@ export function EnhancedGameGeneratorDialog({
     try {
       const result = await refinePromptAction({
         prompt: currentPrompt,
-        isGameGenerated: isGameGenerated,
+        isGameGenerated,
       });
       form.setValue("prompt", result.refinedPrompt, { shouldValidate: true });
       toast.success("Prompt Refined!", {
@@ -148,13 +148,13 @@ export function EnhancedGameGeneratorDialog({
       const result = await generateGameIdeaAction(
         theme,
         difficulty,
-        creativity,
+        creativity
       );
       setGameIdeas([result]);
       form.setValue(
         "prompt",
         `${result.concept}\n\nFeatures: ${result.features.join(", ")}\nVisual Style: ${result.visualStyle}`,
-        { shouldValidate: true },
+        { shouldValidate: true }
       );
 
       // Switch to the Generate tab after generating an idea
@@ -200,7 +200,7 @@ export function EnhancedGameGeneratorDialog({
   };
 
   const handleAdvancedGeneration = async (
-    values: z.infer<typeof formSchema>,
+    values: z.infer<typeof formSchema>
   ) => {
     setIsGenerating(true);
     try {
@@ -210,7 +210,7 @@ export function EnhancedGameGeneratorDialog({
         // Use advanced refinement with reasoning
         const refinementResult: GameRefinementResult = await refineGameAdvanced(
           html,
-          values.prompt,
+          values.prompt
         );
         result = {
           html: refinementResult.improvedGame.html,
@@ -226,7 +226,7 @@ export function EnhancedGameGeneratorDialog({
           {
             prompt: values.prompt,
             previousHtml: isGameGenerated ? html : undefined,
-          },
+          }
         );
 
         result = {
@@ -295,7 +295,7 @@ export function EnhancedGameGeneratorDialog({
     form.setValue(
       "prompt",
       `${variation.description}\n\nUnique Feature: ${variation.uniqueFeature}`,
-      { shouldValidate: true },
+      { shouldValidate: true }
     );
 
     // Switch to the Generate tab after selecting a variation
@@ -307,9 +307,9 @@ export function EnhancedGameGeneratorDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-h-[80vh] overflow-y-auto sm:max-w-[600px]">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
@@ -320,17 +320,17 @@ export function EnhancedGameGeneratorDialog({
                 <div>
                   Advanced AI-powered game generation with creative assistance
                   and detailed analysis.
-                  <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                  <div className="mt-2 rounded bg-muted/50 p-2 text-xs">
                     <div className="flex items-center gap-4 text-muted-foreground">
                       <span className="flex items-center gap-1">
-                        <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] flex items-center justify-center">
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-[10px] text-white">
                           1
                         </span>
                         Generate Ideas
                       </span>
                       <span>→</span>
                       <span className="flex items-center gap-1">
-                        <span className="w-4 h-4 rounded-full bg-green-500 text-white text-[10px] flex items-center justify-center">
+                        <span className="flex h-4 w-4 items-center justify-center rounded-full bg-green-500 text-[10px] text-white">
                           2
                         </span>
                         Generate Game Code
@@ -342,36 +342,36 @@ export function EnhancedGameGeneratorDialog({
             </DialogHeader>
 
             <Tabs
-              value={activeTab}
+              className="mt-4 w-full"
               onValueChange={setActiveTab}
-              className="w-full mt-4"
+              value={activeTab}
             >
               <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="generate" className="relative">
+                <TabsTrigger className="relative" value="generate">
                   Generate
                   {form.watch("prompt") &&
                     form.watch("prompt").length > 100 && (
-                      <div className="absolute -top-1 -right-1 w-2 h-2 bg-green-500 rounded-full"></div>
+                      <div className="-top-1 -right-1 absolute h-2 w-2 rounded-full bg-green-500" />
                     )}
                 </TabsTrigger>
                 <TabsTrigger value="ideas">💡 Ideas</TabsTrigger>
                 <TabsTrigger value="settings">⚙️ Settings</TabsTrigger>
               </TabsList>
 
-              <TabsContent value="generate" className="space-y-4">
+              <TabsContent className="space-y-4" value="generate">
                 <FormField
                   control={form.control}
                   name="prompt"
                   render={({ field }) => (
                     <FormItem>
-                      <div className="flex justify-between items-center">
+                      <div className="flex items-center justify-between">
                         <FormLabel>
                           {isGameGenerated ? "Refinements" : "Game Concept"}
                           {form.watch("prompt") &&
                             form.watch("prompt").length > 100 && (
                               <Badge
-                                variant="secondary"
                                 className="ml-2 text-xs"
+                                variant="secondary"
                               >
                                 AI Generated
                               </Badge>
@@ -379,11 +379,11 @@ export function EnhancedGameGeneratorDialog({
                         </FormLabel>
                         <div className="flex gap-2">
                           <Button
+                            disabled={isRefining || isGenerating}
+                            onClick={handleRefinePrompt}
+                            size="sm"
                             type="button"
                             variant="outline"
-                            size="sm"
-                            onClick={handleRefinePrompt}
-                            disabled={isRefining || isGenerating}
                           >
                             {isRefining ? (
                               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -396,12 +396,12 @@ export function EnhancedGameGeneratorDialog({
                       </div>
                       <FormControl>
                         <Textarea
+                          className="min-h-[100px] resize-none"
                           placeholder={
                             isGameGenerated
                               ? "Describe improvements: make it faster, add power-ups, change colors..."
                               : "Describe your game: a platformer with jumping mechanics, puzzle elements..."
                           }
-                          className="resize-none min-h-[100px]"
                           {...field}
                         />
                       </FormControl>
@@ -412,15 +412,14 @@ export function EnhancedGameGeneratorDialog({
 
                 {gameVariations.length > 0 && (
                   <div className="space-y-2">
-                    <Label className="text-sm font-medium">
+                    <Label className="font-medium text-sm">
                       Game Variations
                     </Label>
-                    <div className="grid gap-2 max-h-48 overflow-y-auto">
+                    <div className="grid max-h-48 gap-2 overflow-y-auto">
                       {gameVariations.map((variation) => (
                         <button
+                          className="w-full cursor-pointer rounded-lg border p-3 text-left transition-colors hover:bg-accent"
                           key={variation.variation}
-                          type="button"
-                          className="p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors text-left w-full"
                           onClick={() => selectVariation(variation)}
                           onKeyDown={(e) => {
                             if (e.key === "Enter" || e.key === " ") {
@@ -428,14 +427,15 @@ export function EnhancedGameGeneratorDialog({
                               selectVariation(variation);
                             }
                           }}
+                          type="button"
                         >
-                          <div className="flex justify-between items-start">
+                          <div className="flex items-start justify-between">
                             <div>
                               <h4 className="font-medium">{variation.title}</h4>
-                              <p className="text-sm text-muted-foreground">
+                              <p className="text-muted-foreground text-sm">
                                 {variation.description}
                               </p>
-                              <p className="text-xs text-accent-foreground mt-1">
+                              <p className="mt-1 text-accent-foreground text-xs">
                                 {variation.uniqueFeature}
                               </p>
                             </div>
@@ -450,14 +450,14 @@ export function EnhancedGameGeneratorDialog({
                 )}
               </TabsContent>
 
-              <TabsContent value="ideas" className="space-y-4">
+              <TabsContent className="space-y-4" value="ideas">
                 <div className="flex gap-2">
                   <Button
+                    className="flex-1"
+                    disabled={isGeneratingIdea}
+                    onClick={handleGenerateIdea}
                     type="button"
                     variant="outline"
-                    onClick={handleGenerateIdea}
-                    disabled={isGeneratingIdea}
-                    className="flex-1"
                   >
                     {isGeneratingIdea ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -467,11 +467,11 @@ export function EnhancedGameGeneratorDialog({
                     Generate Idea
                   </Button>
                   <Button
+                    className="flex-1"
+                    disabled={isGeneratingVariations}
+                    onClick={handleGenerateVariations}
                     type="button"
                     variant="outline"
-                    onClick={handleGenerateVariations}
-                    disabled={isGeneratingVariations}
-                    className="flex-1"
                   >
                     {isGeneratingVariations ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -486,23 +486,23 @@ export function EnhancedGameGeneratorDialog({
                   <div className="space-y-3">
                     {gameIdeas.map((idea) => (
                       <div
+                        className="space-y-2 rounded-lg border p-4"
                         key={idea.title}
-                        className="p-4 border rounded-lg space-y-2"
                       >
                         <h3 className="font-bold">{idea.title}</h3>
                         <p className="text-sm">{idea.concept}</p>
                         <div className="flex flex-wrap gap-1">
                           {idea.features.slice(0, 3).map((feature) => (
                             <Badge
+                              className="text-xs"
                               key={feature}
                               variant="secondary"
-                              className="text-xs"
                             >
                               {feature}
                             </Badge>
                           ))}
                         </div>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           {idea.visualStyle}
                         </p>
                       </div>
@@ -510,14 +510,14 @@ export function EnhancedGameGeneratorDialog({
 
                     <div className="pt-2">
                       <Button
-                        onClick={() => setActiveTab("generate")}
                         className="w-full"
+                        onClick={() => setActiveTab("generate")}
                         variant="default"
                       >
                         <Wand2 className="mr-2 h-4 w-4" />
                         Generate Game Code
                       </Button>
-                      <p className="text-xs text-muted-foreground text-center mt-2">
+                      <p className="mt-2 text-center text-muted-foreground text-xs">
                         Idea has been added to the prompt. Click to generate the
                         actual game code.
                       </p>
@@ -526,7 +526,7 @@ export function EnhancedGameGeneratorDialog({
                 )}
               </TabsContent>
 
-              <TabsContent value="settings" className="space-y-4">
+              <TabsContent className="space-y-4" value="settings">
                 <FormField
                   control={form.control}
                   name="mode"
@@ -534,8 +534,8 @@ export function EnhancedGameGeneratorDialog({
                     <FormItem>
                       <FormLabel>Generation Mode</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        onValueChange={field.onChange}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -565,8 +565,8 @@ export function EnhancedGameGeneratorDialog({
                     <FormItem>
                       <FormLabel>Game Complexity</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        onValueChange={field.onChange}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -597,15 +597,15 @@ export function EnhancedGameGeneratorDialog({
                       <FormLabel>Creativity Level: {field.value}</FormLabel>
                       <FormControl>
                         <Slider
-                          min={0}
+                          className="w-full"
                           max={1}
+                          min={0}
+                          onValueChange={(value) => field.onChange(value[0])}
                           step={0.1}
                           value={[field.value]}
-                          onValueChange={(value) => field.onChange(value[0])}
-                          className="w-full"
                         />
                       </FormControl>
-                      <div className="flex justify-between text-xs text-muted-foreground">
+                      <div className="flex justify-between text-muted-foreground text-xs">
                         <span>Conservative</span>
                         <span>Creative</span>
                       </div>
@@ -614,14 +614,14 @@ export function EnhancedGameGeneratorDialog({
                 />
 
                 {generationMetrics && (
-                  <div className="p-3 bg-muted rounded-lg space-y-2">
+                  <div className="space-y-2 rounded-lg bg-muted p-3">
                     <div className="flex items-center gap-2">
                       <BarChart3 className="h-4 w-4" />
-                      <span className="text-sm font-medium">
+                      <span className="font-medium text-sm">
                         Last Generation Metrics
                       </span>
                     </div>
-                    <div className="text-xs space-y-1">
+                    <div className="space-y-1 text-xs">
                       <div>Duration: {generationMetrics.duration}ms</div>
                       <div>
                         Status:{" "}
@@ -630,7 +630,7 @@ export function EnhancedGameGeneratorDialog({
                       <div>
                         Time:{" "}
                         {new Date(
-                          generationMetrics.timestamp,
+                          generationMetrics.timestamp
                         ).toLocaleTimeString()}
                       </div>
                     </div>
@@ -643,17 +643,17 @@ export function EnhancedGameGeneratorDialog({
               {form.watch("prompt") &&
                 form.watch("prompt").length > 100 &&
                 activeTab !== "generate" && (
-                  <div className="w-full text-center mb-4">
-                    <p className="text-xs text-muted-foreground bg-accent/10 p-2 rounded">
+                  <div className="mb-4 w-full text-center">
+                    <p className="rounded bg-accent/10 p-2 text-muted-foreground text-xs">
                       🎯 Game concept ready! Switch to "Generate" tab to create
                       the game code.
                     </p>
                   </div>
                 )}
               <Button
-                type="submit"
-                disabled={isGenerating || isRefining}
                 className="min-w-[120px]"
+                disabled={isGenerating || isRefining}
+                type="submit"
               >
                 {isGenerating ? (
                   <>

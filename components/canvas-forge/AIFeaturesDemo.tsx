@@ -10,7 +10,7 @@ import {
   XCircle,
   Zap,
 } from "lucide-react";
-import * as React from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -27,6 +27,7 @@ import {
   generateGameIdeaAction,
   generateGameVariationsAction,
 } from "@/lib/actions-enhanced";
+import { VARIATIONS_COUNT } from "@/lib/constants";
 import type {
   GameGenerationResult,
   GameIdea,
@@ -56,11 +57,16 @@ export function AIFeaturesDemo() {
   };
 
   const handleGenerateVariations = async () => {
-    if (!gameIdea) return;
+    if (!gameIdea) {
+      return;
+    }
 
     setIsLoading(true);
     try {
-      const vars = await generateGameVariationsAction(gameIdea.concept, 3);
+      const vars = await generateGameVariationsAction(
+        gameIdea.concept,
+        VARIATIONS_COUNT
+      );
       setVariations(vars);
       toast.success("Variations Generated!", {
         description: `${vars.length} unique variations created`,
@@ -73,7 +79,9 @@ export function AIFeaturesDemo() {
   };
 
   const handleTestGeneration = async () => {
-    if (!gameIdea) return;
+    if (!gameIdea) {
+      return;
+    }
 
     setIsLoading(true);
     try {
@@ -92,9 +100,9 @@ export function AIFeaturesDemo() {
   };
 
   return (
-    <div className="grid gap-6 max-w-4xl mx-auto p-6">
-      <div className="text-center space-y-2">
-        <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
+    <div className="mx-auto grid max-w-4xl gap-6 p-6">
+      <div className="space-y-2 text-center">
+        <h1 className="bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text font-bold text-3xl text-transparent">
           AI-Enhanced Game Generator
         </h1>
         <p className="text-muted-foreground">
@@ -116,30 +124,30 @@ export function AIFeaturesDemo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              onClick={handleGenerateIdea}
-              disabled={isLoading}
               className="w-full"
+              disabled={isLoading}
+              onClick={handleGenerateIdea}
             >
               <Wand2 className="mr-2 h-4 w-4" />
               Generate Game Idea
             </Button>
 
             {gameIdea && (
-              <div className="space-y-3 p-4 bg-muted rounded-lg">
+              <div className="space-y-3 rounded-lg bg-muted p-4">
                 <h3 className="font-bold">{gameIdea.title}</h3>
                 <p className="text-sm">{gameIdea.concept}</p>
                 <div className="flex flex-wrap gap-1">
                   {gameIdea.features.slice(0, 4).map((feature) => (
                     <Badge
+                      className="text-xs"
                       key={feature}
                       variant="secondary"
-                      className="text-xs"
                     >
                       {feature}
                     </Badge>
                   ))}
                 </div>
-                <div className="text-xs text-muted-foreground space-y-1">
+                <div className="space-y-1 text-muted-foreground text-xs">
                   <div>
                     <strong>Style:</strong> {gameIdea.visualStyle}
                   </div>
@@ -164,34 +172,34 @@ export function AIFeaturesDemo() {
           </CardHeader>
           <CardContent className="space-y-4">
             <Button
-              onClick={handleGenerateVariations}
-              disabled={isLoading || !gameIdea}
               className="w-full"
+              disabled={isLoading || !gameIdea}
+              onClick={handleGenerateVariations}
             >
               <Shuffle className="mr-2 h-4 w-4" />
               Generate Variations
             </Button>
 
             {variations.length > 0 && (
-              <div className="space-y-2 max-h-48 overflow-y-auto">
+              <div className="max-h-48 space-y-2 overflow-y-auto">
                 {variations.map((variation) => (
                   <div
+                    className="rounded-lg bg-muted p-3"
                     key={variation.variation}
-                    className="p-3 bg-muted rounded-lg"
                   >
-                    <div className="flex justify-between items-start">
+                    <div className="flex items-start justify-between">
                       <div className="space-y-1">
                         <h4 className="font-medium text-sm">
                           {variation.title}
                         </h4>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-muted-foreground text-xs">
                           {variation.description}
                         </p>
-                        <p className="text-xs text-accent-foreground">
+                        <p className="text-accent-foreground text-xs">
                           {variation.uniqueFeature}
                         </p>
                       </div>
-                      <Badge variant="outline" className="text-xs">
+                      <Badge className="text-xs" variant="outline">
                         {variation.difficulty}
                       </Badge>
                     </div>
@@ -216,25 +224,25 @@ export function AIFeaturesDemo() {
         <CardContent className="space-y-4">
           <div className="grid gap-2 md:grid-cols-3">
             <Button
-              onClick={handleTestGeneration}
               disabled={isLoading || !gameIdea}
+              onClick={handleTestGeneration}
               variant="outline"
             >
               <BarChart3 className="mr-2 h-4 w-4" />
               Test Generation
             </Button>
-            <Button variant="outline" disabled>
+            <Button disabled variant="outline">
               <Zap className="mr-2 h-4 w-4" />
               Stream Generation
             </Button>
-            <Button variant="outline" disabled>
+            <Button disabled variant="outline">
               <Wand2 className="mr-2 h-4 w-4" />
               Multi-Step Analysis
             </Button>
           </div>
 
           {metrics && (
-            <div className="p-4 bg-muted rounded-lg space-y-3">
+            <div className="space-y-3 rounded-lg bg-muted p-4">
               <div className="flex items-center gap-2">
                 <BarChart3 className="h-4 w-4" />
                 <span className="font-medium">Generation Metrics</span>
@@ -254,7 +262,7 @@ export function AIFeaturesDemo() {
                     {metrics.success ? "Success" : "Failed"}
                   </span>
                 </div>
-                <div className="text-xs text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   {new Date(metrics.timestamp).toLocaleTimeString()}
                 </div>
               </div>

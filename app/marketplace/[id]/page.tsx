@@ -3,7 +3,7 @@
 import { ArrowLeft, Share2, Store } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import * as React from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 
-interface Game {
+type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -36,7 +36,7 @@ interface Game {
   originalGameId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export default function MarketplaceGamePage() {
   const params = useParams();
@@ -51,13 +51,15 @@ export default function MarketplaceGamePage() {
     const load = async () => {
       setLoading(true);
       try {
-        const response = await fetch(`/api/marketplace`);
+        const response = await fetch("/api/marketplace");
         const result = await response.json();
 
         if (result.success) {
           const foundGame = result.games.find((g: Game) => g.gameId === gameId);
           if (foundGame) {
-            if (mounted) setGame(foundGame);
+            if (mounted) {
+              setGame(foundGame);
+            }
           } else {
             toast.error("Game not found");
             router.push("/marketplace");
@@ -116,16 +118,20 @@ export default function MarketplaceGamePage() {
     });
   };
 
+  const WALLET_ADDRESS_PREFIX_LENGTH = 8;
+  const WALLET_ADDRESS_SUFFIX_LENGTH = 6;
   const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 8)}...${address.slice(-6)}`;
+    return `${address.slice(0, WALLET_ADDRESS_PREFIX_LENGTH)}...${address.slice(
+      -WALLET_ADDRESS_SUFFIX_LENGTH
+    )}`;
   };
 
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
             <p className="text-muted-foreground">Loading game...</p>
           </div>
         </div>
@@ -136,10 +142,10 @@ export default function MarketplaceGamePage() {
   if (!game) {
     return (
       <div className="container mx-auto p-6">
-        <div className="text-center py-12">
-          <Store className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">Game not found</h3>
-          <p className="text-muted-foreground mb-6">
+        <div className="py-12 text-center">
+          <Store className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+          <h3 className="mb-2 font-semibold text-xl">Game not found</h3>
+          <p className="mb-6 text-muted-foreground">
             The game you're looking for doesn't exist or has been removed.
           </p>
           <Link href="/marketplace">
@@ -153,46 +159,56 @@ export default function MarketplaceGamePage() {
     );
   }
 
-  const latestVersion = game.versions[game.versions.length - 1];
+  const latestVersion = game.versions.at(-1);
   const gameUrl = latestVersion?.ipfsUrl;
 
   return (
-    <div className="min-h-screen h-screen w-screen bg-black">
+    <div className="h-screen min-h-screen w-screen bg-black">
       <div className="relative h-screen w-full">
         {/* Full-viewport game iframe */}
-        {gameUrl ? (
-          <iframe
-            src={gameUrl}
-            className="w-full h-full border-0"
-            title={game.title}
-          />
-        ) : latestVersion?.html ? (
-          <iframe
-            srcDoc={latestVersion.html}
-            className="w-full h-full border-0"
-            title={game.title}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gray-100">
-            <p className="text-gray-500">Game not available</p>
-          </div>
-        )}
+        {(() => {
+          if (gameUrl) {
+            return (
+              <iframe
+                className="h-full w-full border-0"
+                src={gameUrl}
+                title={game.title}
+              />
+            );
+          }
+
+          if (latestVersion?.html) {
+            return (
+              <iframe
+                className="h-full w-full border-0"
+                srcDoc={latestVersion.html}
+                title={game.title}
+              />
+            );
+          }
+
+          return (
+            <div className="flex h-full w-full items-center justify-center bg-gray-100">
+              <p className="text-gray-500">Game not available</p>
+            </div>
+          );
+        })()}
 
         {/* Top-left overlay: back button + title */}
         <div className="absolute top-12 left-4 z-50 flex items-center gap-3">
           <Link href="/marketplace">
-            <Button variant="outline" size="sm" className="gap-2">
+            <Button className="gap-2" size="sm" variant="outline">
               <ArrowLeft className="h-4 w-4" />
             </Button>
           </Link>
-          <h1 className="text-lg font-semibold text-white">{game.title}</h1>
+          <h1 className="font-semibold text-lg text-white">{game.title}</h1>
         </div>
 
         {/* Top-right overlay: avatar (popover) + share button */}
         <div className="absolute top-12 right-4 z-50 flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
-              <Button variant="ghost" className="p-0">
+              <Button className="p-0" variant="ghost">
                 <Avatar>
                   {game.walletAddress ? (
                     <AvatarFallback className="text-xs">
@@ -207,10 +223,10 @@ export default function MarketplaceGamePage() {
             <PopoverContent>
               <div className="text-sm">
                 <div className="font-medium">Creator</div>
-                <div className="font-mono mt-1">
+                <div className="mt-1 font-mono">
                   {formatWalletAddress(game.walletAddress)}
                 </div>
-                <div className="text-muted-foreground mt-2">
+                <div className="mt-2 text-muted-foreground">
                   Published:{" "}
                   {formatDate(game.marketplacePublishedAt || game.createdAt)}
                 </div>
@@ -218,7 +234,7 @@ export default function MarketplaceGamePage() {
             </PopoverContent>
           </Popover>
 
-          <Button variant="outline" size="sm" onClick={handleShare}>
+          <Button onClick={handleShare} size="sm" variant="outline">
             <Share2 className="h-4 w-4" />
           </Button>
         </div>

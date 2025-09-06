@@ -21,7 +21,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
 
-interface HeaderProps {
+type HeaderProps = {
   onGenerate: (output: GenerateGameCodeOutput) => void;
   onSave?: () => void;
   onPublishMarketplace?: () => void;
@@ -35,7 +35,7 @@ interface HeaderProps {
   isPublishedToMarketplace?: boolean;
   isPublishedToCommunity?: boolean;
   onUnpublish?: (type: "marketplace" | "community") => Promise<void> | void;
-}
+};
 
 export function Header({
   onGenerate,
@@ -71,46 +71,46 @@ export function Header({
       <div className="flex items-center gap-2">
         <Code className="h-8 w-8 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />
         <div className="flex items-center gap-2">
-          {!editing ? (
-            <>
-              <h1 className="text-2xl font-bold tracking-tighter text-gray-100">
-                {title || "CanvasForge"}
-              </h1>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing(true)}
-              >
-                <Edit className="h-4 w-4" />
-              </Button>
-            </>
-          ) : (
+          {editing ? (
             <div className="flex items-center gap-2">
               <Input
+                className="w-64"
+                onChange={(e) => onTitleChange?.(e.target.value)}
                 ref={inputRef}
                 value={title}
-                onChange={(e) => onTitleChange?.(e.target.value)}
-                className="w-64"
               />
               <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setEditing(false)}
                 className={buttonClass}
+                onClick={() => setEditing(false)}
+                size="sm"
+                variant="ghost"
               >
                 <Save className={iconClass} />
               </Button>
             </div>
+          ) : (
+            <>
+              <h1 className="font-bold text-2xl text-gray-100 tracking-tighter">
+                {title || "CanvasForge"}
+              </h1>
+              <Button
+                onClick={() => setEditing(true)}
+                size="sm"
+                variant="ghost"
+              >
+                <Edit className="h-4 w-4" />
+              </Button>
+            </>
           )}
         </div>
       </div>
       <div className="flex items-center gap-2">
         <GameGeneratorDialog
-          onGenerate={onGenerate}
           html={html}
           isGameGenerated={isGameGenerated}
+          onGenerate={onGenerate}
         >
-          <Button variant="ghost" className={buttonClass}>
+          <Button className={buttonClass} variant="ghost">
             <Bot className={iconClass} />
             {isGameGenerated ? "Refine Game" : "Generate Game"}
           </Button>
@@ -119,10 +119,10 @@ export function Header({
         {/* Save Button */}
         {onSave && (
           <Button
-            variant="ghost"
-            onClick={onSave}
             className={buttonClass}
             disabled={isSaving}
+            onClick={onSave}
+            variant="ghost"
           >
             <Save className={iconClass} />
             {isSaving ? "Saving..." : "Save"}
@@ -139,7 +139,7 @@ export function Header({
                     {onUnpublish && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" className={buttonClass}>
+                          <Button className={buttonClass} variant="ghost">
                             <XCircle className={iconClass} />
                             Unpublish from Marketplace
                           </Button>
@@ -157,8 +157,8 @@ export function Header({
                           </p>
                           <DialogFooter className="mt-4">
                             <Button
-                              variant="ghost"
                               onClick={() => onUnpublish("marketplace")}
+                              variant="ghost"
                             >
                               Yes, unpublish
                             </Button>
@@ -170,7 +170,7 @@ export function Header({
                 ) : (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" className={buttonClass}>
+                      <Button className={buttonClass} variant="ghost">
                         <ShoppingCart className={iconClass} />
                         Publish to Marketplace
                       </Button>
@@ -184,13 +184,13 @@ export function Header({
                         Marketplace?
                       </p>
                       <DialogFooter className="mt-4">
-                        <Button variant="ghost" onClick={onPublishMarketplace}>
+                        <Button onClick={onPublishMarketplace} variant="ghost">
                           Yes, publish
                         </Button>
                         {onUnpublish && isPublishedToMarketplace && (
                           <Button
-                            variant="ghost"
                             onClick={() => onUnpublish("marketplace")}
+                            variant="ghost"
                           >
                             Unpublish
                           </Button>
@@ -208,7 +208,7 @@ export function Header({
                     {onUnpublish && (
                       <Dialog>
                         <DialogTrigger asChild>
-                          <Button variant="ghost" className={buttonClass}>
+                          <Button className={buttonClass} variant="ghost">
                             <XCircle className={iconClass} />
                             Unpublish from Community
                           </Button>
@@ -224,8 +224,8 @@ export function Header({
                           </p>
                           <DialogFooter className="mt-4">
                             <Button
-                              variant="ghost"
                               onClick={() => onUnpublish("community")}
+                              variant="ghost"
                             >
                               Yes, unpublish
                             </Button>
@@ -237,7 +237,7 @@ export function Header({
                 ) : (
                   <Dialog>
                     <DialogTrigger asChild>
-                      <Button variant="ghost" className={buttonClass}>
+                      <Button className={buttonClass} variant="ghost">
                         <Users className={iconClass} />
                         Publish to Community
                       </Button>
@@ -251,13 +251,13 @@ export function Header({
                         Community?
                       </p>
                       <DialogFooter className="mt-4">
-                        <Button variant="ghost" onClick={onPublishCommunity}>
+                        <Button onClick={onPublishCommunity} variant="ghost">
                           Yes, publish
                         </Button>
                         {onUnpublish && isPublishedToCommunity && (
                           <Button
-                            variant="ghost"
                             onClick={() => onUnpublish("community")}
+                            variant="ghost"
                           >
                             Unpublish
                           </Button>

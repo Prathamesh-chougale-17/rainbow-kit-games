@@ -7,9 +7,9 @@
  * and multi-step reasoning that are possible with the AI SDK.
  */
 
-import { generateText, streamText, generateObject } from "ai";
-import { aiModel } from "@/ai/config";
+import { generateObject, generateText, streamText } from "ai";
 import { z } from "zod";
+import { aiModel } from "@/ai/config";
 
 // Streaming version for real-time game generation
 export async function generateGameCodeStream(prompt: string) {
@@ -28,7 +28,7 @@ export async function generateGameCodeStream(prompt: string) {
 // Multi-step game refinement with reasoning
 export async function refineGameWithReasoning(
   gameHtml: string,
-  feedback: string,
+  feedback: string
 ) {
   // Step 1: Analyze the current game
   const analysis = await generateObject({
@@ -90,7 +90,7 @@ export async function refineGameWithReasoning(
 export async function generateGameIdea(
   theme: string,
   difficulty: "simple" | "medium" | "complex" = "medium",
-  creativity: number = 0.7,
+  creativity = 0.7
 ) {
   const complexityGuide = {
     simple:
@@ -133,7 +133,7 @@ export async function generateGameIdea(
 // Batch processing for multiple game variations
 export async function generateGameVariations(
   basePrompt: string,
-  variationCount: number = 3,
+  variationCount = 3
 ) {
   const variations = await Promise.all(
     Array.from({ length: variationCount }, async (_, index) => {
@@ -156,7 +156,7 @@ export async function generateGameVariations(
         variation: index + 1,
         ...result.object,
       };
-    }),
+    })
   );
 
   return variations;
@@ -165,7 +165,7 @@ export async function generateGameVariations(
 // Error recovery and fallback generation
 export async function generateGameWithFallback(
   prompt: string,
-  previousAttempt?: string,
+  previousAttempt?: string
 ) {
   try {
     // Primary attempt with full features
@@ -208,12 +208,12 @@ export async function generateGameWithMetrics(prompt: string) {
         html: z
           .string()
           .describe(
-            "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.",
+            "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag."
           ),
         description: z
           .string()
           .describe(
-            "A summary of the changes made to the code in this generation step, explaining what was created or modified.",
+            "A summary of the changes made to the code in this generation step, explaining what was created or modified."
           ),
       }),
       prompt: `You are an expert game developer and front-end designer.

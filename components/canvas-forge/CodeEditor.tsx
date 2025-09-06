@@ -34,8 +34,6 @@ export function CodeEditor({ language, value, onChange }: CodeEditorProps) {
         <MonacoEditor
           height="100%"
           language={lang}
-          theme="vs-dark"
-          value={value}
           onChange={onChange}
           options={{
             minimap: { enabled: false },
@@ -44,6 +42,8 @@ export function CodeEditor({ language, value, onChange }: CodeEditorProps) {
             scrollBeyondLastLine: false,
             automaticLayout: true,
           }}
+          theme="vs-dark"
+          value={value}
         />
       </div>
     </div>

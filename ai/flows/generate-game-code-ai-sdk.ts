@@ -9,8 +9,8 @@
  */
 
 import { generateObject } from "ai";
-import { aiModel } from "@/ai/config";
 import { z } from "zod";
+import { aiModel } from "@/ai/config";
 
 const GenerateGameCodeInputSchema = z.object({
   prompt: z
@@ -20,7 +20,7 @@ const GenerateGameCodeInputSchema = z.object({
     .string()
     .optional()
     .describe(
-      "The full HTML (including CSS and JS) of the previous game version.",
+      "The full HTML (including CSS and JS) of the previous game version."
     ),
 });
 export type GenerateGameCodeInput = z.infer<typeof GenerateGameCodeInputSchema>;
@@ -29,12 +29,12 @@ const GenerateGameCodeOutputSchema = z.object({
   html: z
     .string()
     .describe(
-      "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.",
+      "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag."
     ),
   description: z
     .string()
     .describe(
-      "A summary of the changes made to the code in this generation step, explaining what was created or modified.",
+      "A summary of the changes made to the code in this generation step, explaining what was created or modified."
     ),
 });
 export type GenerateGameCodeOutput = z.infer<
@@ -61,12 +61,11 @@ User Feedback:
 
 First, provide a short summary of the changes you are about to make.
 Then, generate the **complete, updated** single HTML file containing the new HTML, CSS, and JavaScript.`;
-  } else {
-    return `${basePrompt}
+  }
+  return `${basePrompt}
 
 First, provide a short summary of the game you are about to create.
 Then, generate a **new, complete single HTML file** containing all HTML, CSS, and JavaScript for a game based on this description: "${input.prompt}"`;
-  }
 }
 
 const GAME_REQUIREMENTS = `
@@ -110,7 +109,7 @@ const GAME_REQUIREMENTS = `
 `;
 
 export async function generateGameCode(
-  input: GenerateGameCodeInput,
+  input: GenerateGameCodeInput
 ): Promise<GenerateGameCodeOutput> {
   try {
     const prompt = createGamePrompt(input) + GAME_REQUIREMENTS;
@@ -126,7 +125,7 @@ export async function generateGameCode(
   } catch (error) {
     console.error("Error generating game code:", error);
     throw new Error(
-      "Failed to generate game. The AI model might be unavailable.",
+      "Failed to generate game. The AI model might be unavailable."
     );
   }
 }

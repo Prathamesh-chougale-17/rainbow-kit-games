@@ -43,13 +43,13 @@ export async function POST() {
           Authorization: `Bearer ${process.env.PINATA_JWT}`,
         },
         body: formData,
-      },
+      }
     );
 
     console.log("Response status:", response.status);
     console.log(
       "Response headers:",
-      Object.fromEntries(response.headers.entries()),
+      Object.fromEntries(response.headers.entries())
     );
 
     if (!response.ok) {

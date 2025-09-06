@@ -6,14 +6,14 @@ import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
 import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
 
-interface HeaderProps {
+type HeaderProps = {
   onExport: () => void;
   onShare: () => void;
   onGenerate: (output: GenerateGameCodeOutput) => void;
   html: string;
   isGameGenerated: boolean;
   useEnhanced?: boolean;
-}
+};
 
 export function EnhancedHeader({
   onExport,
@@ -36,22 +36,22 @@ export function EnhancedHeader({
     <header className="flex h-16 items-center justify-between p-4">
       <div className="flex items-center gap-2">
         <GeneratorDialog
-          onGenerate={onGenerate}
           html={html}
           isGameGenerated={isGameGenerated}
+          onGenerate={onGenerate}
         >
-          <Button variant="ghost" className={buttonClass}>
+          <Button className={buttonClass} variant="ghost">
             <GeneratorIcon className={iconClass} />
             {isGameGenerated ? "Enhance Game" : "Generate Game"}
           </Button>
         </GeneratorDialog>
 
-        <Button variant="ghost" onClick={onShare} className={buttonClass}>
+        <Button className={buttonClass} onClick={onShare} variant="ghost">
           <Share2 className={iconClass} />
           Share
         </Button>
 
-        <Button variant="ghost" onClick={onExport} className={buttonClass}>
+        <Button className={buttonClass} onClick={onExport} variant="ghost">
           <Download className={iconClass} />
           Export
         </Button>

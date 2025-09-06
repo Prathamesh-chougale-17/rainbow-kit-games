@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import * as React from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -155,9 +155,9 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
             <p className="text-muted-foreground">Loading game...</p>
           </div>
         </div>
@@ -170,23 +170,23 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <div className="container mx-auto space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/community">
-          <Button variant="outline" size="icon">
+          <Button size="icon" variant="outline">
             <ArrowLeft className="h-4 w-4" />
           </Button>
         </Link>
         <div className="flex items-center gap-2">
           <Users className="h-6 w-6 text-blue-600" />
-          <h1 className="text-2xl font-bold">Community Game</h1>
+          <h1 className="font-bold text-2xl">Community Game</h1>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Content */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="space-y-6 lg:col-span-2">
           {/* Game Player */}
           <Card>
             <CardHeader>
@@ -194,17 +194,17 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                 <CardTitle>Game Preview</CardTitle>
                 <div className="flex gap-2">
                   <Button
-                    variant="outline"
-                    size="sm"
                     onClick={() => setIsFullscreen(true)}
+                    size="sm"
+                    variant="outline"
                   >
                     <Maximize className="h-4 w-4" />
                   </Button>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDownload}
                     disabled={!getGameUrl()}
+                    onClick={handleDownload}
+                    size="sm"
+                    variant="outline"
                   >
                     <Download className="h-4 w-4" />
                   </Button>
@@ -212,17 +212,17 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="aspect-video bg-muted rounded-lg overflow-hidden">
+              <div className="aspect-video overflow-hidden rounded-lg bg-muted">
                 {getGameUrl() ? (
                   <iframe
+                    className="h-full w-full border-0"
                     src={getGameUrl()}
-                    className="w-full h-full border-0"
                     title={game.title}
                   />
                 ) : (
-                  <div className="flex items-center justify-center h-full">
+                  <div className="flex h-full items-center justify-center">
                     <div className="text-center">
-                      <Play className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                      <Play className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
                       <p className="text-muted-foreground">
                         Game not available
                       </p>
@@ -254,8 +254,8 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               <CardTitle className="flex items-center gap-2">
                 {game.title}
                 {game.originalGameId && (
-                  <Badge variant="outline" className="text-xs">
-                    <GitFork className="h-3 w-3 mr-1" />
+                  <Badge className="text-xs" variant="outline">
+                    <GitFork className="mr-1 h-3 w-3" />
                     Fork
                   </Badge>
                 )}
@@ -265,10 +265,10 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               {/* Tags */}
               {game.tags && game.tags.length > 0 && (
                 <div className="space-y-2">
-                  <h4 className="text-sm font-medium">Tags</h4>
+                  <h4 className="font-medium text-sm">Tags</h4>
                   <div className="flex flex-wrap gap-1">
                     {game.tags.map((tag) => (
-                      <Badge key={tag} variant="secondary" className="text-xs">
+                      <Badge className="text-xs" key={tag} variant="secondary">
                         {tag}
                       </Badge>
                     ))}
@@ -281,7 +281,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               {/* Stats */}
               <div className="space-y-3 text-sm">
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     <User className="h-4 w-4" />
                     Creator
                   </span>
@@ -290,21 +290,21 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   </span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     <Code className="h-4 w-4" />
                     Version
                   </span>
                   <span>v{game.currentVersion}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     <GitFork className="h-4 w-4" />
                     Forks
                   </span>
                   <span>{game.forkCount}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-muted-foreground flex items-center gap-2">
+                  <span className="flex items-center gap-2 text-muted-foreground">
                     <Calendar className="h-4 w-4" />
                     Published
                   </span>
@@ -319,18 +319,18 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               {/* Actions */}
               <div className="space-y-2">
                 <Button
-                  onClick={handleFork}
-                  disabled={forking}
                   className="w-full gap-2"
+                  disabled={forking}
+                  onClick={handleFork}
                 >
                   <GitFork className="h-4 w-4" />
                   {forking ? "Forking..." : "Fork & Edit"}
                 </Button>
                 <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" onClick={handleShare}>
+                  <Button onClick={handleShare} size="sm" variant="outline">
                     <Share2 className="h-4 w-4" />
                   </Button>
-                  <Button variant="outline" size="sm" onClick={handleDownload}>
+                  <Button onClick={handleDownload} size="sm" variant="outline">
                     <Download className="h-4 w-4" />
                   </Button>
                 </div>
@@ -345,11 +345,11 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                 <CardTitle className="text-sm">Fork Information</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="text-sm text-muted-foreground">
+                <div className="text-muted-foreground text-sm">
                   <p>This is a fork of another community game.</p>
                   <Link
+                    className="mt-2 flex items-center gap-1 text-primary hover:underline"
                     href={`/community/${game.originalGameId}`}
-                    className="text-primary hover:underline flex items-center gap-1 mt-2"
                   >
                     View original <ExternalLink className="h-3 w-3" />
                   </Link>
@@ -362,21 +362,21 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
       {/* Fullscreen Modal */}
       {isFullscreen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="w-full h-full relative">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black">
+          <div className="relative h-full w-full">
             <div className="absolute top-4 right-4 z-10">
               <Button
-                variant="secondary"
-                size="sm"
                 onClick={() => setIsFullscreen(false)}
+                size="sm"
+                variant="secondary"
               >
                 Exit Fullscreen
               </Button>
             </div>
             {getGameUrl() && (
               <iframe
+                className="h-full w-full border-0"
                 src={getGameUrl()}
-                className="w-full h-full border-0"
                 title={`${game.title} - Fullscreen`}
               />
             )}

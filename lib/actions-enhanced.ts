@@ -1,5 +1,6 @@
 "use server";
 
+import { toast } from "sonner";
 import { z } from "zod";
 import {
   generateGameCodeStream,
@@ -41,7 +42,7 @@ const RefinePromptInputSchema = z.object({
 
 // Enhanced game generation with metrics and fallback
 export async function generateGameEnhanced(
-  input: GenerateGameCodeInput,
+  input: GenerateGameCodeInput
 ): Promise<GameGenerationResult> {
   const validatedInput = GenerateGameCodeInputSchema.parse(input);
   try {
@@ -58,9 +59,10 @@ export async function generateGameEnhanced(
         timestamp: new Date().toISOString(),
       },
     };
-  } catch (error) {
-    console.error("Error generating game code:", error);
-
+  } catch {
+    toast.error("Primary generation failed, attempting fallback method...", {
+      duration: 4000,
+    });
     // Try with metrics function as fallback
     try {
       const result = await generateGameWithMetrics(
@@ -68,13 +70,12 @@ export async function generateGameEnhanced(
           validatedInput.previousHtml
             ? `\n\nPrevious HTML:\n${validatedInput.previousHtml}`
             : ""
-        }`,
+        }`
       );
       return result;
     } catch (fallbackError) {
-      console.error("Fallback also failed:", fallbackError);
       throw new Error(
-        "Failed to generate game. The AI model might be unavailable.",
+        "Failed to generate game. The AI model might be unavailable."
       );
     }
   }
@@ -82,20 +83,21 @@ export async function generateGameEnhanced(
 
 // Original simple generation (for backward compatibility)
 export async function generateGame(
-  input: GenerateGameCodeInput,
+  input: GenerateGameCodeInput
 ): Promise<GenerateGameCodeOutput> {
   const validatedInput = GenerateGameCodeInputSchema.parse(input);
   try {
     const result = await generateGameCode(validatedInput);
     return result;
-  } catch (error) {
-    console.error("Error generating game code:", error);
-
+  } catch {
     // Try fallback generation
+    toast.error("Primary generation failed, attempting fallback method...", {
+      duration: 4000,
+    });
     try {
       const fallbackResult = await generateGameWithFallback(
         validatedInput.prompt,
-        validatedInput.previousHtml,
+        validatedInput.previousHtml
       );
 
       // Check if it's a generateText result (string) or generateObject result
@@ -104,16 +106,15 @@ export async function generateGame(
           html: fallbackResult.text,
           description: "Generated using fallback method due to initial failure",
         };
-      } else {
-        return {
-          html: fallbackResult.object.html,
-          description: fallbackResult.object.description,
-        };
       }
+      return {
+        html: fallbackResult.object.html,
+        description: fallbackResult.object.description,
+      };
     } catch (fallbackError) {
       console.error("Fallback generation also failed:", fallbackError);
       throw new Error(
-        "Failed to generate game. The AI model might be unavailable.",
+        "Failed to generate game. The AI model might be unavailable."
       );
     }
   }
@@ -122,7 +123,7 @@ export async function generateGame(
 // Advanced refinement with reasoning
 export async function refineGameAdvanced(
   gameHtml: string,
-  feedback: string,
+  feedback: string
 ): Promise<GameRefinementResult> {
   try {
     const result = await refineGameWithReasoning(gameHtml, feedback);
@@ -130,14 +131,14 @@ export async function refineGameAdvanced(
   } catch (error) {
     console.error("Error refining game:", error);
     throw new Error(
-      "Failed to refine game. The AI model might be unavailable.",
+      "Failed to refine game. The AI model might be unavailable."
     );
   }
 }
 
 // Prompt refinement action
 export async function refinePromptAction(
-  input: RefinePromptInput,
+  input: RefinePromptInput
 ): Promise<RefinePromptOutput> {
   const validatedInput = RefinePromptInputSchema.parse(input);
   try {
@@ -146,7 +147,7 @@ export async function refinePromptAction(
   } catch (error) {
     console.error("Error refining prompt:", error);
     throw new Error(
-      "Failed to refine prompt. The AI model might be unavailable.",
+      "Failed to refine prompt. The AI model might be unavailable."
     );
   }
 }
@@ -155,7 +156,7 @@ export async function refinePromptAction(
 export async function generateGameIdeaAction(
   theme: string,
   difficulty: "simple" | "medium" | "complex" = "medium",
-  creativity: number = 0.7,
+  creativity = 0.7
 ): Promise<GameIdea> {
   try {
     const result = await generateGameIdea(theme, difficulty, creativity);
@@ -163,7 +164,7 @@ export async function generateGameIdeaAction(
   } catch (error) {
     console.error("Error generating game idea:", error);
     throw new Error(
-      "Failed to generate game idea. The AI model might be unavailable.",
+      "Failed to generate game idea. The AI model might be unavailable."
     );
   }
 }
@@ -171,7 +172,7 @@ export async function generateGameIdeaAction(
 // Generate multiple game variations
 export async function generateGameVariationsAction(
   basePrompt: string,
-  variationCount: number = 3,
+  variationCount = 3
 ): Promise<GameVariation[]> {
   try {
     const result = await generateGameVariations(basePrompt, variationCount);
@@ -179,7 +180,7 @@ export async function generateGameVariationsAction(
   } catch (error) {
     console.error("Error generating game variations:", error);
     throw new Error(
-      "Failed to generate game variations. The AI model might be unavailable.",
+      "Failed to generate game variations. The AI model might be unavailable."
     );
   }
 }
@@ -192,7 +193,7 @@ export async function generateGameStream(prompt: string) {
   } catch (error) {
     console.error("Error generating game stream:", error);
     throw new Error(
-      "Failed to generate game stream. The AI model might be unavailable.",
+      "Failed to generate game stream. The AI model might be unavailable."
     );
   }
 }

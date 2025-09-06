@@ -5,20 +5,20 @@ export async function POST(request: NextRequest) {
   try {
     const { gameId, type, walletAddress, version } = await request.json();
 
-    if (!gameId || !type || !walletAddress || !version) {
+    if (!(gameId && type && walletAddress && version)) {
       return NextResponse.json(
         {
           error:
             "Missing required fields: gameId, type, walletAddress, version",
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     if (type !== "marketplace" && type !== "community") {
       return NextResponse.json(
         { error: 'Type must be either "marketplace" or "community"' },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -27,13 +27,13 @@ export async function POST(request: NextRequest) {
       result = await gameService.publishToMarketplace(
         gameId,
         version,
-        walletAddress,
+        walletAddress
       );
     } else {
       result = await gameService.publishToCommunity(
         gameId,
         version,
-        walletAddress,
+        walletAddress
       );
     }
 
@@ -49,7 +49,7 @@ export async function POST(request: NextRequest) {
         error:
           error instanceof Error ? error.message : "Failed to publish game",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

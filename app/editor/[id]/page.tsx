@@ -83,7 +83,7 @@ export default function GameEditor() {
   const [html, setHtml] = React.useState(defaultHtml);
   const [title, setTitle] = React.useState("New Game");
   const [currentGameId, setCurrentGameId] = React.useState<string | undefined>(
-    isNewGame ? undefined : gameId,
+    isNewGame ? undefined : gameId
   );
   const [currentGame, setCurrentGame] = React.useState<Game | null>(null);
   const [isGameGenerated, setIsGameGenerated] = React.useState(false);
@@ -98,7 +98,7 @@ export default function GameEditor() {
       if (result.success) {
         const game = result.games.find((g: Game) => g.gameId === id);
         if (game && game.versions.length > 0) {
-          const latestVersion = game.versions[game.versions.length - 1];
+          const latestVersion = game.versions.at(-1);
           setHtml(latestVersion.html);
           setTitle(game.title);
           setIsGameGenerated(true);
@@ -106,8 +106,7 @@ export default function GameEditor() {
           setCurrentGame(game); // Store the full game data
         }
       }
-    } catch (error) {
-      console.error("Load game error:", error);
+    } catch {
       toast.error("Failed to load game");
     }
   }, []);
@@ -126,65 +125,69 @@ export default function GameEditor() {
     });
   };
 
+  // Helper to perform the save request and return the parsed result.
+  const saveGameRequest = async (payload: {
+    gameId?: string;
+    html: string;
+    title: string;
+    description: string;
+    tags: string[];
+    walletAddress: string;
+  }) => {
+    const response = await fetch("/api/games/save", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+    return response.json();
+  };
+
   const handleSave = async () => {
     if (!html.trim()) {
       toast.error("Cannot save empty game");
       return;
     }
 
+    const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+    if (!walletAddress) {
+      toast.error("Wallet address not configured");
+      return;
+    }
+
     setIsSaving(true);
     try {
-      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
-      if (!walletAddress) {
-        toast.error("Wallet address not configured");
-        return;
-      }
-
-      const response = await fetch("/api/games/save", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          gameId: currentGameId,
-          html,
-          title,
-          description: `Generated game - ${new Date().toLocaleDateString()}`,
-          tags: ["ai-generated", "canvas-forge"],
-          walletAddress,
-        }),
+      const result = await saveGameRequest({
+        gameId: currentGameId,
+        html,
+        title,
+        description: `Generated game - ${new Date().toLocaleDateString()}`,
+        tags: ["ai-generated", "canvas-forge"],
+        walletAddress,
       });
 
-      const result = await response.json();
-
-      if (result.success) {
-        if (!currentGameId) {
-          // New game was created
-          setCurrentGameId(result.game.gameId);
-          setCurrentGame(result.game); // Store the new game data
-          // Update URL to reflect the new game ID
-          router.replace(`/editor/${result.game.gameId}`);
-        } else {
-          // Existing game was updated - reload the game data
-          loadGame(currentGameId);
-        }
-
-        toast.success("Game Saved Successfully!", {
-          description:
-            result.message ||
-            "Your game has been saved and uploaded to IPFS permanently",
-        });
-
-        // Show IPFS details if available
-        if (result.ipfs?.cid) {
-          console.log("Game uploaded to IPFS with CID:", result.ipfs.cid);
-          console.log("IPFS URL:", result.ipfs.url);
-        }
-      } else {
+      if (!result.success) {
         throw new Error(result.error || "Failed to save");
       }
+
+      if (currentGameId) {
+        // Existing game was updated - reload the game data
+        loadGame(currentGameId);
+      } else {
+        // New game was created
+        setCurrentGameId(result.game.gameId);
+        setCurrentGame(result.game); // Store the new game data
+        // Update URL to reflect the new game ID
+        router.replace(`/editor/${result.game.gameId}`);
+      }
+
+      toast.success("Game Saved Successfully!", {
+        description:
+          result.message ||
+          "Your game has been saved and uploaded to IPFS permanently",
+      });
     } catch (error) {
-      console.error("Save error:", error);
       toast.error("Failed to save game", {
         description:
           error instanceof Error ? error.message : "Please try again later.",
@@ -214,8 +217,7 @@ export default function GameEditor() {
       } else {
         throw new Error(result.error || "Failed to unpublish");
       }
-    } catch (error) {
-      console.error("Unpublish error:", error);
+    } catch {
       toast.error("Failed to unpublish");
     }
   };
@@ -238,7 +240,7 @@ export default function GameEditor() {
         body: JSON.stringify({
           gameId: currentGameId,
           type: "marketplace",
-          walletAddress: walletAddress,
+          walletAddress,
           version: currentVersion,
         }),
       });
@@ -257,8 +259,10 @@ export default function GameEditor() {
         throw new Error(result.error || "Failed to publish");
       }
     } catch (error) {
-      console.error("Publish to marketplace error:", error);
-      toast.error("Failed to publish to marketplace");
+      toast.error("Failed to publish to marketplace", {
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
+      });
     }
   };
 
@@ -280,7 +284,7 @@ export default function GameEditor() {
         body: JSON.stringify({
           gameId: currentGameId,
           type: "community",
-          walletAddress: walletAddress,
+          walletAddress,
           version: currentVersion,
         }),
       });
@@ -300,8 +304,10 @@ export default function GameEditor() {
         throw new Error(result.error || "Failed to publish");
       }
     } catch (error) {
-      console.error("Publish to community error:", error);
-      toast.error("Failed to publish to community");
+      toast.error("Failed to publish to community", {
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
+      });
     }
   };
 
@@ -310,35 +316,35 @@ export default function GameEditor() {
   }, [html]);
 
   return (
-    <div className="h-[calc(100vh-64px)] flex flex-col bg-[#0a0a0a]">
+    <div className="flex h-[calc(100vh-64px)] flex-col bg-[#0a0a0a]">
       {/* Main Editor */}
       <div className="flex-1">
-        <ResizablePanelGroup direction="horizontal" className="h-full">
-          <ResizablePanel defaultSize={40} className="min-w-[300px]">
+        <ResizablePanelGroup className="h-full" direction="horizontal">
+          <ResizablePanel className="min-w-[300px]" defaultSize={40}>
             <CodeEditor
-              value={html}
-              onChange={(value) => setHtml(value || "")}
               language="html"
+              onChange={(value) => setHtml(value || "")}
+              value={html}
             />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={60} className="min-w-[300px]">
+          <ResizablePanel className="min-w-[300px]" defaultSize={60}>
             {/* Header above Preview */}
-            <div className="border-b border-border">
+            <div className="border-border border-b">
               <Header
-                onGenerate={handleGenerate}
-                onSave={handleSave}
-                onPublishMarketplace={handlePublishToMarketplace}
-                onPublishCommunity={handlePublishToCommunity}
                 html={html}
                 isGameGenerated={isGameGenerated}
-                showPublishButtons={!!currentGameId}
-                isSaving={isSaving}
-                title={title}
-                onTitleChange={(t) => setTitle(t)}
-                isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
                 isPublishedToCommunity={currentGame?.isPublishedToCommunity}
+                isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
+                isSaving={isSaving}
+                onGenerate={handleGenerate}
+                onPublishCommunity={handlePublishToCommunity}
+                onPublishMarketplace={handlePublishToMarketplace}
+                onSave={handleSave}
+                onTitleChange={(t) => setTitle(t)}
                 onUnpublish={handleUnpublish}
+                showPublishButtons={!!currentGameId}
+                title={title}
               />
             </div>
             <Preview srcDoc={srcDoc} />

@@ -21,10 +21,10 @@ export default function AboutPage() {
         {/* Hero Section */}
         <section className="py-20 text-center">
           <div className="mx-auto max-w-4xl">
-            <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-gray-900 dark:text-white">
+            <h1 className="mb-6 font-extrabold text-5xl text-gray-900 leading-tight md:text-7xl dark:text-white">
               The Future of Gaming is Decentralized
             </h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-8 leading-relaxed">
+            <p className="mb-8 text-muted-foreground text-xl leading-relaxed md:text-2xl">
               Game Hub uses{" "}
               <span className="font-semibold text-gray-800 dark:text-gray-200">
                 blockchain
@@ -34,20 +34,20 @@ export default function AboutPage() {
               cross-platform interoperability through Web3 wallets.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/marketplace" className="inline-block">
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <Link className="inline-block" href="/marketplace">
                 <button
+                  className="rounded-xl bg-gray-900 px-8 py-4 font-semibold text-lg text-white shadow-sm transition-all duration-200 hover:shadow-md"
                   type="button"
-                  className="rounded-xl bg-gray-900 px-8 py-4 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-200 text-lg"
                 >
-                  <Gamepad2 className="inline mr-2 h-5 w-5" />
+                  <Gamepad2 className="mr-2 inline h-5 w-5" />
                   Explore Games
                 </button>
               </Link>
-              <Link href="/contact" className="inline-block">
+              <Link className="inline-block" href="/contact">
                 <button
+                  className="rounded-xl border-2 border-gray-200 px-8 py-4 font-semibold text-lg transition-all duration-200 hover:bg-gray-50"
                   type="button"
-                  className="rounded-xl border-2 border-gray-200 px-8 py-4 text-lg font-semibold hover:bg-gray-50 transition-all duration-200"
                 >
                   Learn More
                 </button>
@@ -58,11 +58,11 @@ export default function AboutPage() {
 
         {/* Blockchain Benefits */}
         <section className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-900 dark:text-white">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 font-bold text-3xl text-gray-900 md:text-4xl dark:text-white">
               Why Blockchain Changes Everything
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               By anchoring game progress and checkpoints on-chain, we prevent
               cheating and ensure authenticity, while smart contracts create a
               fair and trustless marketplace.
@@ -71,59 +71,59 @@ export default function AboutPage() {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             <FeatureCard
-              icon={Shield}
-              title="True Ownership"
               description="Your games and assets belong to you permanently. Transfer them anywhere, anytime."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={Shield}
+              iconColor="text-blue-500"
+              title="True Ownership"
             />
             <FeatureCard
-              icon={Coins}
-              title="Secure Trading"
               description="Trade game assets safely with transparent smart contract transactions."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={Coins}
+              iconColor="text-blue-500"
+              title="Secure Trading"
             />
             <FeatureCard
-              icon={Globe}
-              title="Cross-Platform"
               description="Use your Web3 wallet to access games across any platform or device."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={Globe}
+              iconColor="text-blue-500"
+              title="Cross-Platform"
             />
             <FeatureCard
-              icon={Lock}
-              title="Anti-Cheat"
               description="On-chain checkpoints and progress validation ensure fair gameplay for everyone."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={Lock}
+              iconColor="text-blue-500"
+              title="Anti-Cheat"
             />
             <FeatureCard
-              icon={TrendingUp}
-              title="Revenue Sharing"
               description="Transparent, automated revenue distribution to creators and the community."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={TrendingUp}
+              iconColor="text-blue-500"
+              title="Revenue Sharing"
             />
             <FeatureCard
-              icon={Users}
-              title="Community Governance"
               description="Vote on platform decisions and shape the future of Game Hub together."
-              iconColor="text-blue-500"
               gradientColor="#f3f4f6"
+              icon={Users}
+              iconColor="text-blue-500"
+              title="Community Governance"
             />
           </div>
         </section>
 
         {/* Decentralization Section */}
         <section className="py-16">
-          <div className="grid gap-8 lg:grid-cols-2 items-center">
+          <div className="grid items-center gap-8 lg:grid-cols-2">
             <div>
-              <h2 className="text-3xl md:text-4xl font-bold mb-6">
+              <h2 className="mb-6 font-bold text-3xl md:text-4xl">
                 No Central Authority, <br />
                 <span className="text-gray-100">Maximum Freedom</span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-6 leading-relaxed">
+              <p className="mb-6 text-lg text-muted-foreground leading-relaxed">
                 Blockchain removes reliance on central authorities and empowers
                 the community with governance and long-term value in the gaming
                 ecosystem. Smart contracts ensure fairness, transparency, and
@@ -132,29 +132,29 @@ export default function AboutPage() {
 
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <Zap className="h-6 w-6 text-gray-600 mt-1 flex-shrink-0" />
+                  <Zap className="mt-1 h-6 w-6 flex-shrink-0 text-gray-600" />
                   <div>
                     <h4 className="font-semibold">Instant Transactions</h4>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Lightning-fast asset transfers and game interactions.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Heart className="h-6 w-6 text-gray-600 mt-1 flex-shrink-0" />
+                  <Heart className="mt-1 h-6 w-6 flex-shrink-0 text-gray-600" />
                   <div>
                     <h4 className="font-semibold">Community First</h4>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Decisions made by players, for players through
                       decentralized governance.
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <Sparkles className="h-6 w-6 text-gray-600 mt-1 flex-shrink-0" />
+                  <Sparkles className="mt-1 h-6 w-6 flex-shrink-0 text-gray-600" />
                   <div>
                     <h4 className="font-semibold">Innovation Unleashed</h4>
-                    <p className="text-sm text-muted-foreground">
+                    <p className="text-muted-foreground text-sm">
                       Build on top of our platform with complete creative
                       freedom.
                     </p>
@@ -164,8 +164,8 @@ export default function AboutPage() {
             </div>
 
             <div className="grid grid-cols-1 gap-6">
-              <div className="rounded-2xl overflow-hidden shadow-md p-8 border border-gray-100 bg-gray-800">
-                <h3 className="text-xl font-bold mb-3 text-gray-100">
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-800 p-8 shadow-md">
+                <h3 className="mb-3 font-bold text-gray-100 text-xl">
                   Trustless Marketplace
                 </h3>
                 <p className="text-gray-400">
@@ -174,8 +174,8 @@ export default function AboutPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl overflow-hidden shadow-md p-8 border border-gray-100 bg-gray-800">
-                <h3 className="text-xl font-bold mb-3 text-gray-100">
+              <div className="overflow-hidden rounded-2xl border border-gray-100 bg-gray-800 p-8 shadow-md">
+                <h3 className="mb-3 font-bold text-gray-100 text-xl">
                   Immutable Records
                 </h3>
                 <p className="text-gray-400">
@@ -190,44 +190,44 @@ export default function AboutPage() {
 
         {/* Values Section */}
         <section className="py-16">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="mb-12 text-center">
+            <h2 className="mb-4 font-bold text-3xl md:text-4xl">
               Our Core Values
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
               These principles guide everything we build and every decision we
               make as a community.
             </p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-3">
-            <div className="rounded-xl p-6 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-full bg-gray-400 flex items-center justify-center mb-4">
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-400">
                 <Heart className="h-6 w-6 text-white" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Be Helpful</h4>
+              <h4 className="mb-2 font-semibold text-xl">Be Helpful</h4>
               <p className="text-muted-foreground">
                 We help creators learn and iterate quickly with kind, practical
                 feedback and support.
               </p>
             </div>
 
-            <div className="rounded-xl p-6 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-full bg-gray-400 flex items-center justify-center mb-4">
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-400">
                 <Target className="h-6 w-6 text-white" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Stay Focused</h4>
+              <h4 className="mb-2 font-semibold text-xl">Stay Focused</h4>
               <p className="text-muted-foreground">
                 Small, focused experiences are easier to build, share, and
                 iterate on than massive projects.
               </p>
             </div>
 
-            <div className="rounded-xl p-6 border border-gray-100 shadow-sm">
-              <div className="h-12 w-12 rounded-full bg-gray-400 flex items-center justify-center mb-4">
+            <div className="rounded-xl border border-gray-100 p-6 shadow-sm">
+              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-gray-400">
                 <Users className="h-6 w-6 text-white" />
               </div>
-              <h4 className="text-xl font-semibold mb-2">Open & Inclusive</h4>
+              <h4 className="mb-2 font-semibold text-xl">Open & Inclusive</h4>
               <p className="text-muted-foreground">
                 We create an environment where anyone can join, contribute, and
                 thrive regardless of background.
@@ -239,30 +239,30 @@ export default function AboutPage() {
         {/* Call to Action */}
         <section className="py-20 text-center">
           <div className="mx-auto max-w-3xl">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="mb-6 font-bold text-3xl md:text-4xl">
               Ready to Build the Future?
             </h2>
-            <p className="text-lg text-muted-foreground mb-8">
+            <p className="mb-8 text-lg text-muted-foreground">
               Join our community of creators, players, and builders who are
               shaping the next generation of decentralized gaming.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link href="/editor" className="inline-block">
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <Link className="inline-block" href="/editor">
                 <button
+                  className="rounded-xl bg-gray-800 px-8 py-4 font-semibold text-lg text-white shadow-sm transition-all duration-300 hover:shadow-md"
                   type="button"
-                  className="rounded-xl bg-gray-800 px-8 py-4 text-white font-semibold shadow-sm hover:shadow-md transition-all duration-300 text-lg"
                 >
-                  <Sparkles className="inline mr-2 h-5 w-5 text-gray-100" />
+                  <Sparkles className="mr-2 inline h-5 w-5 text-gray-100" />
                   Start Creating
                 </button>
               </Link>
-              <Link href="/community" className="inline-block">
+              <Link className="inline-block" href="/community">
                 <button
+                  className="rounded-xl border-2 border-gray-200 px-8 py-4 font-semibold text-lg transition-all duration-300 hover:bg-gray-50"
                   type="button"
-                  className="rounded-xl border-2 border-gray-200 px-8 py-4 text-lg font-semibold hover:bg-gray-50 transition-all duration-300"
                 >
-                  <Users className="inline mr-2 h-5 w-5 text-gray-700" />
+                  <Users className="mr-2 inline h-5 w-5 text-gray-700" />
                   Join Community
                 </button>
               </Link>

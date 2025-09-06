@@ -8,8 +8,8 @@
  * - GenerateGameCodeOutput - The return type for the generateGameCode function.
  */
 
-import { ai } from "@/ai/genkit";
 import { z } from "genkit";
+import { ai } from "@/ai/genkit";
 
 const GenerateGameCodeInputSchema = z.object({
   prompt: z
@@ -19,7 +19,7 @@ const GenerateGameCodeInputSchema = z.object({
     .string()
     .optional()
     .describe(
-      "The full HTML (including CSS and JS) of the previous game version.",
+      "The full HTML (including CSS and JS) of the previous game version."
     ),
 });
 export type GenerateGameCodeInput = z.infer<typeof GenerateGameCodeInputSchema>;
@@ -28,12 +28,12 @@ const GenerateGameCodeOutputSchema = z.object({
   html: z
     .string()
     .describe(
-      "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.",
+      "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag."
     ),
   description: z
     .string()
     .describe(
-      "A summary of the changes made to the code in this generation step, explaining what was created or modified.",
+      "A summary of the changes made to the code in this generation step, explaining what was created or modified."
     ),
 });
 export type GenerateGameCodeOutput = z.infer<
@@ -41,7 +41,7 @@ export type GenerateGameCodeOutput = z.infer<
 >;
 
 export async function generateGameCode(
-  input: GenerateGameCodeInput,
+  input: GenerateGameCodeInput
 ): Promise<GenerateGameCodeOutput> {
   return generateGameCodeFlow(input);
 }
@@ -77,7 +77,7 @@ Then, generate a **new, complete single HTML file** containing all HTML, CSS, an
 1. **Single File Structure**:
    - All code must be in one HTML file.
    - CSS must be in a \`<style>\` tag within the \`<head>\`.
-   - JavaScript must be in a \`<script>\` tag just before the closing \`<\/body>\` tag.
+   - JavaScript must be in a \`<script>\` tag just before the closing \`</body>\` tag.
    - Use \`<canvas>\` for rendering the game.
 
 2. **Design & Aesthetics**
@@ -133,5 +133,5 @@ const generateGameCodeFlow = ai.defineFlow(
   async (input) => {
     const { output } = await prompt(input);
     return output!;
-  },
+  }
 );

@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { gameService } from "@/lib/game-service";
 
 export async function GET(request: NextRequest) {
@@ -9,7 +9,7 @@ export async function GET(request: NextRequest) {
     if (!walletAddress) {
       return NextResponse.json(
         { error: "Wallet address is required" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
     console.error("Get games error:", error);
     return NextResponse.json(
       { error: "Failed to fetch games" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

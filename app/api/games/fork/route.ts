@@ -6,7 +6,7 @@ async function uploadToIPFS(
   htmlContent: string,
   title: string,
   walletAddress: string,
-  originalOwner: string,
+  originalOwner: string
 ) {
   const formData = new FormData();
   const blob = new Blob([htmlContent], { type: "text/html" });
@@ -17,7 +17,7 @@ async function uploadToIPFS(
     name: `${sanitizedTitle}_fork.html`,
     keyvalues: {
       type: "game",
-      title: title,
+      title,
       uploadedAt: new Date().toISOString(),
       userId: walletAddress,
       forked: "true",
@@ -39,7 +39,7 @@ async function uploadToIPFS(
         Authorization: `Bearer ${process.env.PINATA_JWT}`,
       },
       body: formData,
-    },
+    }
   );
 
   if (!response.ok) {
@@ -61,10 +61,10 @@ export async function POST(request: NextRequest) {
   try {
     const { originalGameId, walletAddress, newTitle } = await request.json();
 
-    if (!originalGameId || !walletAddress) {
+    if (!(originalGameId && walletAddress)) {
       return NextResponse.json(
         { error: "Missing required fields: originalGameId, walletAddress" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
     if (!originalGame) {
       return NextResponse.json(
         { error: "Original game not found" },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -82,7 +82,7 @@ export async function POST(request: NextRequest) {
     if (!latestVersion) {
       return NextResponse.json(
         { error: "No versions found for original game" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       latestVersion.html,
       forkTitle,
       walletAddress,
-      originalGame.walletAddress,
+      originalGame.walletAddress
     );
 
     // Fork the game with new IPFS data
@@ -103,7 +103,7 @@ export async function POST(request: NextRequest) {
       originalGameId,
       walletAddress,
       forkTitle,
-      ipfsResult,
+      ipfsResult
     );
 
     // Also update the newly created forked game's originalOwner (createGame already accepts originalGameId, but ensure originalOwner is set)
@@ -111,7 +111,7 @@ export async function POST(request: NextRequest) {
       try {
         await (await import("@/lib/game-service")).gameService.updateGame(
           forkedGame.gameId,
-          { originalOwner },
+          { originalOwner }
         );
       } catch (e) {
         console.warn("Failed to set originalOwner on forked game:", e);
@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
     console.error("Fork game error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fork game" },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

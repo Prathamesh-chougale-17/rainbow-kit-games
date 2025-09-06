@@ -2,7 +2,7 @@
 
 import { Search, Store } from "lucide-react";
 import Link from "next/link";
-import * as React from "react";
+import React from "react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { GameCard } from "@/components/ui/game-card";
@@ -80,9 +80,9 @@ export default function MarketplacePage() {
   if (loading) {
     return (
       <div className="mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
             <p className="text-muted-foreground">
               Loading marketplace games...
             </p>
@@ -93,11 +93,11 @@ export default function MarketplacePage() {
   }
 
   return (
-    <div className="mx-auto p-6 space-y-6">
+    <div className="mx-auto space-y-6 p-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
+          <h1 className="flex items-center gap-2 font-bold text-3xl tracking-tight">
             <Store className="h-8 w-8 text-green-600" />
             Game Marketplace
           </h1>
@@ -111,25 +111,25 @@ export default function MarketplacePage() {
       </div>
 
       {/* Search */}
-      <form onSubmit={handleSearch} className="flex gap-2 max-w-md">
+      <form className="flex max-w-md gap-2" onSubmit={handleSearch}>
         <Input
-          type="text"
-          placeholder="Search games..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
           className="flex-1"
+          onChange={(e) => setSearchQuery(e.target.value)}
+          placeholder="Search games..."
+          type="text"
+          value={searchQuery}
         />
-        <Button type="submit" size="icon">
+        <Button size="icon" type="submit">
           <Search className="h-4 w-4" />
         </Button>
       </form>
 
       {/* Games Grid */}
       {games.length === 0 ? (
-        <div className="text-center py-12">
-          <Store className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No games found</h3>
-          <p className="text-muted-foreground mb-6">
+        <div className="py-12 text-center">
+          <Store className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+          <h3 className="mb-2 font-semibold text-xl">No games found</h3>
+          <p className="mb-6 text-muted-foreground">
             {searchQuery
               ? "Try a different search term"
               : "Be the first to publish a game to the marketplace!"}
@@ -139,18 +139,18 @@ export default function MarketplacePage() {
           </Link>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {games.map((game) => (
             <GameCard
-              key={game.gameId}
               game={game}
-              variant="marketplace"
+              key={game.gameId}
               onShare={(gameId) => {
                 navigator.clipboard.writeText(
-                  `${window.location.origin}/marketplace/${gameId}`,
+                  `${window.location.origin}/marketplace/${gameId}`
                 );
                 toast.success("Game link copied!");
               }}
+              variant="marketplace"
             />
           ))}
         </div>
@@ -160,13 +160,13 @@ export default function MarketplacePage() {
       {games.length === 12 && (
         <div className="flex justify-center gap-2 pt-6">
           <Button
-            variant="outline"
-            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
+            variant="outline"
           >
             Previous
           </Button>
-          <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
+          <Button onClick={() => setPage((p) => p + 1)} variant="outline">
             Next
           </Button>
         </div>

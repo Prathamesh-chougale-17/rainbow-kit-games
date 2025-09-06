@@ -8,8 +8,8 @@
  * - RefinePromptOutput - The return type for the refinePrompt function.
  */
 
-import { ai } from "@/ai/genkit";
 import { z } from "genkit";
+import { ai } from "@/ai/genkit";
 
 const RefinePromptInputSchema = z.object({
   prompt: z.string().describe("The user-provided game idea or concept."),
@@ -24,13 +24,13 @@ const RefinePromptOutputSchema = z.object({
   refinedPrompt: z
     .string()
     .describe(
-      "The refined, detailed prompt suitable for the game generation AI.",
+      "The refined, detailed prompt suitable for the game generation AI."
     ),
 });
 export type RefinePromptOutput = z.infer<typeof RefinePromptOutputSchema>;
 
 export async function refinePrompt(
-  input: RefinePromptInput,
+  input: RefinePromptInput
 ): Promise<RefinePromptOutput> {
   return refinePromptFlow(input);
 }
@@ -75,5 +75,5 @@ const refinePromptFlow = ai.defineFlow(
   async (input) => {
     const { output } = await prompt(input);
     return output!;
-  },
+  }
 );

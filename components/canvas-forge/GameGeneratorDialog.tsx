@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Bot, Loader2, Sparkles } from "lucide-react";
-import * as React from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -34,12 +34,12 @@ const formSchema = z.object({
   }),
 });
 
-interface GameGeneratorDialogProps {
+type GameGeneratorDialogProps = {
   onGenerate: (output: GenerateGameCodeOutput) => void;
   children: React.ReactNode;
   html: string;
   isGameGenerated: boolean;
-}
+};
 
 export function GameGeneratorDialog({
   onGenerate,
@@ -73,14 +73,13 @@ export function GameGeneratorDialog({
     try {
       const result = await refinePromptAction({
         prompt: currentPrompt,
-        isGameGenerated: isGameGenerated,
+        isGameGenerated,
       });
       form.setValue("prompt", result.refinedPrompt, { shouldValidate: true });
       toast.success("Prompt Refined!", {
         description: "Your game idea has been enhanced with more detail.",
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Refinement Failed", {
         description:
           "There was an error refining the prompt. Please try again.",
@@ -100,8 +99,7 @@ export function GameGeneratorDialog({
       onGenerate(result);
       setIsOpen(false);
       form.reset();
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Generation Failed", {
         description:
           "There was an error generating the game. Please try again.",
@@ -112,7 +110,7 @@ export function GameGeneratorDialog({
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+    <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <Form {...form}>
@@ -133,19 +131,19 @@ export function GameGeneratorDialog({
                 name="prompt"
                 render={({ field }) => (
                   <FormItem>
-                    <div className="flex justify-between items-center">
+                    <div className="flex items-center justify-between">
                       <FormLabel>
                         {isGameGenerated
                           ? "Feedback or Refinements"
                           : "Game Idea"}
                       </FormLabel>
                       <Button
+                        className="h-auto p-0 text-accent transition-all hover:text-primary"
+                        disabled={isRefining || isGenerating}
+                        onClick={handleRefinePrompt}
+                        size="sm"
                         type="button"
                         variant="link"
-                        size="sm"
-                        onClick={handleRefinePrompt}
-                        disabled={isRefining || isGenerating}
-                        className="h-auto p-0 text-accent transition-all hover:text-primary"
                       >
                         {isRefining ? (
                           <>
@@ -162,12 +160,12 @@ export function GameGeneratorDialog({
                     </div>
                     <FormControl>
                       <Textarea
+                        className="resize-none"
                         placeholder={
                           isGameGenerated
                             ? "e.g., Make the paddle smaller and the ball faster."
                             : "e.g., A simple breakout-style game with a paddle and a ball."
                         }
-                        className="resize-none"
                         {...field}
                       />
                     </FormControl>
@@ -177,7 +175,7 @@ export function GameGeneratorDialog({
               />
             </div>
             <DialogFooter>
-              <Button type="submit" disabled={isGenerating || isRefining}>
+              <Button disabled={isGenerating || isRefining} type="submit">
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
