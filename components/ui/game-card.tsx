@@ -71,51 +71,63 @@ export function GameCard({
 
   return (
     <MagicCard
-      className="p-0 rounded-xl"
+      className="p-0 rounded-xl overflow-hidden group transition-shadow hover:shadow-2xl"
       gradientColor={variant === "marketplace" ? "#10b981" : "#6366f1"}
-      gradientOpacity={0.1}
+      gradientOpacity={0.12}
     >
-      <Card className="transition-shadow hover:shadow-lg group bg-transparent border-transparent shadow-none">
-        <CardHeader>
-          <div className="flex items-start justify-between">
-            <div className="flex-1 space-y-1">
-              <CardTitle className="line-clamp-1 group-hover:text-primary transition-colors">
+      <Card className="bg-transparent border-transparent shadow-none">
+        <CardHeader className="px-4 py-3">
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1 min-w-0">
+              <CardTitle className="text-lg font-semibold leading-tight truncate group-hover:text-primary transition-colors">
                 {game.title}
               </CardTitle>
-              <CardDescription className="line-clamp-2">
+              <CardDescription className="text-sm text-muted-foreground line-clamp-2">
                 {game.description || "No description provided"}
               </CardDescription>
             </div>
+
+            <div className="flex flex-col items-end gap-2">
+              <div className="flex items-center gap-2">
+                {game.isPublishedToMarketplace && (
+                  <Badge className="text-xs" variant="default">
+                    <ShoppingCart className="mr-1 h-3 w-3" />
+                    Marketplace
+                  </Badge>
+                )}
+                {game.isPublishedToCommunity && (
+                  <Badge className="text-xs" variant="secondary">
+                    <Users className="mr-1 h-3 w-3" />
+                    Community
+                  </Badge>
+                )}
+                {game.originalGameId && (
+                  <Badge className="text-xs" variant="outline">
+                    Fork
+                  </Badge>
+                )}
+              </div>
+
+              <div className="text-right text-xs text-muted-foreground">
+                <div className="flex items-center gap-2">
+                  <Code className="h-3 w-3" />
+                  <span>v{game.currentVersion}</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Users className="h-3 w-3" />
+                  <span>{game.forkCount} forks</span>
+                </div>
+              </div>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-4">
-          {/* Status Badges */}
-          <div className="flex flex-wrap gap-1">
-            {game.isPublishedToMarketplace && (
-              <Badge className="text-xs" variant="default">
-                <ShoppingCart className="mr-1 h-3 w-3" />
-                Marketplace
-              </Badge>
-            )}
-            {game.isPublishedToCommunity && (
-              <Badge className="text-xs" variant="secondary">
-                <Users className="mr-1 h-3 w-3" />
-                Community
-              </Badge>
-            )}
-            {game.originalGameId && (
-              <Badge className="text-xs" variant="outline">
-                Fork
-              </Badge>
-            )}
-          </div>
-
+        <CardContent className="space-y-4 px-4 pb-4">
           {/* Tags */}
           {game.tags && game.tags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-wrap gap-2">
               {game.tags.slice(0, 3).map((tag) => (
                 <Badge
-                  className="text-xs"
+                  className="text-xs px-2 py-1"
                   key={tag}
                   variant={variant === "marketplace" ? "secondary" : "outline"}
                 >
@@ -124,7 +136,7 @@ export function GameCard({
               ))}
               {game.tags.length > 3 && (
                 <Badge
-                  className="text-xs"
+                  className="text-xs px-2 py-1"
                   variant={variant === "marketplace" ? "secondary" : "outline"}
                 >
                   +{game.tags.length - 3}
@@ -133,19 +145,19 @@ export function GameCard({
             </div>
           )}
 
-          {/* Stats */}
+          {/* Stats / Meta */}
           {variant === "editor" ? (
             <div className="grid grid-cols-2 gap-3 text-muted-foreground text-sm">
               <div className="flex items-center gap-1">
-                <Code className="h-3 w-3" />v{game.currentVersion}
+                <Calendar className="h-3 w-3" />
+                {formatDate(game.updatedAt)}
               </div>
               <div className="flex items-center gap-1">
                 <Users className="h-3 w-3" />
                 {game.forkCount} forks
               </div>
               <div className="flex items-center gap-1">
-                <Calendar className="h-3 w-3" />
-                {formatDate(game.updatedAt)}
+                <Code className="h-3 w-3" />v{game.currentVersion}
               </div>
             </div>
           ) : (
@@ -162,18 +174,23 @@ export function GameCard({
           )}
 
           {/* Actions */}
-          <div className="flex gap-2">
+          <div className="border-t border-white/5 pt-3 flex gap-2">
             {variant === "editor" ? (
               <>
                 <Link className="flex-1" href={`/editor/${game.gameId}`}>
-                  <Button className="w-full gap-2" size="sm" variant="default">
+                  <Button
+                    type="button"
+                    className="w-full gap-2"
+                    size="sm"
+                    variant="default"
+                  >
                     <Edit className="h-3 w-3" />
                     Edit
                   </Button>
                 </Link>
                 {game.isPublishedToMarketplace && (
                   <Link href={`/marketplace/${game.gameId}`}>
-                    <Button size="sm" variant="outline">
+                    <Button type="button" size="sm" variant="outline">
                       <Play className="h-3 w-3" />
                     </Button>
                   </Link>
@@ -181,8 +198,9 @@ export function GameCard({
                 {onDelete && (
                   <Button
                     onClick={() => onDelete(game.gameId)}
+                    type="button"
                     size="sm"
-                    variant="outline"
+                    variant="destructive"
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -191,13 +209,19 @@ export function GameCard({
             ) : (
               <>
                 <Link href={`/marketplace/${game.gameId}`} className="flex-1">
-                  <Button variant="default" size="sm" className="w-full gap-2">
+                  <Button
+                    type="button"
+                    variant="default"
+                    size="sm"
+                    className="w-full gap-2"
+                  >
                     <Play className="h-3 w-3" />
                     Play Game
                   </Button>
                 </Link>
                 {onShare && (
                   <Button
+                    type="button"
                     variant="outline"
                     size="sm"
                     onClick={() => onShare(game.gameId)}
