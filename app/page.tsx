@@ -161,13 +161,7 @@ export default function Home() {
             </p>
           </div>
           <div className="flex justify-center">
-            <MagicCard
-              className="p-0"
-              gradientColor="#6366f1"
-              gradientOpacity={0.1}
-            >
-              <ContactForm />
-            </MagicCard>
+            <ContactForm />
           </div>
         </section>
 

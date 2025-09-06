@@ -134,7 +134,6 @@ export default function EditorDashboard() {
         <div className="flex items-center justify-between">
           <div>
             <h1 className="flex items-center gap-2 font-bold text-3xl tracking-tight">
-              <Code className="h-8 w-8 text-blue-600" />
               Game Studio
             </h1>
             <p className="text-muted-foreground">
