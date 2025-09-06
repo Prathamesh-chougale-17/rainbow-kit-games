@@ -1,0 +1,33 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { gameService } from '@/lib/game-service';
+
+export async function GET(request: NextRequest) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const search = searchParams.get('search');
+
+    const skip = (page - 1) * limit;
+
+    let games;
+    if (search) {
+      games = await gameService.searchGames(search, 'marketplace');
+    } else {
+      games = await gameService.getMarketplaceGames(limit, skip);
+    }
+
+    return NextResponse.json({
+      success: true,
+      games,
+      page,
+      limit,
+    });
+  } catch (error) {
+    console.error('Get marketplace games error:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch marketplace games' },
+      { status: 500 }
+    );
+  }
+}

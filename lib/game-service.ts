@@ -1,0 +1,290 @@
+import { MongoClient } from 'mongodb';
+import client from './mongodb';
+
+export interface GameVersion {
+  _id?: string;
+  versionId: string;
+  gameId: string;
+  version: number;
+  html: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  ipfsCid?: string;
+  ipfsUrl?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Game {
+  _id?: string;
+  gameId: string;
+  walletAddress: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  currentVersion: number;
+  versions: GameVersion[];
+  isPublishedToMarketplace: boolean;
+  isPublishedToCommunity: boolean;
+  marketplacePublishedAt?: Date;
+  communityPublishedAt?: Date;
+  forkCount: number;
+  originalGameId?: string; // For forked games
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface Publication {
+  _id?: string;
+  gameId: string;
+  version: number;
+  type: 'marketplace' | 'community';
+  publishedAt: Date;
+  publishedBy: string; // wallet address
+}
+
+class GameService {
+  private db() {
+    return client.db('game-hub');
+  }
+
+  // Create a new game
+  async createGame(gameData: {
+    walletAddress: string;
+    title: string;
+    description?: string;
+    tags?: string[];
+    isPublishedToMarketplace?: boolean;
+    isPublishedToCommunity?: boolean;
+    originalGameId?: string;
+  }): Promise<Game> {
+    const gameId = `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    
+    const game: Game = {
+      ...gameData,
+      gameId,
+      currentVersion: 0,
+      versions: [],
+      forkCount: 0,
+      isPublishedToMarketplace: gameData.isPublishedToMarketplace || false,
+      isPublishedToCommunity: gameData.isPublishedToCommunity || false,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    const result = await this.db().collection<Game>('games').insertOne(game);
+    return { ...game, _id: result.insertedId.toString() };
+  }
+
+  // Add a new version to a game
+  async addGameVersion(gameId: string, versionData: Omit<GameVersion, '_id' | 'versionId' | 'gameId' | 'version' | 'createdAt' | 'updatedAt'>): Promise<GameVersion> {
+    const game = await this.getGameById(gameId);
+    if (!game) throw new Error('Game not found');
+
+    const versionId = `version_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    const version = game.currentVersion + 1;
+
+    const gameVersion: GameVersion = {
+      ...versionData,
+      versionId,
+      gameId,
+      version,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    // Add version to game and update current version
+    await this.db().collection<Game>('games').updateOne(
+      { gameId },
+      {
+        $push: { versions: gameVersion },
+        $set: { 
+          currentVersion: version,
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    return gameVersion;
+  }
+
+  // Get all games for a wallet
+  async getGamesByWallet(walletAddress: string): Promise<Game[]> {
+    return await this.db()
+      .collection<Game>('games')
+      .find({ walletAddress })
+      .sort({ updatedAt: -1 })
+      .toArray();
+  }
+
+  // Get a specific game by ID
+  async getGameById(gameId: string): Promise<Game | null> {
+    return await this.db().collection<Game>('games').findOne({ gameId });
+  }
+
+  // Update game metadata
+  async updateGame(gameId: string, updates: Partial<Game>): Promise<boolean> {
+    const result = await this.db().collection<Game>('games').updateOne(
+      { gameId },
+      { 
+        $set: { 
+          ...updates, 
+          updatedAt: new Date() 
+        } 
+      }
+    );
+    return result.matchedCount > 0;
+  }
+
+  // Publish game to marketplace
+  async publishToMarketplace(gameId: string, version: number, walletAddress: string): Promise<boolean> {
+    const game = await this.getGameById(gameId);
+    if (!game || game.walletAddress !== walletAddress) {
+      throw new Error('Game not found or unauthorized');
+    }
+
+    // Update game publication status
+    await this.db().collection<Game>('games').updateOne(
+      { gameId },
+      {
+        $set: {
+          isPublishedToMarketplace: true,
+          marketplacePublishedAt: new Date(),
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    // Record publication
+    const publication: Publication = {
+      gameId,
+      version,
+      type: 'marketplace',
+      publishedAt: new Date(),
+      publishedBy: walletAddress,
+    };
+
+    await this.db().collection<Publication>('publications').insertOne(publication);
+    return true;
+  }
+
+  // Publish game to community
+  async publishToCommunity(gameId: string, version: number, walletAddress: string): Promise<boolean> {
+    const game = await this.getGameById(gameId);
+    if (!game || game.walletAddress !== walletAddress) {
+      throw new Error('Game not found or unauthorized');
+    }
+
+    // Update game publication status
+    await this.db().collection<Game>('games').updateOne(
+      { gameId },
+      {
+        $set: {
+          isPublishedToCommunity: true,
+          communityPublishedAt: new Date(),
+          updatedAt: new Date()
+        }
+      }
+    );
+
+    // Record publication
+    const publication: Publication = {
+      gameId,
+      version,
+      type: 'community',
+      publishedAt: new Date(),
+      publishedBy: walletAddress,
+    };
+
+    await this.db().collection<Publication>('publications').insertOne(publication);
+    return true;
+  }
+
+  // Get marketplace games
+  async getMarketplaceGames(limit: number = 20, skip: number = 0): Promise<Game[]> {
+    return await this.db()
+      .collection<Game>('games')
+      .find({ isPublishedToMarketplace: true })
+      .sort({ marketplacePublishedAt: -1 })
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+  }
+
+  // Get community games
+  async getCommunityGames(limit: number = 20, skip: number = 0): Promise<Game[]> {
+    return await this.db()
+      .collection<Game>('games')
+      .find({ isPublishedToCommunity: true })
+      .sort({ communityPublishedAt: -1 })
+      .limit(limit)
+      .skip(skip)
+      .toArray();
+  }
+
+  // Fork a game
+  async forkGame(originalGameId: string, walletAddress: string, newTitle?: string): Promise<Game> {
+    const originalGame = await this.getGameById(originalGameId);
+    if (!originalGame) throw new Error('Original game not found');
+
+    // Increment fork count
+    await this.db().collection<Game>('games').updateOne(
+      { gameId: originalGameId },
+      { $inc: { forkCount: 1 } }
+    );
+
+    // Get the latest version
+    const latestVersion = originalGame.versions[originalGame.versions.length - 1];
+    if (!latestVersion) throw new Error('No versions found for original game');
+
+    // Create new game
+    const forkedGame = await this.createGame({
+      walletAddress,
+      title: newTitle || `${originalGame.title} (Fork)`,
+      description: originalGame.description,
+      tags: originalGame.tags,
+      isPublishedToMarketplace: false,
+      isPublishedToCommunity: false,
+      originalGameId,
+    });
+
+    // Add initial version from original
+    await this.addGameVersion(forkedGame.gameId, {
+      html: latestVersion.html,
+      title: latestVersion.title,
+      description: latestVersion.description,
+      tags: latestVersion.tags,
+      ipfsCid: latestVersion.ipfsCid,
+      ipfsUrl: latestVersion.ipfsUrl,
+    });
+
+    return forkedGame;
+  }
+
+  // Search games
+  async searchGames(query: string, type?: 'marketplace' | 'community'): Promise<Game[]> {
+    const filter: any = {
+      $or: [
+        { title: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } },
+        { tags: { $in: [new RegExp(query, 'i')] } }
+      ]
+    };
+
+    if (type === 'marketplace') {
+      filter.isPublishedToMarketplace = true;
+    } else if (type === 'community') {
+      filter.isPublishedToCommunity = true;
+    }
+
+    return await this.db()
+      .collection<Game>('games')
+      .find(filter)
+      .sort({ updatedAt: -1 })
+      .limit(50)
+      .toArray();
+  }
+}
+
+export const gameService = new GameService();
