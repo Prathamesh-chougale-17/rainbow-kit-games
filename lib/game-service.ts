@@ -379,6 +379,26 @@ class GameService {
       .limit(50)
       .toArray();
   }
+
+  // Delete a game (owner only)
+  async deleteGame(gameId: string, walletAddress: string): Promise<boolean> {
+    const game = await this.getGameById(gameId);
+    if (!game) throw new Error("Game not found");
+    if (game.walletAddress !== walletAddress) {
+      throw new Error("Unauthorized: only the owner can delete this game");
+    }
+
+    // Delete game document and related publications
+    const deleteResult = await this.db()
+      .collection<Game>("games")
+      .deleteOne({ gameId });
+
+    await this.db()
+      .collection<Publication>("publications")
+      .deleteMany({ gameId });
+
+    return deleteResult.deletedCount > 0;
+  }
 }
 
 export const gameService = new GameService();

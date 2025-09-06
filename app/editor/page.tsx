@@ -81,9 +81,28 @@ export default function EditorDashboard() {
     if (!confirm("Are you sure you want to delete this game?")) return;
 
     try {
-      // Note: You'll need to implement delete API endpoint
+      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+      if (!walletAddress) {
+        toast.error("Wallet address not configured");
+        return;
+      }
+
+      const res = await fetch("/api/games/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ gameId, walletAddress }),
+      });
+
+      const result = await res.json();
+      if (!res.ok || !result.success) {
+        throw new Error(result.error || "Failed to delete game");
+      }
+
       toast.success("Game deleted successfully");
       setGames(games.filter((game) => game.gameId !== gameId));
+
+      // If user is currently editing this game, navigate away to editor list
+      // (next/navigation isn't available in this component's scope for client-side redirect)
     } catch (error) {
       toast.error("Failed to delete game");
     }
