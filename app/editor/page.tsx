@@ -22,6 +22,15 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+  DialogClose,
+} from "@/components/ui/dialog";
 
 interface Game {
   _id?: string;
@@ -45,6 +54,9 @@ interface Game {
 export default function EditorDashboard() {
   const [games, setGames] = React.useState<Game[]>([]);
   const [loading, setLoading] = React.useState(true);
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [selectedGameToDelete, setSelectedGameToDelete] = React.useState<string | null>(null);
+  const [deleting, setDeleting] = React.useState(false);
 
   React.useEffect(() => {
     loadGames();
@@ -77,9 +89,19 @@ export default function EditorDashboard() {
     });
   };
 
-  const handleDelete = async (gameId: string) => {
-    if (!confirm("Are you sure you want to delete this game?")) return;
+  const openDeleteDialog = (gameId: string) => {
+    setSelectedGameToDelete(gameId);
+    setDeleteDialogOpen(true);
+  };
 
+  const closeDeleteDialog = () => {
+    setDeleteDialogOpen(false);
+    setSelectedGameToDelete(null);
+  };
+
+  const performDelete = async (gameId: string | null) => {
+    if (!gameId) return;
+    setDeleting(true);
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       if (!walletAddress) {
@@ -99,12 +121,15 @@ export default function EditorDashboard() {
       }
 
       toast.success("Game deleted successfully");
-      setGames(games.filter((game) => game.gameId !== gameId));
+      setGames((prev) => prev.filter((game) => game.gameId !== gameId));
+      closeDeleteDialog();
 
-      // If user is currently editing this game, navigate away to editor list
-      // (next/navigation isn't available in this component's scope for client-side redirect)
+      // Note: if the user is currently editing this game, a redirect could be performed here.
     } catch (error) {
+      console.error("Delete error:", error);
       toast.error("Failed to delete game");
+    } finally {
+      setDeleting(false);
     }
   };
 
@@ -122,7 +147,8 @@ export default function EditorDashboard() {
   }
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
+    <>
+      <div className="container mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -263,7 +289,7 @@ export default function EditorDashboard() {
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => handleDelete(game.gameId)}
+                    onClick={() => openDeleteDialog(game.gameId)}
                   >
                     <Trash2 className="h-3 w-3" />
                   </Button>
@@ -273,6 +299,30 @@ export default function EditorDashboard() {
           ))}
         </div>
       )}
-    </div>
+  </div>
+  {/* Delete Confirmation Dialog */}
+  <Dialog open={deleteDialogOpen} onOpenChange={(open) => { if (!open) closeDeleteDialog(); setDeleteDialogOpen(open); }}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete game?</DialogTitle>
+          <DialogDescription>
+            This action cannot be undone. Are you sure you want to permanently delete this game?
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline">Cancel</Button>
+          </DialogClose>
+          <Button
+            variant="destructive"
+            onClick={() => performDelete(selectedGameToDelete)}
+            disabled={deleting}
+          >
+            {deleting ? "Deleting..." : "Delete"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+      </Dialog>
+    </>
   );
 }
