@@ -12,8 +12,7 @@ import {
   Code,
   Trash2,
   ShoppingCart,
-  Users,
-  Share2
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";

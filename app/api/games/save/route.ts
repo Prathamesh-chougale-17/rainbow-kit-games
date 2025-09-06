@@ -3,7 +3,7 @@ import { gameService } from '@/lib/game-service';
 import { nanoid } from 'nanoid';
 
 // Upload game HTML to IPFS using FormData approach
-async function uploadToIPFS(htmlContent: string, title: string) {
+async function uploadToIPFS(htmlContent: string, title: string,walletAddress:string) {
   try {
     console.log('Starting IPFS upload for:', title);
     console.log('HTML content length:', htmlContent.length);
@@ -35,6 +35,7 @@ async function uploadToIPFS(htmlContent: string, title: string) {
         type: 'game',
         title: title,
         uploadedAt: new Date().toISOString(),
+        userId: walletAddress
       }
     });
     formData.append('pinataMetadata', pinataMetadata);
@@ -160,7 +161,7 @@ export async function POST(request: NextRequest) {
 
       console.log('Uploading to IPFS...');
       // Upload to IPFS - now required for all games
-      const ipfsResult = await uploadToIPFS(html, title);
+      const ipfsResult = await uploadToIPFS(html, title,walletAddress);
       console.log('IPFS upload successful:', ipfsResult.cid);
 
       // Add new version with IPFS data
@@ -195,7 +196,7 @@ export async function POST(request: NextRequest) {
 
       console.log('Uploading to IPFS...');
       // Upload to IPFS - now required for all games
-      const ipfsResult = await uploadToIPFS(html, title);
+      const ipfsResult = await uploadToIPFS(html, title,walletAddress);
       console.log('IPFS upload successful:', ipfsResult.cid);
 
       // Add initial version with IPFS data

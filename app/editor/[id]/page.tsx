@@ -87,6 +87,7 @@ export default function GameEditor() {
   const [currentGameId, setCurrentGameId] = React.useState<string | undefined>(
     isNewGame ? undefined : gameId
   );
+  const [currentGame, setCurrentGame] = React.useState<any>(null);
   const [isGameGenerated, setIsGameGenerated] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
@@ -110,6 +111,7 @@ export default function GameEditor() {
           setTitle(game.title);
           setIsGameGenerated(true);
           setCurrentGameId(game.gameId);
+          setCurrentGame(game); // Store the full game data
         }
       }
     } catch (error) {
@@ -161,8 +163,12 @@ export default function GameEditor() {
         if (!currentGameId) {
           // New game was created
           setCurrentGameId(result.game.gameId);
+          setCurrentGame(result.game); // Store the new game data
           // Update URL to reflect the new game ID
           router.replace(`/editor/${result.game.gameId}`);
+        } else {
+          // Existing game was updated - reload the game data
+          loadGame(currentGameId);
         }
         
         toast.success("Game Saved Successfully!", {
@@ -205,6 +211,9 @@ export default function GameEditor() {
     }
 
     try {
+      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+      const currentVersion = currentGame?.currentVersion || 1;
+      
       const response = await fetch('/api/games/publish', {
         method: 'POST',
         headers: {
@@ -212,7 +221,9 @@ export default function GameEditor() {
         },
         body: JSON.stringify({
           gameId: currentGameId,
-          publishTo: 'marketplace',
+          type: 'marketplace',
+          walletAddress: walletAddress,
+          version: currentVersion,
         }),
       });
 
@@ -222,6 +233,10 @@ export default function GameEditor() {
         toast.success("Published to Marketplace!", {
           description: "Your game is now available for players to enjoy.",
         });
+        // Reload game data to update publish status
+        if (currentGameId) {
+          loadGame(currentGameId);
+        }
       } else {
         throw new Error(result.error || 'Failed to publish');
       }
@@ -238,6 +253,9 @@ export default function GameEditor() {
     }
 
     try {
+      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+      const currentVersion = currentGame?.currentVersion || 1;
+      
       const response = await fetch('/api/games/publish', {
         method: 'POST',
         headers: {
@@ -245,7 +263,9 @@ export default function GameEditor() {
         },
         body: JSON.stringify({
           gameId: currentGameId,
-          publishTo: 'community',
+          type: 'community',
+          walletAddress: walletAddress,
+          version: currentVersion,
         }),
       });
 
@@ -255,6 +275,10 @@ export default function GameEditor() {
         toast.success("Published to Community!", {
           description: "Your game is now available for developers to fork and improve.",
         });
+        // Reload game data to update publish status
+        if (currentGameId) {
+          loadGame(currentGameId);
+        }
       } else {
         throw new Error(result.error || 'Failed to publish');
       }
