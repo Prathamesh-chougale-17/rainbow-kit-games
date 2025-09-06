@@ -3,10 +3,11 @@ import { gameService } from '@/lib/game-service';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const game = await gameService.getGameById(params.id);
+    const { id } = await params;
+    const game = await gameService.getGameById(id);
 
     if (!game) {
       return NextResponse.json(

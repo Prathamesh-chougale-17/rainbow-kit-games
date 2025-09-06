@@ -229,7 +229,51 @@ class GameService {
       .toArray();
   }
 
-  // Fork a game
+  // Fork a game with new IPFS upload
+  async forkGameWithIPFS(
+    originalGameId: string, 
+    walletAddress: string, 
+    newTitle: string,
+    ipfsResult: { cid: string; url: string; size: number }
+  ): Promise<Game> {
+    const originalGame = await this.getGameById(originalGameId);
+    if (!originalGame) throw new Error('Original game not found');
+
+    // Increment fork count
+    await this.db().collection<Game>('games').updateOne(
+      { gameId: originalGameId },
+      { $inc: { forkCount: 1 } }
+    );
+
+    // Get the latest version
+    const latestVersion = originalGame.versions[originalGame.versions.length - 1];
+    if (!latestVersion) throw new Error('No versions found for original game');
+
+    // Create new game
+    const forkedGame = await this.createGame({
+      walletAddress,
+      title: newTitle,
+      description: originalGame.description,
+      tags: originalGame.tags,
+      isPublishedToMarketplace: false,
+      isPublishedToCommunity: false,
+      originalGameId,
+    });
+
+    // Add initial version with new IPFS data
+    await this.addGameVersion(forkedGame.gameId, {
+      html: latestVersion.html,
+      title: newTitle,
+      description: latestVersion.description,
+      tags: latestVersion.tags,
+      ipfsCid: ipfsResult.cid,
+      ipfsUrl: ipfsResult.url,
+    });
+
+    return forkedGame;
+  }
+
+  // Fork a game (legacy method - kept for backward compatibility)
   async forkGame(originalGameId: string, walletAddress: string, newTitle?: string): Promise<Game> {
     const originalGame = await this.getGameById(originalGameId);
     if (!originalGame) throw new Error('Original game not found');
