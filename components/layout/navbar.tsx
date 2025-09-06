@@ -10,7 +10,7 @@ export function Navbar({
 }) {
   return (
     <header className="sticky top-0 z-40 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 px-4 sm:px-6 md:px-8 lg:px-12">
-      <div className="flex justify-between items-center h-14">
+      <div className="flex justify-between items-center h-16">
         {/* Logo - Left */}
         <div className="flex items-center">
           <Link href="/" className="items-center space-x-2 md:flex">

@@ -309,28 +309,12 @@ export default function GameEditor() {
   }, [html]);
 
   return (
-    <div className="h-screen flex flex-col bg-[#0a0a0a]">
-      {/* Header */}
-      <Header
-        onGenerate={handleGenerate}
-        onSave={handleSave}
-        onPublishMarketplace={handlePublishToMarketplace}
-        onPublishCommunity={handlePublishToCommunity}
-        html={html}
-        isGameGenerated={isGameGenerated}
-        showPublishButtons={!!currentGameId}
-        isSaving={isSaving}
-        title={title}
-  onTitleChange={(t) => setTitle(t)}
-  isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
-  isPublishedToCommunity={currentGame?.isPublishedToCommunity}
-  onUnpublish={handleUnpublish}
-      />
+    <div className="h-[calc(100vh-64px)] flex flex-col bg-[#0a0a0a]">
 
       {/* Main Editor */}
       <div className="flex-1">
         <ResizablePanelGroup direction="horizontal" className="h-full">
-          <ResizablePanel defaultSize={50} className="min-w-[300px]">
+          <ResizablePanel defaultSize={40} className="min-w-[300px]">
             <CodeEditor
               value={html}
               onChange={(value) => setHtml(value || "")}
@@ -338,7 +322,25 @@ export default function GameEditor() {
             />
           </ResizablePanel>
           <ResizableHandle withHandle />
-          <ResizablePanel defaultSize={50} className="min-w-[300px]">
+          <ResizablePanel defaultSize={60} className="min-w-[300px]">
+            {/* Header above Preview */}
+            <div className="border-b border-border">
+              <Header
+                onGenerate={handleGenerate}
+                onSave={handleSave}
+                onPublishMarketplace={handlePublishToMarketplace}
+                onPublishCommunity={handlePublishToCommunity}
+                html={html}
+                isGameGenerated={isGameGenerated}
+                showPublishButtons={!!currentGameId}
+                isSaving={isSaving}
+                title={title}
+                onTitleChange={(t) => setTitle(t)}
+                isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
+                isPublishedToCommunity={currentGame?.isPublishedToCommunity}
+                onUnpublish={handleUnpublish}
+              />
+            </div>
             <Preview srcDoc={srcDoc} />
           </ResizablePanel>
         </ResizablePanelGroup>
