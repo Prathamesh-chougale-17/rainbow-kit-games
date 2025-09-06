@@ -89,7 +89,9 @@ async function uploadToIPFS(htmlContent: string, title: string) {
     const result = await response.json();
     console.log('Pinata upload successful. CID:', result.IpfsHash);
     
-    const ipfsUrl = `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${result.IpfsHash}`;
+    // Use reliable public IPFS gateway
+    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || 'ipfs.io';
+    const ipfsUrl = `https://${gatewayUrl}/ipfs/${result.IpfsHash}`;
 
     return {
       cid: result.IpfsHash,
@@ -157,24 +159,18 @@ export async function POST(request: NextRequest) {
       }
 
       console.log('Uploading to IPFS...');
-      // Upload to IPFS
-      let ipfsResult = null;
-      try {
-        ipfsResult = await uploadToIPFS(html, title);
-        console.log('IPFS upload successful:', ipfsResult.cid);
-      } catch (ipfsError) {
-        console.warn('IPFS upload failed, saving without IPFS:', ipfsError);
-        // Continue without IPFS - don't block game saving
-      }
+      // Upload to IPFS - now required for all games
+      const ipfsResult = await uploadToIPFS(html, title);
+      console.log('IPFS upload successful:', ipfsResult.cid);
 
-      // Add new version
+      // Add new version with IPFS data
       const version = await gameService.addGameVersion(gameId, {
         html,
         title,
         description,
         tags,
-        ipfsCid: ipfsResult?.cid,
-        ipfsUrl: ipfsResult?.url,
+        ipfsCid: ipfsResult.cid,
+        ipfsUrl: ipfsResult.url,
       });
 
       console.log('Version added successfully');
@@ -183,7 +179,7 @@ export async function POST(request: NextRequest) {
         game,
         version,
         ipfs: ipfsResult,
-        warning: ipfsResult ? undefined : 'Game saved successfully but IPFS upload failed. Please check Pinata configuration.',
+        message: 'Game saved and uploaded to IPFS successfully!',
       });
     } else {
       console.log('Creating new game');
@@ -198,24 +194,18 @@ export async function POST(request: NextRequest) {
       console.log('Game created:', game.gameId);
 
       console.log('Uploading to IPFS...');
-      // Upload to IPFS
-      let ipfsResult = null;
-      try {
-        ipfsResult = await uploadToIPFS(html, title);
-        console.log('IPFS upload successful:', ipfsResult.cid);
-      } catch (ipfsError) {
-        console.warn('IPFS upload failed, saving without IPFS:', ipfsError);
-        // Continue without IPFS - don't block game saving
-      }
+      // Upload to IPFS - now required for all games
+      const ipfsResult = await uploadToIPFS(html, title);
+      console.log('IPFS upload successful:', ipfsResult.cid);
 
-      // Add initial version
+      // Add initial version with IPFS data
       const version = await gameService.addGameVersion(game.gameId, {
         html,
         title,
         description,
         tags,
-        ipfsCid: ipfsResult?.cid,
-        ipfsUrl: ipfsResult?.url,
+        ipfsCid: ipfsResult.cid,
+        ipfsUrl: ipfsResult.url,
       });
 
       console.log('Initial version added successfully');
@@ -224,7 +214,7 @@ export async function POST(request: NextRequest) {
         game,
         version,
         ipfs: ipfsResult,
-        warning: ipfsResult ? undefined : 'Game saved successfully but IPFS upload failed. Please check Pinata configuration.',
+        message: 'Game created and uploaded to IPFS successfully!',
       });
     }
   } catch (error) {

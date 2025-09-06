@@ -165,11 +165,15 @@ export default function GameEditor() {
           router.replace(`/editor/${result.game.gameId}`);
         }
         
-        toast.success("Game Saved!", {
-          description: result.ipfs ? 
-            "Your game has been saved and uploaded to IPFS" : 
-            "Your game has been saved to the database",
+        toast.success("Game Saved Successfully!", {
+          description: result.message || "Your game has been saved and uploaded to IPFS permanently",
         });
+
+        // Show IPFS details if available
+        if (result.ipfs?.cid) {
+          console.log('Game uploaded to IPFS with CID:', result.ipfs.cid);
+          console.log('IPFS URL:', result.ipfs.url);
+        }
       } else {
         throw new Error(result.error || 'Failed to save');
       }

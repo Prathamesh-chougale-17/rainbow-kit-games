@@ -10,8 +10,8 @@ export interface GameVersion {
   title: string;
   description?: string;
   tags?: string[];
-  ipfsCid?: string;
-  ipfsUrl?: string;
+  ipfsCid: string; // Now required - all games must be on IPFS
+  ipfsUrl: string; // Now required - all games must be on IPFS
   createdAt: Date;
   updatedAt: Date;
 }
@@ -82,6 +82,11 @@ class GameService {
     const game = await this.getGameById(gameId);
     if (!game) throw new Error('Game not found');
 
+    // Validate IPFS data is provided
+    if (!versionData.ipfsCid || !versionData.ipfsUrl) {
+      throw new Error('IPFS CID and URL are required for all game versions');
+    }
+
     const versionId = `version_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
     const version = game.currentVersion + 1;
 
@@ -106,6 +111,7 @@ class GameService {
       }
     );
 
+    console.log(`Game version ${version} added successfully with IPFS CID: ${versionData.ipfsCid}`);
     return gameVersion;
   }
 

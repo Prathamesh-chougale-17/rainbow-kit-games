@@ -121,7 +121,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
   const handleDownload = () => {
     if (game?.versions?.[game.currentVersion - 1]?.ipfsCid) {
-      const downloadUrl = `https://moccasin-historical-rooster-457.mypinata.cloud/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
+      const downloadUrl = `https://ipfs.io/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
       window.open(downloadUrl, '_blank');
     }
   };
@@ -140,7 +140,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
   const getGameUrl = () => {
     if (game?.versions?.[game.currentVersion - 1]?.ipfsCid) {
-      return `https://moccasin-historical-rooster-457.mypinata.cloud/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
+      return `https://ipfs.io/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
     }
     return '';
   };
