@@ -12,9 +12,6 @@ import { CodeEditor } from "@/components/canvas-forge/CodeEditor";
 import { Preview } from "@/components/canvas-forge/Preview";
 import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft } from "lucide-react";
-import Link from "next/link";
 
 const defaultHtml = `<!DOCTYPE html>
 <html lang="en">

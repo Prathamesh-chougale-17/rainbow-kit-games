@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { gameService } from "@/lib/game-service";
 import client from "@/lib/mongodb";
 

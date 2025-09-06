@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
 import { gameService } from "@/lib/game-service";
-import { nanoid } from "nanoid";
 
 // Upload game HTML to IPFS using FormData approach
 async function uploadToIPFS(
