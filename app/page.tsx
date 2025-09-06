@@ -9,8 +9,6 @@ import {
   Zap,
 } from "lucide-react";
 import Link from "next/link";
-import { ContactForm } from "@/components/contact-form";
-import { MagicCard } from "@/components/magicui/magic-card";
 import { Button } from "@/components/ui/button";
 import { FeatureCard } from "@/components/ui/feature-card";
 
@@ -152,7 +150,7 @@ export default function Home() {
         </section>
 
         {/* Contact Section */}
-        <section className="mb-20">
+        {/* <section className="mb-20">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold mb-4">Get in Touch</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
@@ -163,7 +161,7 @@ export default function Home() {
           <div className="flex justify-center">
             <ContactForm />
           </div>
-        </section>
+        </section> */}
 
         {/* CTA Section */}
         <section className="text-center">
@@ -178,7 +176,6 @@ export default function Home() {
             <div className="flex flex-wrap gap-3 justify-center">
               <Button asChild size="lg">
                 <Link href="/editor" className="flex items-center gap-2">
-                  <Code className="size-5" />
                   Create Your First Game
                   <ArrowRight className="size-4" />
                 </Link>

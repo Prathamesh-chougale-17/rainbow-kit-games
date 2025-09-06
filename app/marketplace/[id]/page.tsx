@@ -1,28 +1,17 @@
 "use client";
 
-import * as React from "react";
+import { ArrowLeft, Share2, Store } from "lucide-react";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import * as React from "react";
+import { toast } from "sonner";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from "@/components/ui/popover";
-import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  ArrowLeft,
-  Play,
-  Calendar,
-  User,
-  Share2,
-  Fullscreen,
-  Store,
-} from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
 
 interface Game {
   _id?: string;
@@ -32,7 +21,13 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: any[];
+  versions: {
+    version: number;
+    ipfsCid: string;
+    ipfsUrl?: string;
+    html?: string;
+    createdAt: Date;
+  }[];
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -50,12 +45,39 @@ export default function MarketplaceGamePage() {
 
   const [game, setGame] = React.useState<Game | null>(null);
   const [loading, setLoading] = React.useState(true);
-  const [isFullscreen, setIsFullscreen] = React.useState(false);
 
   React.useEffect(() => {
-    loadGame();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameId]);
+    let mounted = true;
+    const load = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`/api/marketplace`);
+        const result = await response.json();
+
+        if (result.success) {
+          const foundGame = result.games.find((g: Game) => g.gameId === gameId);
+          if (foundGame) {
+            if (mounted) setGame(foundGame);
+          } else {
+            toast.error("Game not found");
+            router.push("/marketplace");
+          }
+        }
+      } catch (error) {
+        console.error("Load game error:", error);
+        toast.error("Failed to load game");
+        router.push("/marketplace");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      mounted = false;
+    };
+  }, [gameId, router]);
 
   // Hide the global navbar/header while on the full-screen marketplace game page
   React.useEffect(() => {
@@ -72,29 +94,6 @@ export default function MarketplaceGamePage() {
     }
     return () => {};
   }, []);
-
-  const loadGame = async () => {
-    try {
-      const response = await fetch(`/api/marketplace`);
-      const result = await response.json();
-
-      if (result.success) {
-        const foundGame = result.games.find((g: Game) => g.gameId === gameId);
-        if (foundGame) {
-          setGame(foundGame);
-        } else {
-          toast.error("Game not found");
-          router.push("/marketplace");
-        }
-      }
-    } catch (error) {
-      console.error("Load game error:", error);
-      toast.error("Failed to load game");
-      router.push("/marketplace");
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleShare = () => {
     if (navigator.share && game) {
@@ -180,7 +179,7 @@ export default function MarketplaceGamePage() {
         )}
 
         {/* Top-left overlay: back button + title */}
-        <div className="absolute top-4 left-4 z-50 flex items-center gap-3">
+        <div className="absolute top-12 left-4 z-50 flex items-center gap-3">
           <Link href="/marketplace">
             <Button variant="outline" size="sm" className="gap-2">
               <ArrowLeft className="h-4 w-4" />
@@ -190,7 +189,7 @@ export default function MarketplaceGamePage() {
         </div>
 
         {/* Top-right overlay: avatar (popover) + share button */}
-        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+        <div className="absolute top-12 right-4 z-50 flex items-center gap-2">
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="ghost" className="p-0">
@@ -223,36 +222,6 @@ export default function MarketplaceGamePage() {
             <Share2 className="h-4 w-4" />
           </Button>
         </div>
-
-        {/* Fullscreen Modal (like community) */}
-        {isFullscreen && (
-          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-            <div className="w-full h-full relative">
-              <div className="absolute top-4 right-4 z-10">
-                <Button
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => setIsFullscreen(false)}
-                >
-                  Exit Fullscreen
-                </Button>
-              </div>
-              {gameUrl ? (
-                <iframe
-                  src={gameUrl}
-                  className="w-full h-full border-0"
-                  title={`${game.title} - Fullscreen`}
-                />
-              ) : latestVersion?.html ? (
-                <iframe
-                  srcDoc={latestVersion.html}
-                  className="w-full h-full border-0"
-                  title={`${game.title} - Fullscreen`}
-                />
-              ) : null}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
