@@ -287,20 +287,21 @@ export function EnhancedGameGeneratorDialog({
               <DialogTitle>
                 {isGameGenerated ? "Enhance Your Game" : "AI Game Generator"}
               </DialogTitle>
-              <DialogDescription>
-                Advanced AI-powered game generation with creative assistance and detailed analysis.
-                <br />
-                <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
-                  <div className="flex items-center gap-4 text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] flex items-center justify-center">1</span>
-                      Generate Ideas
-                    </span>
-                    <span>→</span>
-                    <span className="flex items-center gap-1">
-                      <span className="w-4 h-4 rounded-full bg-green-500 text-white text-[10px] flex items-center justify-center">2</span>
-                      Generate Game Code
-                    </span>
+              <DialogDescription asChild>
+                <div>
+                  Advanced AI-powered game generation with creative assistance and detailed analysis.
+                  <div className="mt-2 p-2 bg-muted/50 rounded text-xs">
+                    <div className="flex items-center gap-4 text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <span className="w-4 h-4 rounded-full bg-blue-500 text-white text-[10px] flex items-center justify-center">1</span>
+                        Generate Ideas
+                      </span>
+                      <span>→</span>
+                      <span className="flex items-center gap-1">
+                        <span className="w-4 h-4 rounded-full bg-green-500 text-white text-[10px] flex items-center justify-center">2</span>
+                        Generate Game Code
+                      </span>
+                    </div>
                   </div>
                 </div>
               </DialogDescription>

@@ -25,8 +25,8 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { generateGame, refinePromptAction } from "@/lib/actions";
-import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
+import { generateGame, refinePromptAction } from "@/lib/actions-ai-sdk";
+import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code-ai-sdk";
 import { toast } from "sonner";
 
 const formSchema = z.object({
