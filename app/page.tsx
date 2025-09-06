@@ -16,9 +16,15 @@ export default function Home() {
 
             <div className="mt-8 flex flex-wrap gap-3">
               <Button asChild>
-                <Link href="#get-started" className="flex items-center gap-2">
+                <Link href="/editor" className="flex items-center gap-2">
                   <ArrowRight className="size-4" />
                   Try the generator
+                </Link>
+              </Button>
+
+              <Button asChild variant="outline">
+                <Link href="/ai-features" className="flex items-center gap-2">
+                  AI Features Demo
                 </Link>
               </Button>
 
@@ -76,7 +82,10 @@ export default function Home() {
             <p className="mt-2 text-muted-foreground">Start by describing a simple game idea — we'll do the rest.</p>
             <div className="mt-6 flex items-center justify-center gap-3">
               <Button asChild>
-                <Link href="#" className="flex items-center gap-2">Open Generator</Link>
+                <Link href="/editor" className="flex items-center gap-2">Open Generator</Link>
+              </Button>
+              <Button asChild variant="outline">
+                <Link href="/ai-features" className="flex items-center gap-2">AI Features Demo</Link>
               </Button>
               <a href="#features" className="text-sm text-muted-foreground underline underline-offset-4">View details</a>
             </div>

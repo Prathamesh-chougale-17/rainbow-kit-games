@@ -192,10 +192,54 @@ export async function generateGameWithMetrics(prompt: string) {
     const result = await generateObject({
       model: aiModel,
       schema: z.object({
-        html: z.string(),
-        description: z.string(),
+        html: z.string().describe('The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.'),
+        description: z.string().describe('A summary of the changes made to the code in this generation step, explaining what was created or modified.'),
       }),
-      prompt,
+      prompt: `You are an expert game developer and front-end designer.
+
+Your task is to create a complete browser-based 2D game within a single HTML file. The CSS must be inside a <style> tag in the <head>, and the JavaScript must be inside a <script> tag at the end of the <body>. The game must be visually polished, functional on first load, and support both keyboard and mobile (touch) controls.
+
+Game Description: ${prompt}
+
+### ✅ Requirements & Guidelines
+
+1. **Single File Structure**:
+   - All code must be in one HTML file.
+   - CSS must be in a \`<style>\` tag within the \`<head>\`.
+   - JavaScript must be in a \`<script>\` tag just before the closing \`</body>\` tag.
+   - Use \`<canvas>\` for rendering the game.
+
+2. **Design & Aesthetics**
+   - Create a **modern**, clean, and **visually attractive** game.
+   - Use **gradients**, soft shadows, rounded corners, and smooth animations.
+   - Include a **start screen**, **score/lives HUD**, and **game-over screen**.
+   - Use beautiful typography and color schemes.
+
+3. **Gameplay**
+   - Ensure the game is **fully playable on first load**, no missing assets or code.
+   - Provide **default instructions** (e.g., "Use arrow keys / tap buttons to play").
+
+4. **Input Support**
+   - Implement **keyboard controls** for desktop (WASD, arrow keys, space, etc.).
+   - Add **on-screen touch buttons** for mobile (e.g., arrows, jump button).
+   - Ensure input responsiveness is smooth across devices.
+
+5. **Responsiveness**
+   - Layout must be **responsive** (fit both desktop and mobile without layout issues).
+   - All UI elements must scale/adapt appropriately.
+
+6. **No Dependencies**
+   - Use **pure HTML, CSS, and JavaScript**. No external libraries or frameworks.
+
+7. **Code Quality**
+   - Do not add comments in code.
+   - Ensure the generated code is complete and ready to run without errors.
+
+8. **Compatibility**
+   - Must work in all major browsers (Chrome, Firefox, Safari, Edge) without errors.
+   - Load and run successfully **without requiring any edits**.
+
+Generate the complete HTML code for the game.`,
       temperature: 0.7,
     });
     

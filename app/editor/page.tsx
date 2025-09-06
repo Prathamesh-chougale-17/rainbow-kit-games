@@ -6,10 +6,10 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Header } from "@/components/canvas-forge/Header";
+import { EnhancedHeader } from "@/components/canvas-forge/EnhancedHeader";
 import { CodeEditor } from "@/components/canvas-forge/CodeEditor";
 import { Preview } from "@/components/canvas-forge/Preview";
-import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
+import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
 import { toast } from "sonner";
 
 const defaultHtml = `<!DOCTYPE html>
@@ -367,7 +367,7 @@ export default function Home() {
 
   return (
     <div className="flex h-[calc(100vh-4rem)] flex-col bg-background text-foreground">
-      <Header
+      <EnhancedHeader
         onExport={handleExport}
         onShare={handleShare}
         onGenerate={handleGenerate}
