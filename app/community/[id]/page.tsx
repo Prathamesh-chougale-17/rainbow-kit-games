@@ -17,8 +17,6 @@ import {
   Maximize,
   ArrowLeft,
   Users,
-  Heart,
-  Copy
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -50,6 +48,10 @@ interface CommunityGamePageProps {
 }
 
 export default function CommunityGamePage({ params }: CommunityGamePageProps) {
+  // Next.js may provide params as a Promise in newer versions.
+  // Use React.use() to unwrap params before accessing properties to be future-proof.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const resolvedParams: { id: string } = params instanceof Promise ? React.use(params) : params;
   const [game, setGame] = React.useState<Game | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [forking, setForking] = React.useState(false);
@@ -58,11 +60,11 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
   React.useEffect(() => {
     loadGame();
-  }, [params.id]);
+  }, [resolvedParams?.id]);
 
   const loadGame = async () => {
     try {
-      const response = await fetch(`/api/community/${params.id}`);
+    const response = await fetch(`/api/community/${resolvedParams.id}`);
       const result = await response.json();
 
       if (result.success && result.game) {
@@ -89,7 +91,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          originalGameId: params.id,
+          originalGameId: resolvedParams.id,
           walletAddress: process.env.NEXT_PUBLIC_WALLET_ADDRESS,
         }),
       });

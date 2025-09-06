@@ -3,18 +3,17 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  ArrowLeft, 
-  Play, 
+import {
+  ArrowLeft,
+  Play,
   Calendar,
   User,
   Share2,
   Fullscreen,
   Store,
-  Download
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -49,12 +48,11 @@ export default function MarketplaceGamePage() {
 
   React.useEffect(() => {
     loadGame();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
 
   const loadGame = async () => {
     try {
-      // For now, we'll get the game from marketplace API
-      // You might want to create a specific endpoint for individual games
       const response = await fetch(`/api/marketplace`);
       const result = await response.json();
 
@@ -64,12 +62,13 @@ export default function MarketplaceGamePage() {
           setGame(foundGame);
         } else {
           toast.error("Game not found");
-          router.push('/marketplace');
+          router.push("/marketplace");
         }
       }
     } catch (error) {
-      console.error('Load game error:', error);
+      console.error("Load game error:", error);
       toast.error("Failed to load game");
+      router.push("/marketplace");
     } finally {
       setLoading(false);
     }
@@ -88,27 +87,11 @@ export default function MarketplaceGamePage() {
     }
   };
 
-  const handleDownload = () => {
-    if (game && game.versions.length > 0) {
-      const latestVersion = game.versions[game.versions.length - 1];
-      if (latestVersion.html) {
-        const blob = new Blob([latestVersion.html], { type: "text/html" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${game.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success("Game downloaded successfully!");
-      }
-    }
-  };
-
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -164,9 +147,6 @@ export default function MarketplaceGamePage() {
         </Link>
         <div className="flex-1">
           <h1 className="text-3xl font-bold tracking-tight">{game.title}</h1>
-          <p className="text-muted-foreground mt-1">
-            {game.description || "No description provided"}
-          </p>
         </div>
       </div>
 
@@ -185,16 +165,7 @@ export default function MarketplaceGamePage() {
                     className="gap-2"
                   >
                     <Fullscreen className="h-4 w-4" />
-                    {isFullscreen ? 'Exit' : 'Fullscreen'}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleDownload}
-                    className="gap-2"
-                  >
-                    <Download className="h-4 w-4" />
-                    Download
+                    {isFullscreen ? "Exit" : "Fullscreen"}
                   </Button>
                   <Button
                     variant="outline"
@@ -209,38 +180,23 @@ export default function MarketplaceGamePage() {
               </div>
             </CardHeader>
             <CardContent className="p-0">
-              <div className={`relative ${isFullscreen ? 'fixed inset-0 z-50 bg-black' : ''}`}>
+              <div className="relative">
                 {gameUrl ? (
                   <iframe
                     src={gameUrl}
-                    className={`w-full border-0 ${
-                      isFullscreen ? 'h-screen' : 'h-[600px]'
-                    }`}
+                    className={`w-full border-0 h-[600px]`}
                     title={game.title}
                   />
                 ) : latestVersion?.html ? (
                   <iframe
                     srcDoc={latestVersion.html}
-                    className={`w-full border-0 ${
-                      isFullscreen ? 'h-screen' : 'h-[600px]'
-                    }`}
+                    className={`w-full border-0 h-[600px]`}
                     title={game.title}
                   />
                 ) : (
                   <div className="h-[600px] flex items-center justify-center bg-gray-100">
                     <p className="text-gray-500">Game not available</p>
                   </div>
-                )}
-                
-                {isFullscreen && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsFullscreen(false)}
-                    className="absolute top-4 right-4 z-10"
-                  >
-                    Exit Fullscreen
-                  </Button>
                 )}
               </div>
             </CardContent>
@@ -310,13 +266,13 @@ export default function MarketplaceGamePage() {
               <Button
                 variant="outline"
                 className="w-full gap-2"
-                onClick={() => window.open(gameUrl || '#', '_blank')}
+                onClick={() => window.open(gameUrl || "#", "_blank")}
                 disabled={!gameUrl}
               >
                 <Play className="h-4 w-4" />
                 Open in New Tab
               </Button>
-              
+
               <Button
                 variant="outline"
                 className="w-full gap-2"
@@ -325,19 +281,42 @@ export default function MarketplaceGamePage() {
                 <Share2 className="h-4 w-4" />
                 Share Game
               </Button>
-
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={handleDownload}
-              >
-                <Download className="h-4 w-4" />
-                Download HTML
-              </Button>
             </CardContent>
           </Card>
         </div>
       </div>
+
+      {/* Fullscreen Modal */}
+      {isFullscreen && (
+        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+          <div className="w-full h-full relative">
+            <div className="absolute top-4 right-4 z-10">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => setIsFullscreen(false)}
+              >
+                Exit Fullscreen
+              </Button>
+            </div>
+            {gameUrl && (
+              <iframe
+                src={gameUrl}
+                className="w-full h-full border-0"
+                title={`${game.title} - Fullscreen`}
+              />
+            )}
+            {(!gameUrl && latestVersion?.html) && (
+              <iframe
+                srcDoc={latestVersion.html}
+                className="w-full h-full border-0"
+                title={`${game.title} - Fullscreen`}
+              />
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
