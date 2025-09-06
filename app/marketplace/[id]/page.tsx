@@ -3,6 +3,8 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
@@ -50,6 +52,19 @@ export default function MarketplaceGamePage() {
     loadGame();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [gameId]);
+
+  // Hide the global navbar/header while on the full-screen marketplace game page
+  React.useEffect(() => {
+    const header = typeof document !== 'undefined' ? document.querySelector('header') as HTMLElement | null : null;
+    if (header) {
+      const prevDisplay = header.style.display;
+      header.style.display = 'none';
+      return () => {
+        header.style.display = prevDisplay || '';
+      };
+    }
+    return () => {};
+  }, []);
 
   const loadGame = async () => {
     try {
@@ -136,187 +151,84 @@ export default function MarketplaceGamePage() {
   const gameUrl = latestVersion?.ipfsUrl;
 
   return (
-    <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center gap-4">
-        <Link href="/marketplace">
-          <Button variant="outline" size="sm" className="gap-2">
-            <ArrowLeft className="h-4 w-4" />
-            Back
-          </Button>
-        </Link>
-        <div className="flex-1">
-          <h1 className="text-3xl font-bold tracking-tight">{game.title}</h1>
-        </div>
-      </div>
+    <div className="min-h-screen h-screen w-screen bg-black">
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Game Player */}
-        <div className="lg:col-span-2 space-y-4">
-          <Card>
-            <CardHeader className="pb-4">
-              <div className="flex items-center justify-between">
-                <CardTitle className="text-lg">Play Game</CardTitle>
-                <div className="flex gap-2">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => setIsFullscreen(!isFullscreen)}
-                    className="gap-2"
-                  >
-                    <Fullscreen className="h-4 w-4" />
-                    {isFullscreen ? "Exit" : "Fullscreen"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={handleShare}
-                    className="gap-2"
-                  >
-                    <Share2 className="h-4 w-4" />
-                    Share
-                  </Button>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="p-0">
-              <div className="relative">
-                {gameUrl ? (
-                  <iframe
-                    src={gameUrl}
-                    className={`w-full border-0 h-[600px]`}
-                    title={game.title}
-                  />
-                ) : latestVersion?.html ? (
-                  <iframe
-                    srcDoc={latestVersion.html}
-                    className={`w-full border-0 h-[600px]`}
-                    title={game.title}
-                  />
-                ) : (
-                  <div className="h-[600px] flex items-center justify-center bg-gray-100">
-                    <p className="text-gray-500">Game not available</p>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Game Info */}
-        <div className="space-y-4">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Game Information</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <User className="h-4 w-4" />
-                  Creator
-                </div>
-                <p className="font-mono text-sm bg-gray-100 p-2 rounded">
-                  {formatWalletAddress(game.walletAddress)}
-                </p>
-              </div>
-
-              <Separator />
-
-              <div>
-                <div className="flex items-center gap-2 text-sm text-muted-foreground mb-2">
-                  <Calendar className="h-4 w-4" />
-                  Published
-                </div>
-                <p className="text-sm">
-                  {formatDate(game.marketplacePublishedAt || game.createdAt)}
-                </p>
-              </div>
-
-              <Separator />
-
-              <div>
-                <div className="text-sm text-muted-foreground mb-2">Version</div>
-                <p className="text-sm">v{game.currentVersion}</p>
-              </div>
-
-              {game.tags && game.tags.length > 0 && (
-                <>
-                  <Separator />
-                  <div>
-                    <div className="text-sm text-muted-foreground mb-2">Tags</div>
-                    <div className="flex flex-wrap gap-1">
-                      {game.tags.map((tag) => (
-                        <Badge key={tag} variant="secondary" className="text-xs">
-                          {tag}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-                </>
-              )}
-            </CardContent>
-          </Card>
-
-          {/* Actions */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Actions</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={() => window.open(gameUrl || "#", "_blank")}
-                disabled={!gameUrl}
-              >
-                <Play className="h-4 w-4" />
-                Open in New Tab
-              </Button>
-
-              <Button
-                variant="outline"
-                className="w-full gap-2"
-                onClick={handleShare}
-              >
-                <Share2 className="h-4 w-4" />
-                Share Game
-              </Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-
-      {/* Fullscreen Modal */}
-      {isFullscreen && (
-        <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
-          <div className="w-full h-full relative">
-            <div className="absolute top-4 right-4 z-10">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => setIsFullscreen(false)}
-              >
-                Exit Fullscreen
-              </Button>
-            </div>
-            {gameUrl && (
-              <iframe
-                src={gameUrl}
-                className="w-full h-full border-0"
-                title={`${game.title} - Fullscreen`}
-              />
-            )}
-            {(!gameUrl && latestVersion?.html) && (
-              <iframe
-                srcDoc={latestVersion.html}
-                className="w-full h-full border-0"
-                title={`${game.title} - Fullscreen`}
-              />
-            )}
+      <div className="relative h-screen w-full">
+        {/* Full-viewport game iframe */}
+        {gameUrl ? (
+          <iframe
+            src={gameUrl}
+            className="w-full h-full border-0"
+            title={game.title}
+          />
+        ) : latestVersion?.html ? (
+          <iframe
+            srcDoc={latestVersion.html}
+            className="w-full h-full border-0"
+            title={game.title}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center bg-gray-100">
+            <p className="text-gray-500">Game not available</p>
           </div>
-        </div>
-      )}
+        )}
 
+        {/* Top-left overlay: back button + title */}
+        <div className="absolute top-4 left-4 z-50 flex items-center gap-3">
+          <Link href="/marketplace">
+            <Button variant="outline" size="sm" className="gap-2">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <h1 className="text-lg font-semibold text-white">{game.title}</h1>
+        </div>
+
+        {/* Top-right overlay: avatar (popover) + share button */}
+        <div className="absolute top-4 right-4 z-50 flex items-center gap-2">
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" className="p-0">
+                <Avatar>
+                  {game.walletAddress ? (
+                    <AvatarFallback className="text-xs">{formatWalletAddress(game.walletAddress)}</AvatarFallback>
+                  ) : (
+                    <AvatarFallback />
+                  )}
+                </Avatar>
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent>
+              <div className="text-sm">
+                <div className="font-medium">Creator</div>
+                <div className="font-mono mt-1">{formatWalletAddress(game.walletAddress)}</div>
+                <div className="text-muted-foreground mt-2">Published: {formatDate(game.marketplacePublishedAt || game.createdAt)}</div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          <Button variant="outline" size="sm" onClick={handleShare}>
+            <Share2 className="h-4 w-4" />
+          </Button>
+        </div>
+
+        {/* Fullscreen Modal (like community) */}
+        {isFullscreen && (
+          <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
+            <div className="w-full h-full relative">
+              <div className="absolute top-4 right-4 z-10">
+                <Button variant="secondary" size="sm" onClick={() => setIsFullscreen(false)}>
+                  Exit Fullscreen
+                </Button>
+              </div>
+              {gameUrl ? (
+                <iframe src={gameUrl} className="w-full h-full border-0" title={`${game.title} - Fullscreen`} />
+              ) : latestVersion?.html ? (
+                <iframe srcDoc={latestVersion.html} className="w-full h-full border-0" title={`${game.title} - Fullscreen`} />
+              ) : null}
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
