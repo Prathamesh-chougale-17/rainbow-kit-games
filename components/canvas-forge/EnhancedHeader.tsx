@@ -33,17 +33,6 @@ export function EnhancedHeader({
   return (
     <header className="flex h-16 items-center justify-between p-4">
       <div className="flex items-center gap-2">
-        <Code className="h-8 w-8 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />
-        <h1 className="text-2xl font-bold tracking-tighter text-gray-100">
-          CanvasForge
-          {useEnhanced && (
-            <span className="ml-2 text-sm bg-gradient-to-r from-purple-500 to-pink-500 bg-clip-text text-transparent">
-              AI Enhanced
-            </span>
-          )}
-        </h1>
-      </div>
-      <div className="flex items-center gap-2">
         <GeneratorDialog
           onGenerate={onGenerate}
           html={html}

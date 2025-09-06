@@ -193,17 +193,6 @@ export default function GameEditor() {
     }
   };
 
-  const handleExport = () => {
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.html`;
-    a.click();
-    URL.revokeObjectURL(url);
-    toast.success("Game exported successfully!");
-  };
-
   const handlePublishToMarketplace = async () => {
     if (!currentGameId) {
       toast.error("Please save your game first");
@@ -307,20 +296,9 @@ export default function GameEditor() {
 
   return (
     <div className="h-screen flex flex-col bg-[#0a0a0a]">
-      {/* Back Button */}
-      <div className="p-2 border-b border-gray-800">
-        <Link href="/editor">
-          <Button variant="ghost" size="sm" className="gap-2 text-gray-300 hover:text-white">
-            <ArrowLeft className="h-4 w-4" />
-            Back to Dashboard
-          </Button>
-        </Link>
-      </div>
-
       {/* Header */}
       <Header
         onGenerate={handleGenerate}
-        onExport={handleExport}
         onShare={handleShare}
         onSave={handleSave}
         onPublishMarketplace={handlePublishToMarketplace}

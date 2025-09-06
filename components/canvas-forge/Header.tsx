@@ -1,12 +1,11 @@
 "use client";
 
-import { Bot, Download, Share2, Code, ShoppingCart, Users, Save } from "lucide-react";
+import { Bot, Download, Share2, Code, ShoppingCart, Users, Save, Link, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
 import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code";
 
 interface HeaderProps {
-  onExport: () => void;
   onShare: () => void;
   onGenerate: (output: GenerateGameCodeOutput) => void;
   onSave?: () => void;
@@ -19,7 +18,6 @@ interface HeaderProps {
 }
 
 export function Header({
-  onExport,
   onShare,
   onGenerate,
   onSave,
@@ -37,6 +35,7 @@ export function Header({
   return (
     <header className="flex h-16 items-center justify-between p-4">
       <div className="flex items-center gap-2">
+        
         <Code className="h-8 w-8 text-primary drop-shadow-[0_0_5px_hsl(var(--primary))]" />
         <h1 className="text-2xl font-bold tracking-tighter text-gray-100">
           CanvasForge
@@ -96,10 +95,6 @@ export function Header({
         <Button variant="ghost" onClick={onShare} className={buttonClass}>
           <Share2 className={iconClass} />
           Share
-        </Button>
-        <Button variant="ghost" onClick={onExport} className={buttonClass}>
-          <Download className={iconClass} />
-          Export
         </Button>
       </div>
     </header>
