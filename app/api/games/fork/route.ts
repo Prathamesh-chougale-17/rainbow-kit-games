@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { gameService } from '@/lib/game-service';
 
 // Upload forked game to IPFS
-async function uploadToIPFS(htmlContent: string, title: string, walletAddress: string) {
+async function uploadToIPFS(htmlContent: string, title: string, walletAddress: string, originalOwner: string) {
   const formData = new FormData();
   const blob = new Blob([htmlContent], { type: 'text/html' });
   const sanitizedTitle = title.replace(/[^a-z0-9\-_]/gi, '_').substring(0, 100);
@@ -15,7 +15,8 @@ async function uploadToIPFS(htmlContent: string, title: string, walletAddress: s
       title: title,
       uploadedAt: new Date().toISOString(),
       userId: walletAddress,
-      forked: 'true'
+      forked: 'true',
+      forkedFrom: originalOwner
     }
   });
   formData.append('pinataMetadata', pinataMetadata);
@@ -78,15 +79,27 @@ export async function POST(request: NextRequest) {
 
     // Upload the forked game HTML to IPFS with new CID
     const forkTitle = newTitle || `${originalGame.title} (Fork)`;
-    const ipfsResult = await uploadToIPFS(latestVersion.html, forkTitle, walletAddress);
+    const ipfsResult = await uploadToIPFS(latestVersion.html, forkTitle, walletAddress, originalGame.walletAddress);
 
     // Fork the game with new IPFS data
+    // Store the original game's owner address in DB as originalOwner
+    const originalOwner = originalGame.walletAddress;
+
     const forkedGame = await gameService.forkGameWithIPFS(
-      originalGameId, 
-      walletAddress, 
+      originalGameId,
+      walletAddress,
       forkTitle,
       ipfsResult
     );
+
+    // Also update the newly created forked game's originalOwner (createGame already accepts originalGameId, but ensure originalOwner is set)
+    await (async () => {
+      try {
+        await (await import('@/lib/game-service')).gameService.updateGame(forkedGame.gameId, { originalOwner });
+      } catch (e) {
+        console.warn('Failed to set originalOwner on forked game:', e);
+      }
+    })();
 
     return NextResponse.json({
       success: true,

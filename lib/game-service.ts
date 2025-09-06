@@ -31,6 +31,7 @@ export interface Game {
   communityPublishedAt?: Date;
   forkCount: number;
   originalGameId?: string; // For forked games
+  originalOwner?: string; // wallet address from which this game was forked
   createdAt: Date;
   updatedAt: Date;
 }
@@ -57,7 +58,8 @@ class GameService {
     tags?: string[];
     isPublishedToMarketplace?: boolean;
     isPublishedToCommunity?: boolean;
-    originalGameId?: string;
+  originalGameId?: string;
+  originalOwner?: string;
   }): Promise<Game> {
     const gameId = `game_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
@@ -69,6 +71,7 @@ class GameService {
       forkCount: 0,
       isPublishedToMarketplace: gameData.isPublishedToMarketplace || false,
       isPublishedToCommunity: gameData.isPublishedToCommunity || false,
+  originalOwner: gameData.originalOwner,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
