@@ -59,8 +59,8 @@ class GameService {
     isPublishedToCommunity?: boolean;
     originalGameId?: string;
   }): Promise<Game> {
-    const gameId = `game_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
-    
+    const gameId = `game_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+
     const game: Game = {
       ...gameData,
       gameId,
