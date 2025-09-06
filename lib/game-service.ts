@@ -1,4 +1,4 @@
-import { MongoClient } from "mongodb";
+import type { Filter } from "mongodb";
 import client from "./mongodb";
 
 export interface GameVersion {
@@ -358,7 +358,7 @@ class GameService {
     query: string,
     type?: "marketplace" | "community",
   ): Promise<Game[]> {
-    const filter: any = {
+    let filter: Filter<Game> = {
       $or: [
         { title: { $regex: query, $options: "i" } },
         { description: { $regex: query, $options: "i" } },
@@ -367,9 +367,9 @@ class GameService {
     };
 
     if (type === "marketplace") {
-      filter.isPublishedToMarketplace = true;
+      filter = { ...filter, isPublishedToMarketplace: true };
     } else if (type === "community") {
-      filter.isPublishedToCommunity = true;
+      filter = { ...filter, isPublishedToCommunity: true };
     }
 
     return await this.db()
