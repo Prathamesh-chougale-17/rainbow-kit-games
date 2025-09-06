@@ -2,18 +2,24 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  Users, 
-  Search, 
+import {
+  Users,
+  Search,
   Calendar,
   User,
   GitFork,
   Code,
   Eye,
-  Heart
+  Heart,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -51,11 +57,11 @@ export default function CommunityPage() {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '12',
+        limit: "12",
       });
-      
+
       if (searchQuery) {
-        params.append('search', searchQuery);
+        params.append("search", searchQuery);
       }
 
       const response = await fetch(`/api/community?${params}`);
@@ -67,7 +73,7 @@ export default function CommunityPage() {
         toast.error("Failed to load community games");
       }
     } catch (error) {
-      console.error('Load community games error:', error);
+      console.error("Load community games error:", error);
       toast.error("Failed to load community games");
     } finally {
       setLoading(false);
@@ -81,10 +87,10 @@ export default function CommunityPage() {
   };
 
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -119,9 +125,7 @@ export default function CommunityPage() {
           </p>
         </div>
         <Link href="/editor">
-          <Button className="gap-2">
-            Share Your Creation
-          </Button>
+          <Button className="gap-2">Share Your Creation</Button>
         </Link>
       </div>
 
@@ -143,23 +147,25 @@ export default function CommunityPage() {
       {games.length === 0 ? (
         <div className="text-center py-12">
           <Users className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No community games found</h3>
+          <h3 className="text-xl font-semibold mb-2">
+            No community games found
+          </h3>
           <p className="text-muted-foreground mb-6">
-            {searchQuery ? 
-              "Try a different search term" : 
-              "Be the first to share a game with the community!"
-            }
+            {searchQuery
+              ? "Try a different search term"
+              : "Be the first to share a game with the community!"}
           </p>
           <Link href="/editor">
-            <Button className="gap-2">
-              Share First Game
-            </Button>
+            <Button className="gap-2">Share First Game</Button>
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {games.map((game) => (
-            <Card key={game.gameId} className="hover:shadow-lg transition-shadow group">
+            <Card
+              key={game.gameId}
+              className="hover:shadow-lg transition-shadow group"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1">
@@ -206,8 +212,7 @@ export default function CommunityPage() {
                     {game.forkCount} forks
                   </div>
                   <div className="flex items-center gap-1">
-                    <Code className="h-3 w-3" />
-                    v{game.currentVersion}
+                    <Code className="h-3 w-3" />v{game.currentVersion}
                   </div>
                   <div className="flex items-center gap-1">
                     <Calendar className="h-3 w-3" />
@@ -218,7 +223,11 @@ export default function CommunityPage() {
                 {/* Actions */}
                 <div className="flex gap-2">
                   <Link href={`/community/${game.gameId}`} className="flex-1">
-                    <Button variant="default" size="sm" className="w-full gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full gap-2"
+                    >
                       <Eye className="h-3 w-3" />
                       View & Fork
                     </Button>
@@ -235,15 +244,12 @@ export default function CommunityPage() {
         <div className="flex justify-center gap-2 pt-6">
           <Button
             variant="outline"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setPage(p => p + 1)}
-          >
+          <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
             Next
           </Button>
         </div>

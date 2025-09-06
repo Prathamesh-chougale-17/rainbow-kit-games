@@ -8,9 +8,9 @@
  * - GenerateGameCodeOutput - The return type for the generateGameCode function.
  */
 
-import { generateObject } from 'ai';
-import { aiModel } from '@/ai/config';
-import { z } from 'zod';
+import { generateObject } from "ai";
+import { aiModel } from "@/ai/config";
+import { z } from "zod";
 
 const GenerateGameCodeInputSchema = z.object({
   prompt: z

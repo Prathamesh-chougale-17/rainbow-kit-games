@@ -1,8 +1,8 @@
-import { google } from '@ai-sdk/google';
+import { google } from "@ai-sdk/google";
 // import { openai } from '@ai-sdk/openai';
 
 // Configure your preferred AI model here
-export const aiModel = google('gemini-2.0-flash-001');
+export const aiModel = google("gemini-2.0-flash-001");
 
 // Alternative models you can use:
 // export const aiModel = openai('gpt-4o');

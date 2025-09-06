@@ -2,18 +2,24 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { 
-  Play, 
-  Search, 
+import {
+  Play,
+  Search,
   Calendar,
   User,
   Star,
   Download,
   Share2,
-  Store
+  Store,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -51,11 +57,11 @@ export default function MarketplacePage() {
     try {
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '12',
+        limit: "12",
       });
-      
+
       if (searchQuery) {
-        params.append('search', searchQuery);
+        params.append("search", searchQuery);
       }
 
       const response = await fetch(`/api/marketplace?${params}`);
@@ -67,7 +73,7 @@ export default function MarketplacePage() {
         toast.error("Failed to load marketplace games");
       }
     } catch (error) {
-      console.error('Load marketplace games error:', error);
+      console.error("Load marketplace games error:", error);
       toast.error("Failed to load marketplace games");
     } finally {
       setLoading(false);
@@ -81,10 +87,10 @@ export default function MarketplacePage() {
   };
 
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -98,7 +104,9 @@ export default function MarketplacePage() {
         <div className="flex items-center justify-center min-h-[400px]">
           <div className="text-center">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading marketplace games...</p>
+            <p className="text-muted-foreground">
+              Loading marketplace games...
+            </p>
           </div>
         </div>
       </div>
@@ -119,9 +127,7 @@ export default function MarketplacePage() {
           </p>
         </div>
         <Link href="/editor">
-          <Button className="gap-2">
-            Create Your Own Game
-          </Button>
+          <Button className="gap-2">Create Your Own Game</Button>
         </Link>
       </div>
 
@@ -145,21 +151,21 @@ export default function MarketplacePage() {
           <Store className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
           <h3 className="text-xl font-semibold mb-2">No games found</h3>
           <p className="text-muted-foreground mb-6">
-            {searchQuery ? 
-              "Try a different search term" : 
-              "Be the first to publish a game to the marketplace!"
-            }
+            {searchQuery
+              ? "Try a different search term"
+              : "Be the first to publish a game to the marketplace!"}
           </p>
           <Link href="/editor">
-            <Button className="gap-2">
-              Create First Game
-            </Button>
+            <Button className="gap-2">Create First Game</Button>
           </Link>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
           {games.map((game) => (
-            <Card key={game.gameId} className="hover:shadow-lg transition-shadow group">
+            <Card
+              key={game.gameId}
+              className="hover:shadow-lg transition-shadow group"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1">
@@ -204,7 +210,11 @@ export default function MarketplacePage() {
                 {/* Actions */}
                 <div className="flex gap-2">
                   <Link href={`/marketplace/${game.gameId}`} className="flex-1">
-                    <Button variant="default" size="sm" className="w-full gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full gap-2"
+                    >
                       <Play className="h-3 w-3" />
                       Play Game
                     </Button>
@@ -214,7 +224,7 @@ export default function MarketplacePage() {
                     size="sm"
                     onClick={() => {
                       navigator.clipboard.writeText(
-                        `${window.location.origin}/marketplace/${game.gameId}`
+                        `${window.location.origin}/marketplace/${game.gameId}`,
                       );
                       toast.success("Game link copied!");
                     }}
@@ -233,15 +243,12 @@ export default function MarketplacePage() {
         <div className="flex justify-center gap-2 pt-6">
           <Button
             variant="outline"
-            onClick={() => setPage(p => Math.max(1, p - 1))}
+            onClick={() => setPage((p) => Math.max(1, p - 1))}
             disabled={page === 1}
           >
             Previous
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => setPage(p => p + 1)}
-          >
+          <Button variant="outline" onClick={() => setPage((p) => p + 1)}>
             Next
           </Button>
         </div>

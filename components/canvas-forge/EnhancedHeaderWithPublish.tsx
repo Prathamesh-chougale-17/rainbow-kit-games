@@ -2,11 +2,11 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { 
-  Bot, 
-  Save, 
-  Play, 
-  Palette, 
+import {
+  Bot,
+  Save,
+  Play,
+  Palette,
   Wand2,
   Upload,
   Users,
@@ -14,7 +14,7 @@ import {
   Code,
   Zap,
   Share2,
-  Download
+  Download,
 } from "lucide-react";
 import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
 import { toast } from "sonner";
@@ -41,7 +41,7 @@ export function EnhancedHeader({
 }: EnhancedHeaderProps) {
   const [isPublishing, setIsPublishing] = React.useState(false);
 
-  const handlePublish = async (type: 'marketplace' | 'community') => {
+  const handlePublish = async (type: "marketplace" | "community") => {
     if (!gameId || !title || !html) {
       toast.error("Please save your game first before publishing");
       return;
@@ -55,10 +55,10 @@ export function EnhancedHeader({
         return;
       }
 
-      const response = await fetch('/api/games/publish', {
-        method: 'POST',
+      const response = await fetch("/api/games/publish", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           gameId,
@@ -72,18 +72,19 @@ export function EnhancedHeader({
 
       if (result.success) {
         toast.success(
-          `Successfully published to ${type === 'marketplace' ? 'Marketplace' : 'Community'}!`,
+          `Successfully published to ${type === "marketplace" ? "Marketplace" : "Community"}!`,
           {
-            description: `Your game "${title}" is now available for ${type === 'marketplace' ? 'players' : 'the community to fork and improve'}.`,
-          }
+            description: `Your game "${title}" is now available for ${type === "marketplace" ? "players" : "the community to fork and improve"}.`,
+          },
         );
       } else {
-        throw new Error(result.error || 'Failed to publish');
+        throw new Error(result.error || "Failed to publish");
       }
     } catch (error) {
-      console.error('Publish error:', error);
+      console.error("Publish error:", error);
       toast.error("Failed to publish game", {
-        description: error instanceof Error ? error.message : "Please try again later.",
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
       });
     } finally {
       setIsPublishing(false);
@@ -129,7 +130,7 @@ export function EnhancedHeader({
         {isGameGenerated && (
           <Button
             variant="ghost"
-            onClick={() => handlePublish('marketplace')}
+            onClick={() => handlePublish("marketplace")}
             disabled={isPublishing}
             className={`${buttonClass} text-green-400 hover:text-green-300`}
           >
@@ -142,7 +143,7 @@ export function EnhancedHeader({
         {isGameGenerated && (
           <Button
             variant="ghost"
-            onClick={() => handlePublish('community')}
+            onClick={() => handlePublish("community")}
             disabled={isPublishing}
             className={`${buttonClass} text-blue-400 hover:text-blue-300`}
           >

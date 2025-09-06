@@ -2,17 +2,23 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Plus, 
-  Play, 
-  Edit, 
+import {
+  Plus,
+  Play,
+  Edit,
   Calendar,
   Code,
   Trash2,
   ShoppingCart,
-  Users
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
@@ -56,7 +62,7 @@ export default function EditorDashboard() {
         toast.error("Failed to load games");
       }
     } catch (error) {
-      console.error('Load games error:', error);
+      console.error("Load games error:", error);
       toast.error("Failed to load games");
     } finally {
       setLoading(false);
@@ -64,10 +70,10 @@ export default function EditorDashboard() {
   };
 
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
     });
   };
 
@@ -77,7 +83,7 @@ export default function EditorDashboard() {
     try {
       // Note: You'll need to implement delete API endpoint
       toast.success("Game deleted successfully");
-      setGames(games.filter(game => game.gameId !== gameId));
+      setGames(games.filter((game) => game.gameId !== gameId));
     } catch (error) {
       toast.error("Failed to delete game");
     }
@@ -149,13 +155,14 @@ export default function EditorDashboard() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {games.map((game) => (
-            <Card key={game.gameId} className="hover:shadow-lg transition-shadow">
+            <Card
+              key={game.gameId}
+              className="hover:shadow-lg transition-shadow"
+            >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <div className="space-y-1 flex-1">
-                    <CardTitle className="line-clamp-1">
-                      {game.title}
-                    </CardTitle>
+                    <CardTitle className="line-clamp-1">{game.title}</CardTitle>
                     <CardDescription className="line-clamp-2">
                       {game.description || "No description provided"}
                     </CardDescription>
@@ -203,8 +210,7 @@ export default function EditorDashboard() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <Code className="h-3 w-3" />
-                    v{game.currentVersion}
+                    <Code className="h-3 w-3" />v{game.currentVersion}
                   </div>
                   <div className="flex items-center gap-1">
                     <Users className="h-3 w-3" />
@@ -219,7 +225,11 @@ export default function EditorDashboard() {
                 {/* Actions */}
                 <div className="flex gap-2">
                   <Link href={`/editor/${game.gameId}`} className="flex-1">
-                    <Button variant="default" size="sm" className="w-full gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="w-full gap-2"
+                    >
                       <Edit className="h-3 w-3" />
                       Edit
                     </Button>
@@ -231,8 +241,8 @@ export default function EditorDashboard() {
                       </Button>
                     </Link>
                   )}
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="sm"
                     onClick={() => handleDelete(game.gameId)}
                   >

@@ -3,7 +3,11 @@
 import * as React from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverTrigger, PopoverContent } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverTrigger,
+  PopoverContent,
+} from "@/components/ui/popover";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -55,12 +59,15 @@ export default function MarketplaceGamePage() {
 
   // Hide the global navbar/header while on the full-screen marketplace game page
   React.useEffect(() => {
-    const header = typeof document !== 'undefined' ? document.querySelector('header') as HTMLElement | null : null;
+    const header =
+      typeof document !== "undefined"
+        ? (document.querySelector("header") as HTMLElement | null)
+        : null;
     if (header) {
       const prevDisplay = header.style.display;
-      header.style.display = 'none';
+      header.style.display = "none";
       return () => {
-        header.style.display = prevDisplay || '';
+        header.style.display = prevDisplay || "";
       };
     }
     return () => {};
@@ -152,7 +159,6 @@ export default function MarketplaceGamePage() {
 
   return (
     <div className="min-h-screen h-screen w-screen bg-black">
-
       <div className="relative h-screen w-full">
         {/* Full-viewport game iframe */}
         {gameUrl ? (
@@ -190,7 +196,9 @@ export default function MarketplaceGamePage() {
               <Button variant="ghost" className="p-0">
                 <Avatar>
                   {game.walletAddress ? (
-                    <AvatarFallback className="text-xs">{formatWalletAddress(game.walletAddress)}</AvatarFallback>
+                    <AvatarFallback className="text-xs">
+                      {formatWalletAddress(game.walletAddress)}
+                    </AvatarFallback>
                   ) : (
                     <AvatarFallback />
                   )}
@@ -200,8 +208,13 @@ export default function MarketplaceGamePage() {
             <PopoverContent>
               <div className="text-sm">
                 <div className="font-medium">Creator</div>
-                <div className="font-mono mt-1">{formatWalletAddress(game.walletAddress)}</div>
-                <div className="text-muted-foreground mt-2">Published: {formatDate(game.marketplacePublishedAt || game.createdAt)}</div>
+                <div className="font-mono mt-1">
+                  {formatWalletAddress(game.walletAddress)}
+                </div>
+                <div className="text-muted-foreground mt-2">
+                  Published:{" "}
+                  {formatDate(game.marketplacePublishedAt || game.createdAt)}
+                </div>
               </div>
             </PopoverContent>
           </Popover>
@@ -216,14 +229,26 @@ export default function MarketplaceGamePage() {
           <div className="fixed inset-0 bg-black z-50 flex items-center justify-center">
             <div className="w-full h-full relative">
               <div className="absolute top-4 right-4 z-10">
-                <Button variant="secondary" size="sm" onClick={() => setIsFullscreen(false)}>
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => setIsFullscreen(false)}
+                >
                   Exit Fullscreen
                 </Button>
               </div>
               {gameUrl ? (
-                <iframe src={gameUrl} className="w-full h-full border-0" title={`${game.title} - Fullscreen`} />
+                <iframe
+                  src={gameUrl}
+                  className="w-full h-full border-0"
+                  title={`${game.title} - Fullscreen`}
+                />
               ) : latestVersion?.html ? (
-                <iframe srcDoc={latestVersion.html} className="w-full h-full border-0" title={`${game.title} - Fullscreen`} />
+                <iframe
+                  srcDoc={latestVersion.html}
+                  className="w-full h-full border-0"
+                  title={`${game.title} - Fullscreen`}
+                />
               ) : null}
             </div>
           </div>

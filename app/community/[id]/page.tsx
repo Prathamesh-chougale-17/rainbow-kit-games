@@ -2,12 +2,18 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Play, 
-  GitFork, 
+import {
+  Play,
+  GitFork,
   Code,
   User,
   Calendar,
@@ -51,7 +57,8 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   // Next.js may provide params as a Promise in newer versions.
   // Use React.use() to unwrap params before accessing properties to be future-proof.
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const resolvedParams: { id: string } = params instanceof Promise ? React.use(params) : params;
+  const resolvedParams: { id: string } =
+    params instanceof Promise ? React.use(params) : params;
   const [game, setGame] = React.useState<Game | null>(null);
   const [loading, setLoading] = React.useState(true);
   const [forking, setForking] = React.useState(false);
@@ -64,19 +71,19 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
   const loadGame = async () => {
     try {
-    const response = await fetch(`/api/community/${resolvedParams.id}`);
+      const response = await fetch(`/api/community/${resolvedParams.id}`);
       const result = await response.json();
 
       if (result.success && result.game) {
         setGame(result.game);
       } else {
         toast.error("Game not found");
-        router.push('/community');
+        router.push("/community");
       }
     } catch (error) {
-      console.error('Load game error:', error);
+      console.error("Load game error:", error);
       toast.error("Failed to load game");
-      router.push('/community');
+      router.push("/community");
     } finally {
       setLoading(false);
     }
@@ -85,10 +92,10 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   const handleFork = async () => {
     try {
       setForking(true);
-      const response = await fetch('/api/games/fork', {
-        method: 'POST',
+      const response = await fetch("/api/games/fork", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           originalGameId: resolvedParams.id,
@@ -100,12 +107,12 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
       if (result.success) {
         toast.success("Game forked successfully!");
-        router.push(`/editor/${result.gameId}`);
+        router.push(`/editor/${result.game.gameId}`);
       } else {
         toast.error(result.error || "Failed to fork game");
       }
     } catch (error) {
-      console.error('Fork game error:', error);
+      console.error("Fork game error:", error);
       toast.error("Failed to fork game");
     } finally {
       setForking(false);
@@ -124,15 +131,15 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   const handleDownload = () => {
     if (game?.versions?.[game.currentVersion - 1]?.ipfsCid) {
       const downloadUrl = `https://ipfs.io/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
-      window.open(downloadUrl, '_blank');
+      window.open(downloadUrl, "_blank");
     }
   };
 
   const formatDate = (dateString: string | Date) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
+    return new Date(dateString).toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
     });
   };
 
@@ -144,7 +151,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
     if (game?.versions?.[game.currentVersion - 1]?.ipfsCid) {
       return `https://ipfs.io/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
     }
-    return '';
+    return "";
   };
 
   if (loading) {
@@ -218,7 +225,9 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   <div className="flex items-center justify-center h-full">
                     <div className="text-center">
                       <Play className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-                      <p className="text-muted-foreground">Game not available</p>
+                      <p className="text-muted-foreground">
+                        Game not available
+                      </p>
                     </div>
                   </div>
                 )}
@@ -301,7 +310,9 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                     <Calendar className="h-4 w-4" />
                     Published
                   </span>
-                  <span>{formatDate(game.communityPublishedAt || game.createdAt)}</span>
+                  <span>
+                    {formatDate(game.communityPublishedAt || game.createdAt)}
+                  </span>
                 </div>
               </div>
 
@@ -309,8 +320,8 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
 
               {/* Actions */}
               <div className="space-y-2">
-                <Button 
-                  onClick={handleFork} 
+                <Button
+                  onClick={handleFork}
                   disabled={forking}
                   className="w-full gap-2"
                 >
@@ -338,7 +349,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
               <CardContent>
                 <div className="text-sm text-muted-foreground">
                   <p>This is a fork of another community game.</p>
-                  <Link 
+                  <Link
                     href={`/community/${game.originalGameId}`}
                     className="text-primary hover:underline flex items-center gap-1 mt-2"
                   >

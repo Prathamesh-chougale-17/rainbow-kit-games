@@ -1,34 +1,34 @@
 /**
  * @fileOverview Example configurations for different AI providers using Vercel AI SDK
- * 
+ *
  * This file demonstrates how to configure various AI providers.
  * Copy the configuration you want to use into ai/config.ts
  */
 
-import { google } from '@ai-sdk/google';
-import { openai } from '@ai-sdk/openai';
+import { google } from "@ai-sdk/google";
+import { openai } from "@ai-sdk/openai";
 // import { anthropic } from '@ai-sdk/anthropic';
 // import { cohere } from '@ai-sdk/cohere';
 
 // Google AI Configuration (Free tier available)
 export const googleConfig = {
-  model: google('gemini-2.0-flash-exp'),
+  model: google("gemini-2.0-flash-exp"),
   temperature: 0.7,
-  description: 'Google Gemini - Fast and capable, free tier available'
+  description: "Google Gemini - Fast and capable, free tier available",
 };
 
 // OpenAI Configuration (Paid)
 export const openaiConfig = {
-  model: openai('gpt-4o'),
+  model: openai("gpt-4o"),
   temperature: 0.7,
-  description: 'OpenAI GPT-4o - Most capable model, paid only'
+  description: "OpenAI GPT-4o - Most capable model, paid only",
 };
 
 // Alternative OpenAI models
 export const openaiAlternatives = {
-  gpt4: openai('gpt-4'),
-  gpt35: openai('gpt-3.5-turbo'),
-  gpt4mini: openai('gpt-4o-mini'), // Cheaper option
+  gpt4: openai("gpt-4"),
+  gpt35: openai("gpt-3.5-turbo"),
+  gpt4mini: openai("gpt-4o-mini"), // Cheaper option
 };
 
 // Anthropic Configuration (Paid)

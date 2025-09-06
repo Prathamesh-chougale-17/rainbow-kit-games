@@ -1,9 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { gameService } from '@/lib/game-service';
+import { NextRequest, NextResponse } from "next/server";
+import { gameService } from "@/lib/game-service";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ) {
   try {
     const { id } = await params;
@@ -11,16 +11,16 @@ export async function GET(
 
     if (!game) {
       return NextResponse.json(
-        { success: false, error: 'Game not found' },
-        { status: 404 }
+        { success: false, error: "Game not found" },
+        { status: 404 },
       );
     }
 
     // Check if game is published to community
     if (!game.isPublishedToCommunity) {
       return NextResponse.json(
-        { success: false, error: 'Game not published to community' },
-        { status: 404 }
+        { success: false, error: "Game not published to community" },
+        { status: 404 },
       );
     }
 
@@ -29,10 +29,10 @@ export async function GET(
       game,
     });
   } catch (error) {
-    console.error('Get community game error:', error);
+    console.error("Get community game error:", error);
     return NextResponse.json(
-      { success: false, error: 'Failed to fetch game' },
-      { status: 500 }
+      { success: false, error: "Failed to fetch game" },
+      { status: 500 },
     );
   }
 }

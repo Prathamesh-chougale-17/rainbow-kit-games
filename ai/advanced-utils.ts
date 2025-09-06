@@ -2,14 +2,14 @@
 
 /**
  * @fileOverview Advanced AI utilities using Vercel AI SDK
- * 
+ *
  * This file demonstrates advanced features like streaming, tool usage,
  * and multi-step reasoning that are possible with the AI SDK.
  */
 
-import { generateText, streamText, generateObject } from 'ai';
-import { aiModel } from '@/ai/config';
-import { z } from 'zod';
+import { generateText, streamText, generateObject } from "ai";
+import { aiModel } from "@/ai/config";
+import { z } from "zod";
 
 // Streaming version for real-time game generation
 export async function generateGameCodeStream(prompt: string) {
@@ -28,15 +28,21 @@ export async function generateGameCodeStream(prompt: string) {
 // Multi-step game refinement with reasoning
 export async function refineGameWithReasoning(
   gameHtml: string,
-  feedback: string
+  feedback: string,
 ) {
   // Step 1: Analyze the current game
   const analysis = await generateObject({
     model: aiModel,
     schema: z.object({
-      currentFeatures: z.array(z.string()).describe('List of current game features'),
-      issues: z.array(z.string()).describe('Identified issues in the current game'),
-      improvementPlan: z.string().describe('Plan for improvements based on feedback'),
+      currentFeatures: z
+        .array(z.string())
+        .describe("List of current game features"),
+      issues: z
+        .array(z.string())
+        .describe("Identified issues in the current game"),
+      improvementPlan: z
+        .string()
+        .describe("Plan for improvements based on feedback"),
     }),
     prompt: `Analyze this HTML5 game and the user feedback:
     
@@ -53,14 +59,16 @@ export async function refineGameWithReasoning(
   const improvedGame = await generateObject({
     model: aiModel,
     schema: z.object({
-      html: z.string().describe('The improved HTML5 game code'),
-      changes: z.array(z.string()).describe('List of specific changes made'),
-      reasoning: z.string().describe('Explanation of why these changes were made'),
+      html: z.string().describe("The improved HTML5 game code"),
+      changes: z.array(z.string()).describe("List of specific changes made"),
+      reasoning: z
+        .string()
+        .describe("Explanation of why these changes were made"),
     }),
     prompt: `Based on this analysis, improve the game:
     
-    Current Features: ${analysis.object.currentFeatures.join(', ')}
-    Issues: ${analysis.object.issues.join(', ')}
+    Current Features: ${analysis.object.currentFeatures.join(", ")}
+    Issues: ${analysis.object.issues.join(", ")}
     Improvement Plan: ${analysis.object.improvementPlan}
     
     Original Game:
@@ -81,29 +89,34 @@ export async function refineGameWithReasoning(
 // Game idea generator with creativity controls
 export async function generateGameIdea(
   theme: string,
-  difficulty: 'simple' | 'medium' | 'complex' = 'medium',
-  creativity: number = 0.7
+  difficulty: "simple" | "medium" | "complex" = "medium",
+  creativity: number = 0.7,
 ) {
   const complexityGuide = {
-    simple: 'Use basic mechanics like clicking, simple movement, or matching. Suitable for beginners.',
-    medium: 'Include intermediate mechanics like physics, collision detection, or basic AI. Good balance of fun and complexity.',
-    complex: 'Advanced mechanics like procedural generation, complex AI, or multiple game systems. For experienced players.'
+    simple:
+      "Use basic mechanics like clicking, simple movement, or matching. Suitable for beginners.",
+    medium:
+      "Include intermediate mechanics like physics, collision detection, or basic AI. Good balance of fun and complexity.",
+    complex:
+      "Advanced mechanics like procedural generation, complex AI, or multiple game systems. For experienced players.",
   };
 
   const result = await generateObject({
     model: aiModel,
     schema: z.object({
-      title: z.string().describe('Creative game title'),
-      concept: z.string().describe('One-sentence game concept'),
-      mechanics: z.array(z.string()).describe('Core gameplay mechanics'),
+      title: z.string().describe("Creative game title"),
+      concept: z.string().describe("One-sentence game concept"),
+      mechanics: z.array(z.string()).describe("Core gameplay mechanics"),
       controls: z.object({
-        keyboard: z.array(z.string()).describe('Keyboard controls'),
-        touch: z.array(z.string()).describe('Touch/mobile controls'),
+        keyboard: z.array(z.string()).describe("Keyboard controls"),
+        touch: z.array(z.string()).describe("Touch/mobile controls"),
       }),
-      visualStyle: z.string().describe('Visual design and art style'),
-      objective: z.string().describe('Win condition and player goal'),
-      features: z.array(z.string()).describe('Key game features'),
-      technicalRequirements: z.array(z.string()).describe('Technical implementation notes'),
+      visualStyle: z.string().describe("Visual design and art style"),
+      objective: z.string().describe("Win condition and player goal"),
+      features: z.array(z.string()).describe("Key game features"),
+      technicalRequirements: z
+        .array(z.string())
+        .describe("Technical implementation notes"),
     }),
     prompt: `Generate a creative ${difficulty} game idea based on the theme: "${theme}"
     
@@ -120,7 +133,7 @@ export async function generateGameIdea(
 // Batch processing for multiple game variations
 export async function generateGameVariations(
   basePrompt: string,
-  variationCount: number = 3
+  variationCount: number = 3,
 ) {
   const variations = await Promise.all(
     Array.from({ length: variationCount }, async (_, index) => {
@@ -130,7 +143,7 @@ export async function generateGameVariations(
           title: z.string(),
           description: z.string(),
           uniqueFeature: z.string(),
-          difficulty: z.enum(['easy', 'medium', 'hard']),
+          difficulty: z.enum(["easy", "medium", "hard"]),
         }),
         prompt: `Create variation ${index + 1} of this game concept: "${basePrompt}"
         
@@ -138,12 +151,12 @@ export async function generateGameVariations(
         Keep the core concept recognizable but add a unique twist.`,
         temperature: 0.8,
       });
-      
+
       return {
         variation: index + 1,
         ...result.object,
       };
-    })
+    }),
   );
 
   return variations;
@@ -152,7 +165,7 @@ export async function generateGameVariations(
 // Error recovery and fallback generation
 export async function generateGameWithFallback(
   prompt: string,
-  previousAttempt?: string
+  previousAttempt?: string,
 ) {
   try {
     // Primary attempt with full features
@@ -165,14 +178,14 @@ export async function generateGameWithFallback(
       }),
       prompt: `Generate a complete HTML5 game: ${prompt}
       
-      ${previousAttempt ? `Previous attempt had issues. Improve upon: ${previousAttempt}` : ''}
+      ${previousAttempt ? `Previous attempt had issues. Improve upon: ${previousAttempt}` : ""}
       
       Include all necessary HTML, CSS, and JavaScript in a single file.`,
       temperature: 0.7,
     });
   } catch (error) {
-    console.warn('Primary generation failed, trying fallback:', error);
-    
+    console.warn("Primary generation failed, trying fallback:", error);
+
     // Fallback with simpler requirements
     return await generateText({
       model: aiModel,
@@ -187,13 +200,21 @@ export async function generateGameWithFallback(
 // Performance monitoring for AI calls
 export async function generateGameWithMetrics(prompt: string) {
   const startTime = Date.now();
-  
+
   try {
     const result = await generateObject({
       model: aiModel,
       schema: z.object({
-        html: z.string().describe('The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.'),
-        description: z.string().describe('A summary of the changes made to the code in this generation step, explaining what was created or modified.'),
+        html: z
+          .string()
+          .describe(
+            "The complete HTML code for the game, with CSS embedded in a <style> tag and JavaScript in a <script> tag.",
+          ),
+        description: z
+          .string()
+          .describe(
+            "A summary of the changes made to the code in this generation step, explaining what was created or modified.",
+          ),
       }),
       prompt: `You are an expert game developer and front-end designer.
 
@@ -242,10 +263,10 @@ Game Description: ${prompt}
 Generate the complete HTML code for the game.`,
       temperature: 0.7,
     });
-    
+
     const endTime = Date.now();
     const duration = endTime - startTime;
-    
+
     return {
       ...result.object,
       metrics: {
@@ -257,14 +278,14 @@ Generate the complete HTML code for the game.`,
   } catch (error) {
     const endTime = Date.now();
     const duration = endTime - startTime;
-    
+
     return {
-      html: '',
-      description: 'Generation failed',
+      html: "",
+      description: "Generation failed",
       metrics: {
         duration,
         success: false,
-        error: error instanceof Error ? error.message : 'Unknown error',
+        error: error instanceof Error ? error.message : "Unknown error",
         timestamp: new Date().toISOString(),
       },
     };

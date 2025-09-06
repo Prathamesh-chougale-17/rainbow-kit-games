@@ -1,6 +1,12 @@
 // Type definitions for AI SDK integration
-export type { GenerateGameCodeInput, GenerateGameCodeOutput } from '@/ai/flows/generate-game-code-ai-sdk';
-export type { RefinePromptInput, RefinePromptOutput } from '@/ai/flows/refine-prompt-ai-sdk';
+export type {
+  GenerateGameCodeInput,
+  GenerateGameCodeOutput,
+} from "@/ai/flows/generate-game-code-ai-sdk";
+export type {
+  RefinePromptInput,
+  RefinePromptOutput,
+} from "@/ai/flows/refine-prompt-ai-sdk";
 
 // Additional types for advanced features
 export interface GameVariation {
@@ -8,7 +14,7 @@ export interface GameVariation {
   title: string;
   description: string;
   uniqueFeature: string;
-  difficulty: 'easy' | 'medium' | 'hard';
+  difficulty: "easy" | "medium" | "hard";
 }
 
 export interface GameIdea {

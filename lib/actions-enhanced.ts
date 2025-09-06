@@ -19,11 +19,11 @@ import {
   generateGameWithMetrics,
 } from "@/ai/advanced-utils";
 import { z } from "zod";
-import type { 
-  GameVariation, 
-  GameIdea, 
+import type {
+  GameVariation,
+  GameIdea,
   GameRefinementResult,
-  GameGenerationResult 
+  GameGenerationResult,
 } from "@/types/ai-sdk";
 
 const GenerateGameCodeInputSchema = z.object({
@@ -47,7 +47,7 @@ export async function generateGameEnhanced(
   try {
     // Use the proper game generation function first
     const gameResult = await generateGameCode(validatedInput);
-    
+
     // Return with metrics
     return {
       html: gameResult.html,
@@ -60,15 +60,15 @@ export async function generateGameEnhanced(
     };
   } catch (error) {
     console.error("Error generating game code:", error);
-    
+
     // Try with metrics function as fallback
     try {
       const result = await generateGameWithMetrics(
         `${validatedInput.prompt}${
-          validatedInput.previousHtml 
+          validatedInput.previousHtml
             ? `\n\nPrevious HTML:\n${validatedInput.previousHtml}`
-            : ''
-        }`
+            : ""
+        }`,
       );
       return result;
     } catch (fallbackError) {
@@ -90,24 +90,24 @@ export async function generateGame(
     return result;
   } catch (error) {
     console.error("Error generating game code:", error);
-    
+
     // Try fallback generation
     try {
       const fallbackResult = await generateGameWithFallback(
         validatedInput.prompt,
-        validatedInput.previousHtml
+        validatedInput.previousHtml,
       );
-      
+
       // Check if it's a generateText result (string) or generateObject result
-      if ('text' in fallbackResult) {
+      if ("text" in fallbackResult) {
         return {
           html: fallbackResult.text,
-          description: "Generated using fallback method due to initial failure"
+          description: "Generated using fallback method due to initial failure",
         };
       } else {
         return {
           html: fallbackResult.object.html,
-          description: fallbackResult.object.description
+          description: fallbackResult.object.description,
         };
       }
     } catch (fallbackError) {
@@ -122,7 +122,7 @@ export async function generateGame(
 // Advanced refinement with reasoning
 export async function refineGameAdvanced(
   gameHtml: string,
-  feedback: string
+  feedback: string,
 ): Promise<GameRefinementResult> {
   try {
     const result = await refineGameWithReasoning(gameHtml, feedback);
@@ -154,8 +154,8 @@ export async function refinePromptAction(
 // Generate creative game ideas
 export async function generateGameIdeaAction(
   theme: string,
-  difficulty: 'simple' | 'medium' | 'complex' = 'medium',
-  creativity: number = 0.7
+  difficulty: "simple" | "medium" | "complex" = "medium",
+  creativity: number = 0.7,
 ): Promise<GameIdea> {
   try {
     const result = await generateGameIdea(theme, difficulty, creativity);
@@ -171,7 +171,7 @@ export async function generateGameIdeaAction(
 // Generate multiple game variations
 export async function generateGameVariationsAction(
   basePrompt: string,
-  variationCount: number = 3
+  variationCount: number = 3,
 ): Promise<GameVariation[]> {
   try {
     const result = await generateGameVariations(basePrompt, variationCount);

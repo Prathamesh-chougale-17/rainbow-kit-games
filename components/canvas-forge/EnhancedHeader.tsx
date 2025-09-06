@@ -27,7 +27,9 @@ export function EnhancedHeader({
   const buttonClass =
     "transition-all hover:text-accent hover:drop-shadow-[0_0_4px_hsl(var(--accent))]";
 
-  const GeneratorDialog = useEnhanced ? EnhancedGameGeneratorDialog : GameGeneratorDialog;
+  const GeneratorDialog = useEnhanced
+    ? EnhancedGameGeneratorDialog
+    : GameGeneratorDialog;
   const GeneratorIcon = useEnhanced ? Zap : Bot;
 
   return (

@@ -1,15 +1,15 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { gameService } from '@/lib/game-service';
+import { NextRequest, NextResponse } from "next/server";
+import { gameService } from "@/lib/game-service";
 
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
-    const walletAddress = searchParams.get('wallet');
+    const walletAddress = searchParams.get("wallet");
 
     if (!walletAddress) {
       return NextResponse.json(
-        { error: 'Wallet address is required' },
-        { status: 400 }
+        { error: "Wallet address is required" },
+        { status: 400 },
       );
     }
 
@@ -20,10 +20,10 @@ export async function GET(request: NextRequest) {
       games,
     });
   } catch (error) {
-    console.error('Get games error:', error);
+    console.error("Get games error:", error);
     return NextResponse.json(
-      { error: 'Failed to fetch games' },
-      { status: 500 }
+      { error: "Failed to fetch games" },
+      { status: 500 },
     );
   }
 }

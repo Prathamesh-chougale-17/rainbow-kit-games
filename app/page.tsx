@@ -1,15 +1,21 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { 
-  ArrowRight, 
-  Code, 
-  Users, 
-  ShoppingCart, 
-  GitFork, 
-  Zap, 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  ArrowRight,
+  Code,
+  Users,
+  ShoppingCart,
+  GitFork,
+  Zap,
   Shield,
-  Cloud
+  Cloud,
 } from "lucide-react";
 
 export default function Home() {
@@ -28,9 +34,9 @@ export default function Home() {
             </h1>
 
             <p className="mt-4 text-lg text-muted-foreground max-w-xl">
-              Build games with AI assistance, manage versions with IPFS storage, 
-              publish to marketplace, and collaborate with the community. 
-              All secured by blockchain wallet authentication.
+              Build games with AI assistance, manage versions with IPFS storage,
+              publish to marketplace, and collaborate with the community. All
+              secured by blockchain wallet authentication.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
@@ -61,7 +67,9 @@ export default function Home() {
             <div className="aspect-video bg-gradient-to-br from-blue-500/20 to-purple-600/20 rounded-lg border border-border/50 p-8 backdrop-blur-sm">
               <div className="text-center">
                 <Code className="size-16 mx-auto mb-4 text-blue-500" />
-                <h3 className="text-xl font-semibold mb-2">Game Development Reimagined</h3>
+                <h3 className="text-xl font-semibold mb-2">
+                  Game Development Reimagined
+                </h3>
                 <p className="text-muted-foreground">
                   AI-assisted coding, IPFS storage, and community collaboration
                 </p>
@@ -73,9 +81,12 @@ export default function Home() {
         {/* Features Section */}
         <section className="mb-20">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">Everything You Need to Build Games</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Everything You Need to Build Games
+            </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              From AI-powered generation to community sharing, our platform provides all the tools for modern game development
+              From AI-powered generation to community sharing, our platform
+              provides all the tools for modern game development
             </p>
           </div>
 
@@ -85,7 +96,8 @@ export default function Home() {
                 <Zap className="size-8 text-yellow-500 mb-2" />
                 <CardTitle>AI-Powered Generation</CardTitle>
                 <CardDescription>
-                  Describe your game idea and let AI generate the complete HTML5 game code instantly
+                  Describe your game idea and let AI generate the complete HTML5
+                  game code instantly
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -95,7 +107,8 @@ export default function Home() {
                 <Cloud className="size-8 text-blue-500 mb-2" />
                 <CardTitle>IPFS Version Control</CardTitle>
                 <CardDescription>
-                  Every game version is stored on IPFS via Pinata, ensuring permanent and decentralized storage
+                  Every game version is stored on IPFS via Pinata, ensuring
+                  permanent and decentralized storage
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -105,7 +118,8 @@ export default function Home() {
                 <Shield className="size-8 text-green-500 mb-2" />
                 <CardTitle>Wallet Authentication</CardTitle>
                 <CardDescription>
-                  Secure ownership and management of your games using blockchain wallet authentication
+                  Secure ownership and management of your games using blockchain
+                  wallet authentication
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -115,7 +129,8 @@ export default function Home() {
                 <ShoppingCart className="size-8 text-purple-500 mb-2" />
                 <CardTitle>Game Marketplace</CardTitle>
                 <CardDescription>
-                  Publish your games to the marketplace for players to discover and enjoy
+                  Publish your games to the marketplace for players to discover
+                  and enjoy
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -125,7 +140,8 @@ export default function Home() {
                 <Users className="size-8 text-orange-500 mb-2" />
                 <CardTitle>Developer Community</CardTitle>
                 <CardDescription>
-                  Share your games with developers, get feedback, and collaborate on improvements
+                  Share your games with developers, get feedback, and
+                  collaborate on improvements
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -135,7 +151,8 @@ export default function Home() {
                 <GitFork className="size-8 text-pink-500 mb-2" />
                 <CardTitle>Fork & Improve</CardTitle>
                 <CardDescription>
-                  Fork community games to learn, modify, and create your own improved versions
+                  Fork community games to learn, modify, and create your own
+                  improved versions
                 </CardDescription>
               </CardHeader>
             </Card>
@@ -145,9 +162,12 @@ export default function Home() {
         {/* CTA Section */}
         <section className="text-center">
           <div className="max-w-2xl mx-auto">
-            <h2 className="text-3xl font-bold mb-4">Ready to Start Building?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Start Building?
+            </h2>
             <p className="text-lg text-muted-foreground mb-8">
-              Join the future of game development with AI assistance, decentralized storage, and community collaboration
+              Join the future of game development with AI assistance,
+              decentralized storage, and community collaboration
             </p>
             <div className="flex flex-wrap gap-3 justify-center">
               <Button asChild size="lg">

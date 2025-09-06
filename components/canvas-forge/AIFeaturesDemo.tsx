@@ -1,26 +1,36 @@
 "use client";
 
 import * as React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Lightbulb, 
-  Shuffle, 
-  Zap, 
-  BarChart3, 
+import {
+  Lightbulb,
+  Shuffle,
+  Zap,
+  BarChart3,
   Wand2,
   Clock,
   CheckCircle,
-  XCircle
+  XCircle,
 } from "lucide-react";
 import {
   generateGameIdeaAction,
   generateGameVariationsAction,
-  generateGameEnhanced
+  generateGameEnhanced,
 } from "@/lib/actions-enhanced";
-import type { GameIdea, GameVariation, GameGenerationResult } from "@/types/ai-sdk";
+import type {
+  GameIdea,
+  GameVariation,
+  GameGenerationResult,
+} from "@/types/ai-sdk";
 import { toast } from "sonner";
 
 export function AIFeaturesDemo() {
@@ -35,7 +45,7 @@ export function AIFeaturesDemo() {
       const idea = await generateGameIdeaAction("retro arcade", "medium", 0.8);
       setGameIdea(idea);
       toast.success("Game Idea Generated!", {
-        description: idea.title
+        description: idea.title,
       });
     } catch (error) {
       toast.error("Failed to generate game idea");
@@ -46,13 +56,13 @@ export function AIFeaturesDemo() {
 
   const handleGenerateVariations = async () => {
     if (!gameIdea) return;
-    
+
     setIsLoading(true);
     try {
       const vars = await generateGameVariationsAction(gameIdea.concept, 3);
       setVariations(vars);
       toast.success("Variations Generated!", {
-        description: `${vars.length} unique variations created`
+        description: `${vars.length} unique variations created`,
       });
     } catch (error) {
       toast.error("Failed to generate variations");
@@ -63,15 +73,15 @@ export function AIFeaturesDemo() {
 
   const handleTestGeneration = async () => {
     if (!gameIdea) return;
-    
+
     setIsLoading(true);
     try {
       const result: GameGenerationResult = await generateGameEnhanced({
-        prompt: gameIdea.concept
+        prompt: gameIdea.concept,
       });
       setMetrics(result.metrics);
       toast.success("Generation Test Complete!", {
-        description: `Completed in ${result.metrics.duration}ms`
+        description: `Completed in ${result.metrics.duration}ms`,
       });
     } catch (error) {
       toast.error("Generation test failed");
@@ -87,7 +97,8 @@ export function AIFeaturesDemo() {
           AI-Enhanced Game Generator
         </h1>
         <p className="text-muted-foreground">
-          Powered by Vercel AI SDK with advanced features for creative game development
+          Powered by Vercel AI SDK with advanced features for creative game
+          development
         </p>
       </div>
 
@@ -103,29 +114,37 @@ export function AIFeaturesDemo() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button 
-              onClick={handleGenerateIdea} 
+            <Button
+              onClick={handleGenerateIdea}
               disabled={isLoading}
               className="w-full"
             >
               <Wand2 className="mr-2 h-4 w-4" />
               Generate Game Idea
             </Button>
-            
+
             {gameIdea && (
               <div className="space-y-3 p-4 bg-muted rounded-lg">
                 <h3 className="font-bold">{gameIdea.title}</h3>
                 <p className="text-sm">{gameIdea.concept}</p>
                 <div className="flex flex-wrap gap-1">
                   {gameIdea.features.slice(0, 4).map((feature) => (
-                    <Badge key={feature} variant="secondary" className="text-xs">
+                    <Badge
+                      key={feature}
+                      variant="secondary"
+                      className="text-xs"
+                    >
                       {feature}
                     </Badge>
                   ))}
                 </div>
                 <div className="text-xs text-muted-foreground space-y-1">
-                  <div><strong>Style:</strong> {gameIdea.visualStyle}</div>
-                  <div><strong>Objective:</strong> {gameIdea.objective}</div>
+                  <div>
+                    <strong>Style:</strong> {gameIdea.visualStyle}
+                  </div>
+                  <div>
+                    <strong>Objective:</strong> {gameIdea.objective}
+                  </div>
                 </div>
               </div>
             )}
@@ -143,26 +162,37 @@ export function AIFeaturesDemo() {
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <Button 
-              onClick={handleGenerateVariations} 
+            <Button
+              onClick={handleGenerateVariations}
               disabled={isLoading || !gameIdea}
               className="w-full"
             >
               <Shuffle className="mr-2 h-4 w-4" />
               Generate Variations
             </Button>
-            
+
             {variations.length > 0 && (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {variations.map((variation) => (
-                  <div key={variation.variation} className="p-3 bg-muted rounded-lg">
+                  <div
+                    key={variation.variation}
+                    className="p-3 bg-muted rounded-lg"
+                  >
                     <div className="flex justify-between items-start">
                       <div className="space-y-1">
-                        <h4 className="font-medium text-sm">{variation.title}</h4>
-                        <p className="text-xs text-muted-foreground">{variation.description}</p>
-                        <p className="text-xs text-accent-foreground">{variation.uniqueFeature}</p>
+                        <h4 className="font-medium text-sm">
+                          {variation.title}
+                        </h4>
+                        <p className="text-xs text-muted-foreground">
+                          {variation.description}
+                        </p>
+                        <p className="text-xs text-accent-foreground">
+                          {variation.uniqueFeature}
+                        </p>
                       </div>
-                      <Badge variant="outline" className="text-xs">{variation.difficulty}</Badge>
+                      <Badge variant="outline" className="text-xs">
+                        {variation.difficulty}
+                      </Badge>
                     </div>
                   </div>
                 ))}
@@ -184,8 +214,8 @@ export function AIFeaturesDemo() {
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-2 md:grid-cols-3">
-            <Button 
-              onClick={handleTestGeneration} 
+            <Button
+              onClick={handleTestGeneration}
               disabled={isLoading || !gameIdea}
               variant="outline"
             >
@@ -219,7 +249,9 @@ export function AIFeaturesDemo() {
                   ) : (
                     <XCircle className="h-4 w-4 text-red-500" />
                   )}
-                  <span className="text-sm">{metrics.success ? "Success" : "Failed"}</span>
+                  <span className="text-sm">
+                    {metrics.success ? "Success" : "Failed"}
+                  </span>
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {new Date(metrics.timestamp).toLocaleTimeString()}
@@ -229,13 +261,15 @@ export function AIFeaturesDemo() {
           )}
 
           <Separator />
-          
+
           <div className="space-y-2">
             <h4 className="font-medium">Available Features:</h4>
             <div className="grid gap-2 text-sm">
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />
-                <span>Multi-provider AI support (Google, OpenAI, Anthropic)</span>
+                <span>
+                  Multi-provider AI support (Google, OpenAI, Anthropic)
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <CheckCircle className="h-4 w-4 text-green-500" />

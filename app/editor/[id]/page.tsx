@@ -80,12 +80,12 @@ export default function GameEditor() {
   const params = useParams();
   const router = useRouter();
   const gameId = params.id as string;
-  const isNewGame = gameId === 'new';
+  const isNewGame = gameId === "new";
 
   const [html, setHtml] = React.useState(defaultHtml);
   const [title, setTitle] = React.useState("New Game");
   const [currentGameId, setCurrentGameId] = React.useState<string | undefined>(
-    isNewGame ? undefined : gameId
+    isNewGame ? undefined : gameId,
   );
   const [currentGame, setCurrentGame] = React.useState<any>(null);
   const [isGameGenerated, setIsGameGenerated] = React.useState(false);
@@ -115,7 +115,7 @@ export default function GameEditor() {
         }
       }
     } catch (error) {
-      console.error('Load game error:', error);
+      console.error("Load game error:", error);
       toast.error("Failed to load game");
     }
   };
@@ -142,17 +142,17 @@ export default function GameEditor() {
         return;
       }
 
-      const response = await fetch('/api/games/save', {
-        method: 'POST',
+      const response = await fetch("/api/games/save", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           gameId: currentGameId,
           html,
           title,
           description: `Generated game - ${new Date().toLocaleDateString()}`,
-          tags: ['ai-generated', 'canvas-forge'],
+          tags: ["ai-generated", "canvas-forge"],
           walletAddress,
         }),
       });
@@ -170,23 +170,26 @@ export default function GameEditor() {
           // Existing game was updated - reload the game data
           loadGame(currentGameId);
         }
-        
+
         toast.success("Game Saved Successfully!", {
-          description: result.message || "Your game has been saved and uploaded to IPFS permanently",
+          description:
+            result.message ||
+            "Your game has been saved and uploaded to IPFS permanently",
         });
 
         // Show IPFS details if available
         if (result.ipfs?.cid) {
-          console.log('Game uploaded to IPFS with CID:', result.ipfs.cid);
-          console.log('IPFS URL:', result.ipfs.url);
+          console.log("Game uploaded to IPFS with CID:", result.ipfs.cid);
+          console.log("IPFS URL:", result.ipfs.url);
         }
       } else {
-        throw new Error(result.error || 'Failed to save');
+        throw new Error(result.error || "Failed to save");
       }
     } catch (error) {
-      console.error('Save error:', error);
+      console.error("Save error:", error);
       toast.error("Failed to save game", {
-        description: error instanceof Error ? error.message : "Please try again later.",
+        description:
+          error instanceof Error ? error.message : "Please try again later.",
       });
     } finally {
       setIsSaving(false);
@@ -202,15 +205,15 @@ export default function GameEditor() {
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       const currentVersion = currentGame?.currentVersion || 1;
-      
-      const response = await fetch('/api/games/publish', {
-        method: 'POST',
+
+      const response = await fetch("/api/games/publish", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           gameId: currentGameId,
-          type: 'marketplace',
+          type: "marketplace",
           walletAddress: walletAddress,
           version: currentVersion,
         }),
@@ -227,10 +230,10 @@ export default function GameEditor() {
           loadGame(currentGameId);
         }
       } else {
-        throw new Error(result.error || 'Failed to publish');
+        throw new Error(result.error || "Failed to publish");
       }
     } catch (error) {
-      console.error('Publish to marketplace error:', error);
+      console.error("Publish to marketplace error:", error);
       toast.error("Failed to publish to marketplace");
     }
   };
@@ -244,15 +247,15 @@ export default function GameEditor() {
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       const currentVersion = currentGame?.currentVersion || 1;
-      
-      const response = await fetch('/api/games/publish', {
-        method: 'POST',
+
+      const response = await fetch("/api/games/publish", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           gameId: currentGameId,
-          type: 'community',
+          type: "community",
           walletAddress: walletAddress,
           version: currentVersion,
         }),
@@ -262,17 +265,18 @@ export default function GameEditor() {
 
       if (result.success) {
         toast.success("Published to Community!", {
-          description: "Your game is now available for developers to fork and improve.",
+          description:
+            "Your game is now available for developers to fork and improve.",
         });
         // Reload game data to update publish status
         if (currentGameId) {
           loadGame(currentGameId);
         }
       } else {
-        throw new Error(result.error || 'Failed to publish');
+        throw new Error(result.error || "Failed to publish");
       }
     } catch (error) {
-      console.error('Publish to community error:', error);
+      console.error("Publish to community error:", error);
       toast.error("Failed to publish to community");
     }
   };
@@ -307,25 +311,16 @@ export default function GameEditor() {
         isGameGenerated={isGameGenerated}
         showPublishButtons={!!currentGameId}
         isSaving={isSaving}
+        title={title}
+        onTitleChange={(t) => setTitle(t)}
       />
-
-      {/* Game Title */}
-      <div className="px-4 py-2 border-b border-gray-800">
-        <input
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="bg-gray-900 border border-gray-700 rounded px-3 py-1 text-white w-full max-w-md"
-          placeholder="Game title..."
-        />
-      </div>
 
       {/* Main Editor */}
       <div className="flex-1">
         <ResizablePanelGroup direction="horizontal" className="h-full">
           <ResizablePanel defaultSize={50} className="min-w-[300px]">
-            <CodeEditor 
-              value={html} 
+            <CodeEditor
+              value={html}
               onChange={(value) => setHtml(value || "")}
               language="html"
             />

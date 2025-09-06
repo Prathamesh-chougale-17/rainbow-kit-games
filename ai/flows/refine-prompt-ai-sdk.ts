@@ -8,9 +8,9 @@
  * - RefinePromptOutput - The return type for the refinePrompt function.
  */
 
-import { generateObject } from 'ai';
-import { aiModel } from '@/ai/config';
-import { z } from 'zod';
+import { generateObject } from "ai";
+import { aiModel } from "@/ai/config";
+import { z } from "zod";
 
 const RefinePromptInputSchema = z.object({
   prompt: z.string().describe("The user-provided game idea or concept."),
@@ -31,7 +31,8 @@ const RefinePromptOutputSchema = z.object({
 export type RefinePromptOutput = z.infer<typeof RefinePromptOutputSchema>;
 
 function createRefinePrompt(input: RefinePromptInput): string {
-  const basePrompt = "You are an expert prompt engineer for a game-generating AI.";
+  const basePrompt =
+    "You are an expert prompt engineer for a game-generating AI.";
 
   if (input.isGameGenerated) {
     return `${basePrompt}
