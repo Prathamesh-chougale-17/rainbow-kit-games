@@ -1,6 +1,19 @@
 "use client";
 
-import * as React from "react";
+import {
+  Calendar,
+  Code,
+  Edit,
+  Play,
+  Plus,
+  ShoppingCart,
+  Trash2,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
+import React from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,27 +22,14 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import {
-  Plus,
-  Play,
-  Edit,
-  Calendar,
-  Code,
-  Trash2,
-  ShoppingCart,
-  Users,
-} from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 
 interface Game {
@@ -55,7 +55,9 @@ export default function EditorDashboard() {
   const [games, setGames] = React.useState<Game[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
-  const [selectedGameToDelete, setSelectedGameToDelete] = React.useState<string | null>(null);
+  const [selectedGameToDelete, setSelectedGameToDelete] = React.useState<
+    string | null
+  >(null);
   const [deleting, setDeleting] = React.useState(false);
 
   React.useEffect(() => {
@@ -74,7 +76,6 @@ export default function EditorDashboard() {
         toast.error("Failed to load games");
       }
     } catch (error) {
-      console.error("Load games error:", error);
       toast.error("Failed to load games");
     } finally {
       setLoading(false);
@@ -116,7 +117,7 @@ export default function EditorDashboard() {
       });
 
       const result = await res.json();
-      if (!res.ok || !result.success) {
+      if (!(res.ok && result.success)) {
         throw new Error(result.error || "Failed to delete game");
       }
 
@@ -136,9 +137,9 @@ export default function EditorDashboard() {
   if (loading) {
     return (
       <div className="container mx-auto p-6">
-        <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex min-h-[400px] items-center justify-center">
           <div className="text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
             <p className="text-muted-foreground">Loading your games...</p>
           </div>
         </div>
@@ -148,180 +149,189 @@ export default function EditorDashboard() {
 
   return (
     <>
-      <div className="container mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-2">
-            <Code className="h-8 w-8 text-blue-600" />
-            Game Studio
-          </h1>
-          <p className="text-muted-foreground">
-            Create, manage, and publish your games
-          </p>
+      <div className="container mx-auto space-y-6 p-6">
+        {/* Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="flex items-center gap-2 font-bold text-3xl tracking-tight">
+              <Code className="h-8 w-8 text-blue-600" />
+              Game Studio
+            </h1>
+            <p className="text-muted-foreground">
+              Create, manage, and publish your games
+            </p>
+          </div>
+          <div className="flex gap-2">
+            <Link href="/marketplace">
+              <Button className="gap-2" variant="outline">
+                <ShoppingCart className="h-4 w-4" />
+                Marketplace
+              </Button>
+            </Link>
+            <Link href="/community">
+              <Button className="gap-2" variant="outline">
+                <Users className="h-4 w-4" />
+                Community
+              </Button>
+            </Link>
+            <Link href="/editor/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Game
+              </Button>
+            </Link>
+          </div>
         </div>
-        <div className="flex gap-2">
-          <Link href="/marketplace">
-            <Button variant="outline" className="gap-2">
-              <ShoppingCart className="h-4 w-4" />
-              Marketplace
-            </Button>
-          </Link>
-          <Link href="/community">
-            <Button variant="outline" className="gap-2">
-              <Users className="h-4 w-4" />
-              Community
-            </Button>
-          </Link>
-          <Link href="/editor/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Game
-            </Button>
-          </Link>
-        </div>
-      </div>
 
-      {/* Games Grid */}
-      {games.length === 0 ? (
-        <div className="text-center py-12">
-          <Code className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
-          <h3 className="text-xl font-semibold mb-2">No games yet</h3>
-          <p className="text-muted-foreground mb-6">
-            Create your first game to get started!
-          </p>
-          <Link href="/editor/new">
-            <Button className="gap-2">
-              <Plus className="h-4 w-4" />
-              Create First Game
-            </Button>
-          </Link>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {games.map((game) => (
-            <Card
-              key={game.gameId}
-              className="hover:shadow-lg transition-shadow"
-            >
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="space-y-1 flex-1">
-                    <CardTitle className="line-clamp-1">{game.title}</CardTitle>
-                    <CardDescription className="line-clamp-2">
-                      {game.description || "No description provided"}
-                    </CardDescription>
+        {/* Games Grid */}
+        {games.length === 0 ? (
+          <div className="py-12 text-center">
+            <Code className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
+            <h3 className="mb-2 font-semibold text-xl">No games yet</h3>
+            <p className="mb-6 text-muted-foreground">
+              Create your first game to get started!
+            </p>
+            <Link href="/editor/new">
+              <Button className="gap-2">
+                <Plus className="h-4 w-4" />
+                Create First Game
+              </Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {games.map((game) => (
+              <Card
+                className="transition-shadow hover:shadow-lg"
+                key={game.gameId}
+              >
+                <CardHeader>
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 space-y-1">
+                      <CardTitle className="line-clamp-1">
+                        {game.title}
+                      </CardTitle>
+                      <CardDescription className="line-clamp-2">
+                        {game.description || "No description provided"}
+                      </CardDescription>
+                    </div>
                   </div>
-                </div>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                {/* Status Badges */}
-                <div className="flex flex-wrap gap-1">
-                  {game.isPublishedToMarketplace && (
-                    <Badge variant="default" className="text-xs">
-                      <ShoppingCart className="h-3 w-3 mr-1" />
-                      Marketplace
-                    </Badge>
-                  )}
-                  {game.isPublishedToCommunity && (
-                    <Badge variant="secondary" className="text-xs">
-                      <Users className="h-3 w-3 mr-1" />
-                      Community
-                    </Badge>
-                  )}
-                  {game.originalGameId && (
-                    <Badge variant="outline" className="text-xs">
-                      Fork
-                    </Badge>
-                  )}
-                </div>
-
-                {/* Tags */}
-                {game.tags && game.tags.length > 0 && (
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  {/* Status Badges */}
                   <div className="flex flex-wrap gap-1">
-                    {game.tags.slice(0, 3).map((tag) => (
-                      <Badge key={tag} variant="outline" className="text-xs">
-                        {tag}
+                    {game.isPublishedToMarketplace && (
+                      <Badge className="text-xs" variant="default">
+                        <ShoppingCart className="mr-1 h-3 w-3" />
+                        Marketplace
                       </Badge>
-                    ))}
-                    {game.tags.length > 3 && (
-                      <Badge variant="outline" className="text-xs">
-                        +{game.tags.length - 3}
+                    )}
+                    {game.isPublishedToCommunity && (
+                      <Badge className="text-xs" variant="secondary">
+                        <Users className="mr-1 h-3 w-3" />
+                        Community
+                      </Badge>
+                    )}
+                    {game.originalGameId && (
+                      <Badge className="text-xs" variant="outline">
+                        Fork
                       </Badge>
                     )}
                   </div>
-                )}
 
-                {/* Stats */}
-                <div className="grid grid-cols-2 gap-3 text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Code className="h-3 w-3" />v{game.currentVersion}
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Users className="h-3 w-3" />
-                    {game.forkCount} forks
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    {formatDate(game.updatedAt)}
-                  </div>
-                </div>
+                  {/* Tags */}
+                  {game.tags && game.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-1">
+                      {game.tags.slice(0, 3).map((tag) => (
+                        <Badge className="text-xs" key={tag} variant="outline">
+                          {tag}
+                        </Badge>
+                      ))}
+                      {game.tags.length > 3 && (
+                        <Badge className="text-xs" variant="outline">
+                          +{game.tags.length - 3}
+                        </Badge>
+                      )}
+                    </div>
+                  )}
 
-                {/* Actions */}
-                <div className="flex gap-2">
-                  <Link href={`/editor/${game.gameId}`} className="flex-1">
-                    <Button
-                      variant="default"
-                      size="sm"
-                      className="w-full gap-2"
-                    >
-                      <Edit className="h-3 w-3" />
-                      Edit
-                    </Button>
-                  </Link>
-                  {game.isPublishedToMarketplace && (
-                    <Link href={`/marketplace/${game.gameId}`}>
-                      <Button variant="outline" size="sm">
-                        <Play className="h-3 w-3" />
+                  {/* Stats */}
+                  <div className="grid grid-cols-2 gap-3 text-muted-foreground text-sm">
+                    <div className="flex items-center gap-1">
+                      <Code className="h-3 w-3" />v{game.currentVersion}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Users className="h-3 w-3" />
+                      {game.forkCount} forks
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      {formatDate(game.updatedAt)}
+                    </div>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex gap-2">
+                    <Link className="flex-1" href={`/editor/${game.gameId}`}>
+                      <Button
+                        className="w-full gap-2"
+                        size="sm"
+                        variant="default"
+                      >
+                        <Edit className="h-3 w-3" />
+                        Edit
                       </Button>
                     </Link>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => openDeleteDialog(game.gameId)}
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      )}
-  </div>
-  {/* Delete Confirmation Dialog */}
-  <Dialog open={deleteDialogOpen} onOpenChange={(open) => { if (!open) closeDeleteDialog(); setDeleteDialogOpen(open); }}>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Delete game?</DialogTitle>
-          <DialogDescription>
-            This action cannot be undone. Are you sure you want to permanently delete this game?
-          </DialogDescription>
-        </DialogHeader>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
-          </DialogClose>
-          <Button
-            variant="destructive"
-            onClick={() => performDelete(selectedGameToDelete)}
-            disabled={deleting}
-          >
-            {deleting ? "Deleting..." : "Delete"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
+                    {game.isPublishedToMarketplace && (
+                      <Link href={`/marketplace/${game.gameId}`}>
+                        <Button size="sm" variant="outline">
+                          <Play className="h-3 w-3" />
+                        </Button>
+                      </Link>
+                    )}
+                    <Button
+                      onClick={() => openDeleteDialog(game.gameId)}
+                      size="sm"
+                      variant="outline"
+                    >
+                      <Trash2 className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        )}
+      </div>
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        onOpenChange={(open) => {
+          if (!open) closeDeleteDialog();
+          setDeleteDialogOpen(open);
+        }}
+        open={deleteDialogOpen}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete game?</DialogTitle>
+            <DialogDescription>
+              This action cannot be undone. Are you sure you want to permanently
+              delete this game?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              disabled={deleting}
+              onClick={() => performDelete(selectedGameToDelete)}
+              variant="destructive"
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
     </>
   );

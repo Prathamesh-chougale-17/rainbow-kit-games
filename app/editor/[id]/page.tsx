@@ -310,7 +310,6 @@ export default function GameEditor() {
 
   return (
     <div className="h-[calc(100vh-64px)] flex flex-col bg-[#0a0a0a]">
-
       {/* Main Editor */}
       <div className="flex-1">
         <ResizablePanelGroup direction="horizontal" className="h-full">

@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { ThemeProvider } from "@/components/theme-provider";
+import Background from "@/components/background";
 import { Navbar } from "@/components/layout/navbar";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -26,23 +27,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html className="dark" lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Navbar
-          navItems={[
-            { title: "Home", href: "/" },
-            { title: "About", href: "/about" },
-            { title: "Contact", href: "/contact" },
-            { title: "Games", href: "/games" },
-            { title: "Editor", href: "/editor" },
-            { title: "Market Place", href: "/marketplace" },
-            { title: "Community", href: "/community" },
-          ]}
-        />
-        {children}
-        <Toaster />
+        <Background>
+          <Navbar
+            navItems={[
+              { title: "Home", href: "/" },
+              { title: "About", href: "/about" },
+              { title: "Contact", href: "/contact" },
+              { title: "Games", href: "/games" },
+              { title: "Editor", href: "/editor" },
+              { title: "Market Place", href: "/marketplace" },
+              { title: "Community", href: "/community" },
+            ]}
+          />
+          {children}
+          <Toaster />
+        </Background>
       </body>
     </html>
   );

@@ -9,7 +9,14 @@ import {
   CheckCircle,
   XCircle,
 } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogFooter,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { GameGeneratorDialog } from "./GameGeneratorDialog";
@@ -140,11 +147,13 @@ export function Header({
                         </DialogTrigger>
                         <DialogContent>
                           <DialogHeader>
-                            <DialogTitle>Unpublish from Marketplace</DialogTitle>
+                            <DialogTitle>
+                              Unpublish from Marketplace
+                            </DialogTitle>
                           </DialogHeader>
                           <p>
-                            Are you sure you want to unpublish this game from the
-                            Marketplace? This will remove it from the public
+                            Are you sure you want to unpublish this game from
+                            the Marketplace? This will remove it from the public
                             marketplace listing.
                           </p>
                           <DialogFooter className="mt-4">
@@ -171,13 +180,19 @@ export function Header({
                       <DialogHeader>
                         <DialogTitle>Publish to Marketplace</DialogTitle>
                       </DialogHeader>
-                      <p>Are you sure you want to publish this game to the Marketplace?</p>
+                      <p>
+                        Are you sure you want to publish this game to the
+                        Marketplace?
+                      </p>
                       <DialogFooter className="mt-4">
                         <Button variant="ghost" onClick={onPublishMarketplace}>
                           Yes, publish
                         </Button>
                         {onUnpublish && isPublishedToMarketplace && (
-                          <Button variant="ghost" onClick={() => onUnpublish("marketplace")}>
+                          <Button
+                            variant="ghost"
+                            onClick={() => onUnpublish("marketplace")}
+                          >
                             Unpublish
                           </Button>
                         )}
@@ -204,8 +219,9 @@ export function Header({
                             <DialogTitle>Unpublish from Community</DialogTitle>
                           </DialogHeader>
                           <p>
-                            Are you sure you want to unpublish this game from the
-                            Community? This will remove it from community listings.
+                            Are you sure you want to unpublish this game from
+                            the Community? This will remove it from community
+                            listings.
                           </p>
                           <DialogFooter className="mt-4">
                             <Button
@@ -231,13 +247,19 @@ export function Header({
                       <DialogHeader>
                         <DialogTitle>Publish to Community</DialogTitle>
                       </DialogHeader>
-                      <p>Are you sure you want to publish this game to the Community?</p>
+                      <p>
+                        Are you sure you want to publish this game to the
+                        Community?
+                      </p>
                       <DialogFooter className="mt-4">
                         <Button variant="ghost" onClick={onPublishCommunity}>
                           Yes, publish
                         </Button>
                         {onUnpublish && isPublishedToCommunity && (
-                          <Button variant="ghost" onClick={() => onUnpublish("community")}>
+                          <Button
+                            variant="ghost"
+                            onClick={() => onUnpublish("community")}
+                          >
                             Unpublish
                           </Button>
                         )}

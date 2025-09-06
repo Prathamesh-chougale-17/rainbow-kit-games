@@ -6,19 +6,27 @@ export async function POST(request: NextRequest) {
     const { gameId, walletAddress } = await request.json();
 
     if (!gameId || !walletAddress) {
-      return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
     }
 
     const deleted = await gameService.deleteGame(gameId, walletAddress);
     if (!deleted) {
-      return NextResponse.json({ success: false, error: "Failed to delete game" }, { status: 500 });
+      return NextResponse.json(
+        { success: false, error: "Failed to delete game" },
+        { status: 500 },
+      );
     }
 
     return NextResponse.json({ success: true, message: "Game deleted" });
   } catch (error) {
     console.error("Delete game error:", error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Failed to delete game" },
+      {
+        error: error instanceof Error ? error.message : "Failed to delete game",
+      },
       { status: 500 },
     );
   }
