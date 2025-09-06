@@ -1,17 +1,18 @@
 "use client";
 
-import React from "react";
 import { useParams, useRouter } from "next/navigation";
+import React from "react";
+import { toast } from "sonner";
+import { CodeEditor } from "@/components/canvas-forge/CodeEditor";
+import { Header } from "@/components/canvas-forge/Header";
+import { Preview } from "@/components/canvas-forge/Preview";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
-import { Header } from "@/components/canvas-forge/Header";
-import { CodeEditor } from "@/components/canvas-forge/CodeEditor";
-import { Preview } from "@/components/canvas-forge/Preview";
+import type { Game } from "@/lib/game-service";
 import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
-import { toast } from "sonner";
 
 const defaultHtml = `<!DOCTYPE html>
 <html lang="en">
@@ -84,24 +85,18 @@ export default function GameEditor() {
   const [currentGameId, setCurrentGameId] = React.useState<string | undefined>(
     isNewGame ? undefined : gameId,
   );
-  const [currentGame, setCurrentGame] = React.useState<any>(null);
+  const [currentGame, setCurrentGame] = React.useState<Game | null>(null);
   const [isGameGenerated, setIsGameGenerated] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
-  React.useEffect(() => {
-    if (!isNewGame) {
-      loadGame(gameId);
-    }
-  }, [gameId, isNewGame]);
-
-  const loadGame = async (id: string) => {
+  const loadGame = React.useCallback(async (id: string) => {
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       const response = await fetch(`/api/games?wallet=${walletAddress}`);
       const result = await response.json();
 
       if (result.success) {
-        const game = result.games.find((g: any) => g.gameId === id);
+        const game = result.games.find((g: Game) => g.gameId === id);
         if (game && game.versions.length > 0) {
           const latestVersion = game.versions[game.versions.length - 1];
           setHtml(latestVersion.html);
@@ -115,7 +110,13 @@ export default function GameEditor() {
       console.error("Load game error:", error);
       toast.error("Failed to load game");
     }
-  };
+  }, []);
+
+  React.useEffect(() => {
+    if (!isNewGame) {
+      loadGame(gameId);
+    }
+  }, [gameId, isNewGame, loadGame]);
 
   const handleGenerate = (output: GenerateGameCodeOutput) => {
     setHtml(output.html);

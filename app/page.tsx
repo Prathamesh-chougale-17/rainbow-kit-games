@@ -1,3 +1,13 @@
+import {
+  ArrowRight,
+  Cloud,
+  Code,
+  GitFork,
+  Shield,
+  ShoppingCart,
+  Users,
+  Zap,
+} from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,16 +16,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  ArrowRight,
-  Code,
-  Users,
-  ShoppingCart,
-  GitFork,
-  Zap,
-  Shield,
-  Cloud,
-} from "lucide-react";
 
 export default function Home() {
   return (

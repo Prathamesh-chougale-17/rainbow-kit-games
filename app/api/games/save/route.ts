@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
-import { gameService } from "@/lib/game-service";
+import { type NextRequest, NextResponse } from "next/server";
+import { type Game, gameService } from "@/lib/game-service";
 
 // Upload game HTML to IPFS using FormData approach
 async function uploadToIPFS(
@@ -22,7 +22,7 @@ async function uploadToIPFS(
     }
 
     // Ensure we have a safe title for filename (fallback to timestamped name)
-    const safeTitle = title && title.length ? title : `game_${Date.now()}`;
+    const safeTitle = title?.length ? title : `game_${Date.now()}`;
     // Sanitize title for filename
     const sanitizedTitle = safeTitle
       .replace(/[^a-z0-9\-_]/gi, "_")
@@ -154,7 +154,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let game;
+    let game: Game | null = null;
 
     if (gameId) {
       console.log("Updating existing game:", gameId);

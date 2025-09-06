@@ -1,6 +1,18 @@
 "use client";
 
+import {
+  Calendar,
+  Code,
+  Eye,
+  GitFork,
+  Search,
+  User,
+  Users,
+} from "lucide-react";
+import Link from "next/link";
 import * as React from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -9,20 +21,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import {
-  Users,
-  Search,
-  Calendar,
-  User,
-  GitFork,
-  Code,
-  Eye,
-  Heart,
-} from "lucide-react";
-import Link from "next/link";
-import { toast } from "sonner";
 
 interface Game {
   _id?: string;
@@ -32,7 +31,7 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: any[];
+  versions: number[];
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -49,12 +48,9 @@ export default function CommunityPage() {
   const [searchQuery, setSearchQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
 
-  React.useEffect(() => {
-    loadCommunityGames();
-  }, [page, searchQuery]);
-
-  const loadCommunityGames = async () => {
+  const loadCommunityGames = React.useCallback(async () => {
     try {
+      setLoading(true);
       const params = new URLSearchParams({
         page: page.toString(),
         limit: "12",
@@ -78,12 +74,15 @@ export default function CommunityPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [page, searchQuery]);
+
+  React.useEffect(() => {
+    loadCommunityGames();
+  }, [loadCommunityGames]);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     setPage(1);
-    loadCommunityGames();
   };
 
   const formatDate = (dateString: string | Date) => {

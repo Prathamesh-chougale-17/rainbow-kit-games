@@ -1,32 +1,26 @@
 "use client";
 
-import * as React from "react";
-import { Button } from "@/components/ui/button";
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import {
-  Play,
-  GitFork,
-  Code,
-  User,
-  Calendar,
-  Download,
-  Share2,
-  ExternalLink,
-  Maximize,
   ArrowLeft,
+  Calendar,
+  Code,
+  Download,
+  ExternalLink,
+  GitFork,
+  Maximize,
+  Play,
+  Share2,
+  User,
   Users,
 } from "lucide-react";
 import Link from "next/link";
-import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import * as React from "react";
+import { toast } from "sonner";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 
 interface Game {
   _id?: string;
@@ -36,7 +30,11 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: any[];
+  versions: {
+    version: number;
+    ipfsCid: string;
+    createdAt: Date;
+  }[];
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -65,11 +63,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   const [isFullscreen, setIsFullscreen] = React.useState(false);
   const router = useRouter();
 
-  React.useEffect(() => {
-    loadGame();
-  }, [resolvedParams?.id]);
-
-  const loadGame = async () => {
+  const loadGame = React.useCallback(async () => {
     try {
       const response = await fetch(`/api/community/${resolvedParams.id}`);
       const result = await response.json();
@@ -87,7 +81,11 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [resolvedParams.id, router]);
+
+  React.useEffect(() => {
+    loadGame();
+  }, [loadGame]);
 
   const handleFork = async () => {
     try {
@@ -123,7 +121,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
     try {
       await navigator.clipboard.writeText(window.location.href);
       toast.success("Game link copied to clipboard!");
-    } catch (error) {
+    } catch {
       toast.error("Failed to copy link");
     }
   };

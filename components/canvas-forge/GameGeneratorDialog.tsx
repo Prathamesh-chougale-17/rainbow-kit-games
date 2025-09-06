@@ -1,11 +1,12 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Bot, Loader2, Sparkles } from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { z } from "zod";
-import { Bot, Loader2, Sparkles } from "lucide-react";
-
+import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code-ai-sdk";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -26,8 +27,6 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 import { generateGame, refinePromptAction } from "@/lib/actions-ai-sdk";
-import type { GenerateGameCodeOutput } from "@/ai/flows/generate-game-code-ai-sdk";
-import { toast } from "sonner";
 
 const formSchema = z.object({
   prompt: z.string().min(10, {

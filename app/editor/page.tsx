@@ -40,7 +40,7 @@ interface Game {
   description?: string;
   tags?: string[];
   currentVersion: number;
-  versions: any[];
+  versions: number[];
   isPublishedToMarketplace: boolean;
   isPublishedToCommunity: boolean;
   marketplacePublishedAt?: Date;
@@ -60,11 +60,7 @@ export default function EditorDashboard() {
   >(null);
   const [deleting, setDeleting] = React.useState(false);
 
-  React.useEffect(() => {
-    loadGames();
-  }, []);
-
-  const loadGames = async () => {
+  const loadGames = React.useCallback(async () => {
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       const response = await fetch(`/api/games?wallet=${walletAddress}`);
@@ -75,12 +71,16 @@ export default function EditorDashboard() {
       } else {
         toast.error("Failed to load games");
       }
-    } catch (error) {
+    } catch {
       toast.error("Failed to load games");
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  React.useEffect(() => {
+    loadGames();
+  }, [loadGames]);
 
   const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString("en-US", {

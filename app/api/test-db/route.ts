@@ -18,7 +18,7 @@ export async function GET() {
     console.log("Testing game creation...");
     const testGame = await gameService.createGame({
       walletAddress: "test-wallet-123",
-      title: "Test Game " + Date.now(),
+      title: `Test Game ${Date.now()}`,
       description: "Test game description",
       tags: ["test"],
     });

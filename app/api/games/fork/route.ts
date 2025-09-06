@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { gameService } from "@/lib/game-service";
 
 // Upload forked game to IPFS

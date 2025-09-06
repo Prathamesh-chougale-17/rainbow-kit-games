@@ -1,20 +1,20 @@
 "use client";
 
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  BarChart3,
+  Lightbulb,
+  Loader2,
+  Shuffle,
+  Sparkles,
+  Wand2,
+  Zap,
+} from "lucide-react";
 import * as React from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 import { z } from "zod";
-import {
-  Bot,
-  Loader2,
-  Sparkles,
-  Lightbulb,
-  Shuffle,
-  Zap,
-  BarChart3,
-  Wand2,
-} from "lucide-react";
-
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -33,9 +33,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import { Textarea } from "@/components/ui/textarea";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -44,21 +41,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import {
   generateGameEnhanced,
-  refineGameAdvanced,
-  refinePromptAction,
   generateGameIdeaAction,
   generateGameVariationsAction,
+  refineGameAdvanced,
+  refinePromptAction,
 } from "@/lib/actions-enhanced";
 import type {
-  GenerateGameCodeOutput,
-  GameIdea,
-  GameVariation,
   GameGenerationResult,
+  GameIdea,
+  GameMetrics,
   GameRefinementResult,
+  GameVariation,
+  GenerateGameCodeOutput,
 } from "@/types/ai-sdk";
-import { toast } from "sonner";
+import { Label } from "../ui/label";
 
 const formSchema = z.object({
   prompt: z.string().min(10, {
@@ -93,7 +93,8 @@ export function EnhancedGameGeneratorDialog({
   const [gameVariations, setGameVariations] = React.useState<GameVariation[]>(
     [],
   );
-  const [generationMetrics, setGenerationMetrics] = React.useState<any>(null);
+  const [generationMetrics, setGenerationMetrics] =
+    React.useState<GameMetrics | null>(null);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -411,15 +412,22 @@ export function EnhancedGameGeneratorDialog({
 
                 {gameVariations.length > 0 && (
                   <div className="space-y-2">
-                    <label className="text-sm font-medium">
+                    <Label className="text-sm font-medium">
                       Game Variations
-                    </label>
+                    </Label>
                     <div className="grid gap-2 max-h-48 overflow-y-auto">
                       {gameVariations.map((variation) => (
-                        <div
+                        <button
                           key={variation.variation}
-                          className="p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors"
+                          type="button"
+                          className="p-3 border rounded-lg hover:bg-accent cursor-pointer transition-colors text-left w-full"
                           onClick={() => selectVariation(variation)}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              selectVariation(variation);
+                            }
+                          }}
                         >
                           <div className="flex justify-between items-start">
                             <div>
@@ -435,7 +443,7 @@ export function EnhancedGameGeneratorDialog({
                               {variation.difficulty}
                             </Badge>
                           </div>
-                        </div>
+                        </button>
                       ))}
                     </div>
                   </div>
@@ -476,9 +484,9 @@ export function EnhancedGameGeneratorDialog({
 
                 {gameIdeas.length > 0 && (
                   <div className="space-y-3">
-                    {gameIdeas.map((idea, index) => (
+                    {gameIdeas.map((idea) => (
                       <div
-                        key={index}
+                        key={idea.title}
                         className="p-4 border rounded-lg space-y-2"
                       >
                         <h3 className="font-bold">{idea.title}</h3>

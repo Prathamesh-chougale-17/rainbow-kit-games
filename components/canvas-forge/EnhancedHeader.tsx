@@ -1,10 +1,10 @@
 "use client";
 
-import { Bot, Download, Share2, Code, Zap } from "lucide-react";
+import { Bot, Download, Share2, Zap } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { GameGeneratorDialog } from "./GameGeneratorDialog";
-import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
 import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
+import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
+import { GameGeneratorDialog } from "./GameGeneratorDialog";
 
 interface HeaderProps {
   onExport: () => void;

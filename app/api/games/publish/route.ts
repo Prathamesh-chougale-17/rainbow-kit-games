@@ -1,4 +1,4 @@
-import { NextRequest, NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { gameService } from "@/lib/game-service";
 
 export async function POST(request: NextRequest) {
@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let result;
+    let result: boolean;
     if (type === "marketplace") {
       result = await gameService.publishToMarketplace(
         gameId,

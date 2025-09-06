@@ -1,24 +1,11 @@
 "use client";
 
+import { Code, Download, Share2, Store, Users, Zap } from "lucide-react";
 import * as React from "react";
-import { Button } from "@/components/ui/button";
-import {
-  Bot,
-  Save,
-  Play,
-  Palette,
-  Wand2,
-  Upload,
-  Users,
-  Store,
-  Code,
-  Zap,
-  Share2,
-  Download,
-} from "lucide-react";
-import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
 import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
 import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
+import { EnhancedGameGeneratorDialog } from "./EnhancedGameGeneratorDialog";
 
 interface EnhancedHeaderProps {
   onGenerate: (output: GenerateGameCodeOutput) => void;
