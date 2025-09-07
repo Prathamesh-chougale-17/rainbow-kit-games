@@ -11,6 +11,7 @@ import {
   ResizablePanel,
   ResizablePanelGroup,
 } from "@/components/ui/resizable";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Game } from "@/lib/game-service";
 import type { GenerateGameCodeOutput } from "@/types/ai-sdk";
 
@@ -86,10 +87,13 @@ export default function GameEditor() {
     isNewGame ? undefined : gameId
   );
   const [currentGame, setCurrentGame] = React.useState<Game | null>(null);
+  // Loading state for fetching an existing game
+  const [isLoading, setIsLoading] = React.useState<boolean>(!isNewGame);
   const [isGameGenerated, setIsGameGenerated] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
 
   const loadGame = React.useCallback(async (id: string) => {
+    setIsLoading(true);
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
       const response = await fetch(`/api/games?wallet=${walletAddress}`);
@@ -108,6 +112,8 @@ export default function GameEditor() {
       }
     } catch {
       toast.error("Failed to load game");
+    } finally {
+      setIsLoading(false);
     }
   }, []);
 
@@ -321,33 +327,65 @@ export default function GameEditor() {
       <div className="flex-1">
         <ResizablePanelGroup className="h-full" direction="horizontal">
           <ResizablePanel className="min-w-[300px]" defaultSize={40}>
-            <CodeEditor
-              language="html"
-              onChange={(value) => setHtml(value || "")}
-              value={html}
-            />
+            {isLoading ? (
+              <div className="space-y-3 p-6">
+                <Skeleton className="h-6 w-1/3" />
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-5/6" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              </div>
+            ) : (
+              <CodeEditor
+                language="html"
+                onChange={(value) => setHtml(value || "")}
+                value={html}
+              />
+            )}
           </ResizablePanel>
           <ResizableHandle withHandle />
           <ResizablePanel className="min-w-[300px]" defaultSize={60}>
             {/* Header above Preview */}
             <div className="border-border border-b">
-              <Header
-                html={html}
-                isGameGenerated={isGameGenerated}
-                isPublishedToCommunity={currentGame?.isPublishedToCommunity}
-                isPublishedToMarketplace={currentGame?.isPublishedToMarketplace}
-                isSaving={isSaving}
-                onGenerate={handleGenerate}
-                onPublishCommunity={handlePublishToCommunity}
-                onPublishMarketplace={handlePublishToMarketplace}
-                onSave={handleSave}
-                onTitleChange={(t) => setTitle(t)}
-                onUnpublish={handleUnpublish}
-                showPublishButtons={!!currentGameId}
-                title={title}
-              />
+              {isLoading ? (
+                <div className="flex items-center justify-between p-4">
+                  <Skeleton className="h-6 w-1/3" />
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-8 w-20" />
+                    <Skeleton className="h-8 w-20" />
+                  </div>
+                </div>
+              ) : (
+                <Header
+                  html={html}
+                  isGameGenerated={isGameGenerated}
+                  isPublishedToCommunity={currentGame?.isPublishedToCommunity}
+                  isPublishedToMarketplace={
+                    currentGame?.isPublishedToMarketplace
+                  }
+                  isSaving={isSaving}
+                  onGenerate={handleGenerate}
+                  onPublishCommunity={handlePublishToCommunity}
+                  onPublishMarketplace={handlePublishToMarketplace}
+                  onSave={handleSave}
+                  onTitleChange={(t) => setTitle(t)}
+                  onUnpublish={handleUnpublish}
+                  showPublishButtons={!!currentGameId}
+                  title={title}
+                />
+              )}
             </div>
-            <Preview srcDoc={srcDoc} />
+            {isLoading ? (
+              <div className="p-6">
+                <Skeleton className="mb-4 h-8 w-full" />
+                <Skeleton className="h-[480px] w-full" />
+              </div>
+            ) : (
+              <Preview srcDoc={srcDoc} />
+            )}
           </ResizablePanel>
         </ResizablePanelGroup>
       </div>
