@@ -1,127 +1,149 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { type Game, gameService } from "@/lib/game-service";
+import {
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_PAYLOAD_TOO_LARGE,
+  HTTP_STATUS_TOO_MANY_REQUESTS,
+  HTTP_STATUS_UNAUTHORIZED,
+  IPFS_UPLOAD_TIMEOUT_MS,
+  MAX_FILENAME_LENGTH,
+  MAX_HTML_SIZE_BYTES,
+  PINATA_API_URL,
+} from "@/lib/constants";
+import { gameService } from "@/lib/game-service";
 
 // Upload game HTML to IPFS using FormData approach
+function validateHtmlContent(htmlContent: string) {
+  if (!htmlContent || htmlContent.length === 0) {
+    throw new Error("HTML content is empty");
+  }
+
+  if (htmlContent.length > MAX_HTML_SIZE_BYTES) {
+    // 50MB limit
+    throw new Error("HTML content too large (max 50MB)");
+  }
+}
+
+function sanitizeTitle(title: string) {
+  const safeTitle = title?.length ? title : `game_${Date.now()}`;
+  return safeTitle
+    .replace(/[^a-z0-9\-_]/gi, "_")
+    .substring(0, MAX_FILENAME_LENGTH);
+}
+
+function buildFormData(
+  htmlContent: string,
+  title: string,
+  walletAddress: string
+) {
+  const sanitizedTitle = sanitizeTitle(title);
+
+  const formData = new FormData();
+  const blob = new Blob([htmlContent], { type: "text/html" });
+  formData.append("file", blob, `${sanitizedTitle}.html`);
+
+  const pinataMetadata = JSON.stringify({
+    name: `${sanitizedTitle}.html`,
+    keyvalues: {
+      type: "game",
+      title,
+      uploadedAt: new Date().toISOString(),
+      userId: walletAddress,
+    },
+  });
+  formData.append("pinataMetadata", pinataMetadata);
+
+  const pinataOptions = JSON.stringify({
+    cidVersion: 1,
+  });
+  formData.append("pinataOptions", pinataOptions);
+
+  return formData;
+}
+
+async function postToPinata(formData: FormData) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    IPFS_UPLOAD_TIMEOUT_MS
+  ); // 60 second timeout
+
+  try {
+    const response = await fetch(PINATA_API_URL, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.PINATA_JWT}`,
+      },
+      body: formData,
+      signal: controller.signal,
+    });
+
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function parsePinataResponse(response: Response) {
+  if (!response.ok) {
+    const errorText = await response.text();
+
+    if (response.status === HTTP_STATUS_UNAUTHORIZED) {
+      throw new Error("Pinata authentication failed - invalid JWT token");
+    }
+    if (response.status === HTTP_STATUS_FORBIDDEN) {
+      if (errorText.includes("NO_SCOPES_FOUND")) {
+        throw new Error(
+          "Pinata JWT token lacks required file upload permissions. Please update the token with proper scopes."
+        );
+      }
+      throw new Error("Pinata access forbidden - check token permissions");
+    }
+    if (response.status === HTTP_STATUS_TOO_MANY_REQUESTS) {
+      throw new Error("Pinata rate limit exceeded - please try again later");
+    }
+    if (response.status === HTTP_STATUS_PAYLOAD_TOO_LARGE) {
+      throw new Error("File too large for Pinata upload");
+    }
+    throw new Error(
+      `Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`
+    );
+  }
+
+  const result = await response.json();
+
+  // Use reliable public IPFS gateway
+  const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || "ipfs.io";
+  const ipfsUrl = `https://${gatewayUrl}/ipfs/${result.IpfsHash}`;
+
+  return {
+    cid: result.IpfsHash,
+    url: ipfsUrl,
+    size: result.PinSize,
+  };
+}
+
 async function uploadToIPFS(
   htmlContent: string,
   title: string,
   walletAddress: string
 ) {
   try {
-    // Validate input
-    if (!htmlContent || htmlContent.length === 0) {
-      throw new Error("HTML content is empty");
-    }
+    await validateHtmlContent(htmlContent);
 
-    if (htmlContent.length > 50 * 1024 * 1024) {
-      // 50MB limit
-      throw new Error("HTML content too large (max 50MB)");
-    }
+    const formData = buildFormData(htmlContent, title, walletAddress);
 
-    // Ensure we have a safe title for filename (fallback to timestamped name)
-    const safeTitle = title?.length ? title : `game_${Date.now()}`;
-    // Sanitize title for filename
-    const sanitizedTitle = safeTitle
-      .replace(/[^a-z0-9\-_]/gi, "_")
-      .substring(0, 100);
+    const response = await postToPinata(formData);
 
-    console.log("PINATA_JWT exists:", !!process.env.PINATA_JWT);
-    console.log("GATEWAY_URL:", process.env.NEXT_PUBLIC_GATEWAY_URL);
-
-    // Create form data for upload
-    const formData = new FormData();
-    const blob = new Blob([htmlContent], { type: "text/html" });
-    formData.append("file", blob, `${sanitizedTitle}.html`);
-
-    // Add metadata for better organization
-    const pinataMetadata = JSON.stringify({
-      name: `${sanitizedTitle}.html`,
-      keyvalues: {
-        type: "game",
-        title,
-        uploadedAt: new Date().toISOString(),
-        userId: walletAddress,
-      },
-    });
-    formData.append("pinataMetadata", pinataMetadata);
-
-    // Add pinata options for better control
-    const pinataOptions = JSON.stringify({
-      cidVersion: 1,
-    });
-    formData.append("pinataOptions", pinataOptions);
-
-    console.log("Making request to Pinata API...");
-
-    // Use Pinata API directly with timeout
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 60_000); // 60 second timeout
-
-    const response = await fetch(
-      "https://api.pinata.cloud/pinning/pinFileToIPFS",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.PINATA_JWT}`,
-        },
-        body: formData,
-        signal: controller.signal,
-      }
-    );
-
-    clearTimeout(timeoutId);
-
-    console.log("Pinata response status:", response.status);
-
-    if (!response.ok) {
-      const errorText = await response.text();
-      console.error("Pinata error response:", errorText);
-
-      // Handle specific error cases
-      if (response.status === 401) {
-        throw new Error("Pinata authentication failed - invalid JWT token");
-      }
-      if (response.status === 403) {
-        const errorBody = await response.text();
-        if (errorBody.includes("NO_SCOPES_FOUND")) {
-          throw new Error(
-            "Pinata JWT token lacks required file upload permissions. Please update the token with proper scopes."
-          );
-        }
-        throw new Error("Pinata access forbidden - check token permissions");
-      }
-      if (response.status === 429) {
-        throw new Error("Pinata rate limit exceeded - please try again later");
-      }
-      if (response.status === 413) {
-        throw new Error("File too large for Pinata upload");
-      }
-      throw new Error(
-        `Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`
-      );
-    }
-
-    const result = await response.json();
-    console.log("Pinata upload successful. CID:", result.IpfsHash);
-
-    // Use reliable public IPFS gateway
-    const gatewayUrl = process.env.NEXT_PUBLIC_GATEWAY_URL || "ipfs.io";
-    const ipfsUrl = `https://${gatewayUrl}/ipfs/${result.IpfsHash}`;
-
-    return {
-      cid: result.IpfsHash,
-      url: ipfsUrl,
-      size: result.PinSize,
-    };
+    return await parsePinataResponse(response);
   } catch (error) {
-    console.error("IPFS upload error details:", error);
-
-    if (error instanceof Error && error.name === "AbortError") {
+    if (
+      error instanceof Error &&
+      (error.name === "AbortError" || error.name === "DOMException")
+    ) {
       throw new Error("Upload timeout - please try again");
     }
 
     if (error instanceof Error) {
-      console.error("Error message:", error.message);
       throw new Error(`Failed to upload to IPFS: ${error.message}`);
     }
 
@@ -129,21 +151,118 @@ async function uploadToIPFS(
   }
 }
 
+async function updateFlow({
+  gameId,
+  html,
+  title,
+  description,
+  tags,
+  walletAddress,
+}: {
+  gameId: string;
+  html: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  walletAddress: string;
+}) {
+  const game = await gameService.getGameById(gameId);
+  if (!game) {
+    return NextResponse.json(
+      { success: false, error: "Game not found" },
+      { status: 404 }
+    );
+  }
+
+  if (game.walletAddress !== walletAddress) {
+    return NextResponse.json(
+      { success: false, error: "Unauthorized" },
+      { status: 403 }
+    );
+  }
+
+  const ipfsResult = await uploadToIPFS(html, title, walletAddress);
+
+  const version = await gameService.addGameVersion(gameId, {
+    html,
+    title,
+    description,
+    tags,
+    ipfsCid: ipfsResult.cid,
+    ipfsUrl: ipfsResult.url,
+  });
+
+  try {
+    await gameService.updateGame(gameId, { title });
+  } catch (err) {
+    return NextResponse.json(
+      {
+        success: false,
+        error: `Failed to update game title: ${
+          err instanceof Error ? err.message : "Unknown error"
+        }`,
+      },
+      { status: 500 }
+    );
+  }
+
+  const updatedGame = await gameService.getGameById(gameId);
+  return NextResponse.json({
+    success: true,
+    game: updatedGame,
+    version,
+    ipfs: ipfsResult,
+    message: "Game saved and uploaded to IPFS successfully!",
+  });
+}
+
+async function createFlow({
+  html,
+  title,
+  description,
+  tags,
+  walletAddress,
+}: {
+  html: string;
+  title: string;
+  description?: string;
+  tags?: string[];
+  walletAddress: string;
+}) {
+  const game = await gameService.createGame({
+    walletAddress,
+    title,
+    description,
+    tags,
+  });
+
+  const ipfsResult = await uploadToIPFS(html, title, walletAddress);
+
+  const version = await gameService.addGameVersion(game.gameId, {
+    html,
+    title,
+    description,
+    tags,
+    ipfsCid: ipfsResult.cid,
+    ipfsUrl: ipfsResult.url,
+  });
+
+  const freshGame = await gameService.getGameById(game.gameId);
+  return NextResponse.json({
+    success: true,
+    game: freshGame,
+    version,
+    ipfs: ipfsResult,
+    message: "Game created and uploaded to IPFS successfully!",
+  });
+}
+
 export async function POST(request: NextRequest) {
   try {
-    console.log("Save API called");
     const { html, title, description, tags, walletAddress, gameId } =
       await request.json();
 
-    console.log("Request data:", {
-      title,
-      walletAddress,
-      gameId,
-      hasHtml: !!html,
-    });
-
     if (!(html && title && walletAddress)) {
-      console.log("Missing required fields");
       return NextResponse.json(
         {
           success: false,
@@ -153,108 +272,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    let game: Game | null = null;
-
     if (gameId) {
-      console.log("Updating existing game:", gameId);
-      // Update existing game with new version
-      game = await gameService.getGameById(gameId);
-      if (!game) {
-        console.log("Game not found:", gameId);
-        return NextResponse.json(
-          { success: false, error: "Game not found" },
-          { status: 404 }
-        );
-      }
-
-      if (game.walletAddress !== walletAddress) {
-        console.log("Unauthorized access attempt");
-        return NextResponse.json(
-          { success: false, error: "Unauthorized" },
-          { status: 403 }
-        );
-      }
-
-      console.log("Uploading to IPFS...");
-      // Upload to IPFS - now required for all games
-      const ipfsResult = await uploadToIPFS(html, title, walletAddress);
-      console.log("IPFS upload successful:", ipfsResult.cid);
-
-      // Add new version with IPFS data
-      const version = await gameService.addGameVersion(gameId, {
+      return await updateFlow({
+        gameId,
         html,
         title,
         description,
         tags,
-        ipfsCid: ipfsResult.cid,
-        ipfsUrl: ipfsResult.url,
-      });
-
-      console.log("Version added successfully");
-
-      // Update top-level game title so the game metadata reflects the latest title
-      try {
-        await gameService.updateGame(gameId, { title });
-      } catch (err) {
-        console.warn("Failed to update top-level game title:", err);
-      }
-
-      // Return the fresh game object
-      const updatedGame = await gameService.getGameById(gameId);
-      return NextResponse.json({
-        success: true,
-        game: updatedGame,
-        version,
-        ipfs: ipfsResult,
-        message: "Game saved and uploaded to IPFS successfully!",
+        walletAddress,
       });
     }
-    console.log("Creating new game");
-    // Create new game
-    game = await gameService.createGame({
-      walletAddress,
-      title,
-      description,
-      tags,
-    });
 
-    console.log("Game created:", game.gameId);
-
-    console.log("Uploading to IPFS...");
-    // Upload to IPFS - now required for all games
-    const ipfsResult = await uploadToIPFS(html, title, walletAddress);
-    console.log("IPFS upload successful:", ipfsResult.cid);
-
-    // Add initial version with IPFS data
-    const version = await gameService.addGameVersion(game.gameId, {
+    return await createFlow({
       html,
       title,
       description,
       tags,
-      ipfsCid: ipfsResult.cid,
-      ipfsUrl: ipfsResult.url,
-    });
-
-    console.log("Initial version added successfully");
-
-    // Fetch the fresh game object including the newly added version
-    const freshGame = await gameService.getGameById(game.gameId);
-    return NextResponse.json({
-      success: true,
-      game: freshGame,
-      version,
-      ipfs: ipfsResult,
-      message: "Game created and uploaded to IPFS successfully!",
+      walletAddress,
     });
   } catch (error) {
-    console.error("Save game error:", error);
-
-    // Log detailed error information
-    if (error instanceof Error) {
-      console.error("Error message:", error.message);
-      console.error("Error stack:", error.stack);
-    }
-
     return NextResponse.json(
       {
         success: false,
