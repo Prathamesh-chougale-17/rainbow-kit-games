@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 import { cn } from "@/lib/utils";
 
-interface MagicCardProps {
+type MagicCardProps = {
   children?: React.ReactNode;
   className?: string;
   gradientSize?: number;
@@ -14,7 +14,7 @@ interface MagicCardProps {
   gradientOpacity?: number;
   gradientFrom?: string;
   gradientTo?: string;
-}
+};
 
 export function MagicCard({
   children,

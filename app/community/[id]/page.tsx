@@ -4,7 +4,6 @@ import {
   ArrowLeft,
   Calendar,
   Code,
-  Download,
   ExternalLink,
   GitFork,
   Maximize,
@@ -106,13 +105,6 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
     }
   };
 
-  const handleDownload = () => {
-    if (game?.versions?.[game.currentVersion - 1]?.ipfsCid) {
-      const downloadUrl = `https://ipfs.io/ipfs/${game.versions[game.currentVersion - 1].ipfsCid}`;
-      window.open(downloadUrl, "_blank");
-    }
-  };
-
   const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString("en-US", {
       year: "numeric",
@@ -180,14 +172,6 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   >
                     <Maximize className="h-4 w-4" />
                   </Button>
-                  <Button
-                    disabled={!getGameUrl()}
-                    onClick={handleDownload}
-                    size="sm"
-                    variant="outline"
-                  >
-                    <Download className="h-4 w-4" />
-                  </Button>
                 </div>
               </div>
             </CardHeader>
@@ -210,18 +194,6 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   </div>
                 )}
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Game Description */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Description</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground">
-                {game.description || "No description provided for this game."}
-              </p>
             </CardContent>
           </Card>
         </div>
@@ -306,14 +278,13 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   <GitFork className="h-4 w-4" />
                   {forking ? "Forking..." : "Fork & Edit"}
                 </Button>
-                <div className="grid grid-cols-2 gap-2">
-                  <Button onClick={handleShare} size="sm" variant="outline">
-                    <Share2 className="h-4 w-4" />
-                  </Button>
-                  <Button onClick={handleDownload} size="sm" variant="outline">
-                    <Download className="h-4 w-4" />
-                  </Button>
-                </div>
+                <Button
+                  className="w-full"
+                  onClick={handleShare}
+                  variant="outline"
+                >
+                  <Share2 className="h-4 w-4" />
+                </Button>
               </div>
             </CardContent>
           </Card>

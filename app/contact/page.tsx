@@ -3,7 +3,7 @@ import { ContactForm } from "@/components/contact-form";
 
 export default function ContactPage() {
   return (
-    <main className="min-h-screen py-16">
+    <main className="py-16">
       <div className="mx-auto max-w-6xl px-4">
         <div className="grid grid-cols-1 items-stretch gap-10 md:grid-cols-2">
           {/* Left: Illustration card */}
