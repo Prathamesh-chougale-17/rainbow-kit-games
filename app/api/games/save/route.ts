@@ -9,7 +9,7 @@ import {
   MAX_HTML_SIZE_BYTES,
   PINATA_API_URL,
 } from "@/lib/constants";
-import { gameService } from "@/lib/game-service";
+import { type Game, gameService } from "@/lib/game-service";
 
 // Upload game HTML to IPFS using FormData approach
 // For forked games, includes fork metadata (forked=true, forkedFrom=originalOwner)
@@ -29,6 +29,41 @@ function sanitizeTitle(title: string) {
   return safeTitle
     .replace(/[^a-z0-9\-_]/gi, "_")
     .substring(0, MAX_FILENAME_LENGTH);
+}
+
+// Check if forked game content differs from original
+async function validateForkedGameChanges(
+  game: Pick<Game, "originalGameId" | "originalOwner">,
+  newHtml: string
+): Promise<boolean> {
+  if (!game.originalGameId) {
+    return true; // Not a forked game, allow save
+  }
+
+  if (!game.originalOwner) {
+    return true; // No original owner info, allow save
+  }
+
+  // Get the original game
+  const originalGame = await gameService.getGameById(game.originalGameId);
+  if (!originalGame) {
+    return true; // Original game not found, allow save
+  }
+
+  // Get the latest version of the original game
+  const originalLatestVersion = originalGame.versions.at(-1);
+  if (!originalLatestVersion) {
+    return true; // No versions in original, allow save
+  }
+
+  // Compare HTML content (normalize whitespace for comparison)
+  const normalizeHtml = (html: string) =>
+    html.replace(/\s+/g, " ").trim().toLowerCase();
+
+  const originalHtmlNormalized = normalizeHtml(originalLatestVersion.html);
+  const newHtmlNormalized = normalizeHtml(newHtml);
+
+  return originalHtmlNormalized !== newHtmlNormalized;
 }
 
 function buildFormData(
@@ -222,6 +257,21 @@ async function updateFlow({
       { success: false, error: "Unauthorized" },
       { status: 403 }
     );
+  }
+
+  // For forked games, ensure the content has actually changed
+  if (game.originalOwner) {
+    const hasChanges = await validateForkedGameChanges(game, html);
+    if (!hasChanges) {
+      return NextResponse.json(
+        {
+          success: false,
+          error:
+            "No changes detected. Forked games can only be saved if the content differs from the original.",
+        },
+        { status: 400 }
+      );
+    }
   }
 
   // Check if this is a forked game and pass originalOwner for metadata
