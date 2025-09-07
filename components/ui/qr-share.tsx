@@ -1,7 +1,15 @@
+"use client";
+
 import { Copy, Share2 } from "lucide-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { QRCode } from "@/components/ui/kibo-ui/qr-code";
 import { cn } from "@/lib/utils";
 
 // NOTE: This file expects the `@kibo/qr-code` shadcn component to be added to the project.
@@ -32,47 +40,17 @@ export function QrShare({ url, className }: QrShareProps) {
     <div className={cn("flex items-center gap-2", className)}>
       <Dialog>
         <DialogTrigger asChild>
-          <Button size="sm" variant="outline">
+          <Button className="w-full" variant="outline">
             <Share2 className="h-4 w-4" />
             Share
           </Button>
         </DialogTrigger>
         <DialogContent className="max-w-sm">
+          <DialogTitle className="font-medium text-lg">Share link</DialogTitle>
           <div className="grid gap-4">
-            {/* Lazy load the QR component so app stays light if not installed */}
-            <React.Suspense fallback={<div className="h-40 w-full bg-muted" />}>
-              {/** The shadcn added component typically exports `QrCode` */}
-              {
-                // Dynamically require to avoid hard dependency until the developer runs shadcn add
-                // eslint-disable-next-line @typescript-eslint/no-var-requires
-                (() => {
-                  try {
-                    const mod = require("@kibo/qr-code");
-                    const Qr = mod?.QrCode || mod?.default || mod;
-                    return <Qr className="mx-auto" size={220} value={url} />;
-                  } catch (_err) {
-                    // QR component not available — return a lightweight placeholder
-                    return (
-                      <div
-                        className={cn(
-                          "grid",
-                          "h-44",
-                          "w-44",
-                          "place-items-center",
-                          "rounded-md",
-                          "bg-muted",
-                          "text-sm",
-                          "text-muted-foreground",
-                          "mx-auto"
-                        )}
-                      >
-                        QR component not installed
-                      </div>
-                    );
-                  }
-                })()
-              }
-            </React.Suspense>
+            <div className="flex justify-center">
+              <QRCode className="h-56 w-56" data={url} />
+            </div>
 
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">

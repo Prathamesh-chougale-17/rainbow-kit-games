@@ -3,7 +3,6 @@ import {
   Code,
   Edit,
   Play,
-  Share2,
   ShoppingCart,
   Star,
   Trash2,
@@ -16,6 +15,7 @@ import { MagicCard } from "@/components/magicui/magic-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
+import QrShare from "@/components/ui/qr-share";
 import { POPULAR_FORK_THRESHOLD } from "@/lib/constants";
 import type { Game } from "@/lib/game-service";
 
@@ -236,15 +236,11 @@ function ActionsSection({
         </Button>
       </Link>
       {onShare && (
-        <Button
-          className="border-emerald-200 transition-all duration-200 hover:scale-105 hover:border-emerald-300 hover:bg-emerald-50 dark:border-emerald-800 dark:hover:bg-emerald-900/20"
-          onClick={() => onShare(game.gameId)}
-          size="sm"
-          type="button"
-          variant="outline"
-        >
-          <Share2 className="h-4 w-4" />
-        </Button>
+        <div className="flex items-center">
+          <QrShare
+            url={`${typeof window !== "undefined" ? window.location.origin : ""}/marketplace/${game.gameId}`}
+          />
+        </div>
       )}
     </>
   );

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeft, Share2, Store } from "lucide-react";
+import { ArrowLeft, Store } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import React from "react";
@@ -12,6 +12,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
+import QrShare from "@/components/ui/qr-share";
 import {
   WALLET_ADDRESS_PREFIX_LENGTH,
   WALLET_ADDRESS_SUFFIX_LENGTH,
@@ -76,18 +77,18 @@ export default function MarketplaceGamePage() {
     // return () => {};
   }, []);
 
-  const handleShare = () => {
-    if (navigator.share && game) {
-      navigator.share({
-        title: game.title,
-        text: `Check out this awesome game: ${game.title}`,
-        url: window.location.href,
-      });
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Game link copied to clipboard!");
-    }
-  };
+  // const handleShare = () => {
+  //   if (navigator.share && game) {
+  //     navigator.share({
+  //       title: game.title,
+  //       text: `Check out this awesome game: ${game.title}`,
+  //       url: window.location.href,
+  //     });
+  //   } else {
+  //     navigator.clipboard.writeText(window.location.href);
+  //     toast.success("Game link copied to clipboard!");
+  //   }
+  // };
 
   const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -211,9 +212,9 @@ export default function MarketplaceGamePage() {
             </PopoverContent>
           </Popover>
 
-          <Button onClick={handleShare} size="sm" variant="outline">
-            <Share2 className="h-4 w-4" />
-          </Button>
+          <div className="flex items-center gap-2">
+            <QrShare url={window.location.href} />
+          </div>
         </div>
       </div>
     </div>

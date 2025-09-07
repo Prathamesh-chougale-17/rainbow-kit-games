@@ -8,7 +8,6 @@ import {
   GitFork,
   Maximize,
   Play,
-  Share2,
   User,
   Users,
 } from "lucide-react";
@@ -19,6 +18,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import QrShare from "@/components/ui/qr-share";
 import { Separator } from "@/components/ui/separator";
 import {
   WALLET_ADDRESS_PREFIX_LENGTH,
@@ -96,14 +96,14 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
     }
   };
 
-  const handleShare = async () => {
-    try {
-      await navigator.clipboard.writeText(window.location.href);
-      toast.success("Game link copied to clipboard!");
-    } catch {
-      toast.error("Failed to copy link");
-    }
-  };
+  // const handleShare = async () => {
+  //   try {
+  //     await navigator.clipboard.writeText(window.location.href);
+  //     toast.success("Game link copied to clipboard!");
+  //   } catch {
+  //     toast.error("Failed to copy link");
+  //   }
+  // };
 
   const formatDate = (dateString: string | Date) => {
     return new Date(dateString).toLocaleDateString("en-US", {
@@ -278,13 +278,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
                   <GitFork className="h-4 w-4" />
                   {forking ? "Forking..." : "Fork & Edit"}
                 </Button>
-                <Button
-                  className="w-full"
-                  onClick={handleShare}
-                  variant="outline"
-                >
-                  <Share2 className="h-4 w-4" />
-                </Button>
+                <QrShare url={window.location.href} />
               </div>
             </CardContent>
           </Card>
