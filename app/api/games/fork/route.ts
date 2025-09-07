@@ -130,7 +130,7 @@ async function uploadToIPFS(
   originalOwner: string
 ) {
   try {
-    validateHtmlContent(htmlContent);
+    await validateHtmlContent(htmlContent);
 
     const formData = buildForkFormData(
       htmlContent,
@@ -203,9 +203,6 @@ export async function POST(request: NextRequest) {
     }
 
     // Fork the game with new IPFS data
-    // Store the original game's owner address in DB as originalOwner
-    const originalOwner = originalGame.walletAddress;
-
     const forkedGame = await gameService.forkGameWithIPFS(
       originalGameId,
       walletAddress,
@@ -220,25 +217,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Also update the newly created forked game's originalOwner (createGame already accepts originalGameId, but ensure originalOwner is set)
-    await (async () => {
-      try {
-        await (await import("@/lib/game-service")).gameService.updateGame(
-          forkedGame.gameId,
-          { originalOwner }
-        );
-      } catch (error) {
-        return NextResponse.json(
-          {
-            error:
-              error instanceof Error
-                ? error.message
-                : "Failed to set original owner on forked game",
-          },
-          { status: 500 }
-        );
-      }
-    })();
+    // Update the newly created forked game's originalOwner
+    try {
+      await gameService.updateGame(forkedGame.gameId, {
+        originalOwner: originalGame.walletAddress,
+      });
+    } catch {
+      // Don't fail the entire request for this non-critical update
+    }
 
     return NextResponse.json({
       success: true,

@@ -12,6 +12,7 @@ import {
 import { gameService } from "@/lib/game-service";
 
 // Upload game HTML to IPFS using FormData approach
+// For forked games, includes fork metadata (forked=true, forkedFrom=originalOwner)
 function validateHtmlContent(htmlContent: string) {
   if (!htmlContent || htmlContent.length === 0) {
     throw new Error("HTML content is empty");
@@ -48,6 +49,40 @@ function buildFormData(
       title,
       uploadedAt: new Date().toISOString(),
       userId: walletAddress,
+    },
+  });
+  formData.append("pinataMetadata", pinataMetadata);
+
+  const pinataOptions = JSON.stringify({
+    cidVersion: 1,
+  });
+  formData.append("pinataOptions", pinataOptions);
+
+  return formData;
+}
+
+function buildForkedGameFormData(
+  htmlContent: string,
+  title: string,
+  walletAddress: string,
+  originalOwner: string
+) {
+  const sanitizedTitle = sanitizeTitle(title);
+
+  const formData = new FormData();
+  const blob = new Blob([htmlContent], { type: "text/html" });
+  formData.append("file", blob, `${sanitizedTitle}.html`);
+
+  // Include fork metadata to match fork route behavior
+  const pinataMetadata = JSON.stringify({
+    name: `${sanitizedTitle}.html`,
+    keyvalues: {
+      type: "game",
+      title,
+      uploadedAt: new Date().toISOString(),
+      userId: walletAddress,
+      forked: "true",
+      forkedFrom: originalOwner,
     },
   });
   formData.append("pinataMetadata", pinataMetadata);
@@ -125,12 +160,20 @@ async function parsePinataResponse(response: Response) {
 async function uploadToIPFS(
   htmlContent: string,
   title: string,
-  walletAddress: string
+  walletAddress: string,
+  originalOwner?: string
 ) {
   try {
     await validateHtmlContent(htmlContent);
 
-    const formData = buildFormData(htmlContent, title, walletAddress);
+    const formData = originalOwner
+      ? buildForkedGameFormData(
+          htmlContent,
+          title,
+          walletAddress,
+          originalOwner
+        )
+      : buildFormData(htmlContent, title, walletAddress);
 
     const response = await postToPinata(formData);
 
@@ -181,7 +224,13 @@ async function updateFlow({
     );
   }
 
-  const ipfsResult = await uploadToIPFS(html, title, walletAddress);
+  // Check if this is a forked game and pass originalOwner for metadata
+  const ipfsResult = await uploadToIPFS(
+    html,
+    title,
+    walletAddress,
+    game.originalOwner
+  );
 
   const version = await gameService.addGameVersion(gameId, {
     html,
