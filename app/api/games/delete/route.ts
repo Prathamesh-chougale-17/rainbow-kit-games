@@ -22,7 +22,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ success: true, message: "Game deleted" });
   } catch (error) {
-    console.error("Delete game error:", error);
     return NextResponse.json(
       {
         error: error instanceof Error ? error.message : "Failed to delete game",

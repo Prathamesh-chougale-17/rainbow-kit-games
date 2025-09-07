@@ -28,8 +28,7 @@ export async function GET(
       success: true,
       game,
     });
-  } catch (error) {
-    console.error("Get community game error:", error);
+  } catch {
     return NextResponse.json(
       { success: false, error: "Failed to fetch game" },
       { status: 500 }

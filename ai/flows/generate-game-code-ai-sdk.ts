@@ -122,8 +122,7 @@ export async function generateGameCode(
     });
 
     return object;
-  } catch (error) {
-    console.error("Error generating game code:", error);
+  } catch {
     throw new Error(
       "Failed to generate game. The AI model might be unavailable."
     );

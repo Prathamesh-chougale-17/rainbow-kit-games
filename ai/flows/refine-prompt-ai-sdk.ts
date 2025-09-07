@@ -78,8 +78,7 @@ export async function refinePrompt(
     });
 
     return object;
-  } catch (error) {
-    console.error("Error refining prompt:", error);
+  } catch {
     throw new Error(
       "Failed to refine prompt. The AI model might be unavailable."
     );

@@ -23,8 +23,7 @@ export async function GET(request: NextRequest) {
       page,
       limit,
     });
-  } catch (error) {
-    console.error("Get community games error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Failed to fetch community games" },
       { status: 500 }

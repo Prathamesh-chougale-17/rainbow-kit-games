@@ -28,25 +28,7 @@ import {
   WALLET_ADDRESS_PREFIX_LENGTH,
   WALLET_ADDRESS_SUFFIX_LENGTH,
 } from "@/lib/constants";
-
-type Game = {
-  _id?: string;
-  gameId: string;
-  walletAddress: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  currentVersion: number;
-  versions: number[];
-  isPublishedToMarketplace: boolean;
-  isPublishedToCommunity: boolean;
-  marketplacePublishedAt?: Date;
-  communityPublishedAt?: Date;
-  forkCount: number;
-  originalGameId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { Game } from "@/lib/game-service";
 
 export default function CommunityPage() {
   const [games, setGames] = React.useState<Game[]>([]);

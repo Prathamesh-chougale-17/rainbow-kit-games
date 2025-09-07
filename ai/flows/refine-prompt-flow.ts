@@ -29,7 +29,7 @@ const RefinePromptOutputSchema = z.object({
 });
 export type RefinePromptOutput = z.infer<typeof RefinePromptOutputSchema>;
 
-export async function refinePrompt(
+export function refinePrompt(
   input: RefinePromptInput
 ): Promise<RefinePromptOutput> {
   return refinePromptFlow(input);
@@ -74,6 +74,9 @@ const refinePromptFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await prompt(input);
-    return output!;
+    if (output === undefined || output === null) {
+      throw new Error("refinePromptFlow: prompt returned no output.");
+    }
+    return output;
   }
 );

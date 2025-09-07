@@ -8,29 +8,7 @@ import { Button } from "@/components/ui/button";
 import { GameCard } from "@/components/ui/game-card";
 import { Input } from "@/components/ui/input";
 import { PAGE_SIZE } from "@/lib/constants";
-
-type Game = {
-  _id?: string;
-  gameId: string;
-  walletAddress: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  currentVersion: number;
-  versions: Array<{
-    version: number;
-    ipfsCid: string;
-    createdAt: Date;
-  }>;
-  isPublishedToMarketplace: boolean;
-  isPublishedToCommunity: boolean;
-  marketplacePublishedAt?: Date;
-  communityPublishedAt?: Date;
-  forkCount: number;
-  originalGameId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
+import type { Game } from "@/lib/game-service";
 
 export default function MarketplacePage() {
   const [games, setGames] = React.useState<Game[]>([]);

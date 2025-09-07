@@ -183,9 +183,7 @@ export async function generateGameWithFallback(
       Include all necessary HTML, CSS, and JavaScript in a single file.`,
       temperature: 0.7,
     });
-  } catch (error) {
-    console.warn("Primary generation failed, trying fallback:", error);
-
+  } catch {
     // Fallback with simpler requirements
     return await generateText({
       model: aiModel,

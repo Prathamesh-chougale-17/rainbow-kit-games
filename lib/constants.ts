@@ -12,3 +12,4 @@ export const PAGE_SIZE = 12;
 export const WALLET_ADDRESS_PREFIX_LENGTH = 6;
 export const WALLET_ADDRESS_SUFFIX_LENGTH = 4;
 export const MAX_TAGS_DISPLAY = 3;
+export const SANITIZED_TITLE_MAX_LENGTH = 100;

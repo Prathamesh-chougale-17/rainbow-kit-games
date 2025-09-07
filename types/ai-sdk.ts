@@ -9,15 +9,15 @@ export type {
 } from "@/ai/flows/refine-prompt-ai-sdk";
 
 // Additional types for advanced features
-export interface GameVariation {
+export type GameVariation = {
   variation: number;
   title: string;
   description: string;
   uniqueFeature: string;
   difficulty: "easy" | "medium" | "hard";
-}
+};
 
-export interface GameIdea {
+export type GameIdea = {
   title: string;
   concept: string;
   mechanics: string[];
@@ -29,34 +29,34 @@ export interface GameIdea {
   objective: string;
   features: string[];
   technicalRequirements: string[];
-}
+};
 
-export interface GameAnalysis {
+export type GameAnalysis = {
   currentFeatures: string[];
   issues: string[];
   improvementPlan: string;
-}
+};
 
-export interface ImprovedGame {
+export type ImprovedGame = {
   html: string;
   changes: string[];
   reasoning: string;
-}
+};
 
-export interface GameRefinementResult {
+export type GameRefinementResult = {
   analysis: GameAnalysis;
   improvedGame: ImprovedGame;
-}
+};
 
-export interface GameMetrics {
+export type GameMetrics = {
   duration: number;
   success: boolean;
   timestamp: string;
   error?: string;
-}
+};
 
-export interface GameGenerationResult {
+export type GameGenerationResult = {
   html: string;
   description: string;
   metrics: GameMetrics;
-}
+};

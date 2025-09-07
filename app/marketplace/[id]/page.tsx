@@ -12,32 +12,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-
-type Game = {
-  _id?: string;
-  gameId: string;
-  walletAddress: string;
-  title: string;
-  description?: string;
-  tags?: string[];
-  currentVersion: number;
-  versions: {
-    version: number;
-    ipfsCid: string;
-    ipfsUrl?: string;
-    html?: string;
-    createdAt: Date;
-  }[];
-  isPublishedToMarketplace: boolean;
-  isPublishedToCommunity: boolean;
-  marketplacePublishedAt?: Date;
-  communityPublishedAt?: Date;
-  forkCount: number;
-  originalGameId?: string;
-  createdAt: Date;
-  updatedAt: Date;
-};
-
+import {
+  WALLET_ADDRESS_PREFIX_LENGTH,
+  WALLET_ADDRESS_SUFFIX_LENGTH,
+} from "@/lib/constants";
+import type { Game } from "@/lib/game-service";
 export default function MarketplaceGamePage() {
   const params = useParams();
   const router = useRouter();
@@ -118,8 +97,6 @@ export default function MarketplaceGamePage() {
     });
   };
 
-  const WALLET_ADDRESS_PREFIX_LENGTH = 8;
-  const WALLET_ADDRESS_SUFFIX_LENGTH = 6;
   const formatWalletAddress = (address: string) => {
     return `${address.slice(0, WALLET_ADDRESS_PREFIX_LENGTH)}...${address.slice(
       -WALLET_ADDRESS_SUFFIX_LENGTH

@@ -43,7 +43,7 @@ export type GenerateGameCodeOutput = z.infer<
 export async function generateGameCode(
   input: GenerateGameCodeInput
 ): Promise<GenerateGameCodeOutput> {
-  return generateGameCodeFlow(input);
+  return await generateGameCodeFlow(input);
 }
 
 const prompt = ai.definePrompt({
@@ -132,6 +132,9 @@ const generateGameCodeFlow = ai.defineFlow(
   },
   async (input) => {
     const { output } = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error("AI prompt returned no output");
+    }
+    return output;
   }
 );

@@ -1,4 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
+import { SANITIZED_TITLE_MAX_LENGTH } from "@/lib/constants";
 import { gameService } from "@/lib/game-service";
 
 // Upload forked game to IPFS
@@ -10,7 +11,9 @@ async function uploadToIPFS(
 ) {
   const formData = new FormData();
   const blob = new Blob([htmlContent], { type: "text/html" });
-  const sanitizedTitle = title.replace(/[^a-z0-9\-_]/gi, "_").substring(0, 100);
+  const sanitizedTitle = title
+    .replace(/[^a-z0-9\-_]/gi, "_")
+    .substring(0, SANITIZED_TITLE_MAX_LENGTH);
   formData.append("file", blob, `${sanitizedTitle}_fork.html`);
 
   const pinataMetadata = JSON.stringify({
@@ -77,8 +80,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const latestVersion =
-      originalGame.versions[originalGame.versions.length - 1];
+    const latestVersion = originalGame.versions.at(-1);
     if (!latestVersion) {
       return NextResponse.json(
         { error: "No versions found for original game" },
@@ -113,8 +115,16 @@ export async function POST(request: NextRequest) {
           forkedGame.gameId,
           { originalOwner }
         );
-      } catch (e) {
-        console.warn("Failed to set originalOwner on forked game:", e);
+      } catch (error) {
+        return NextResponse.json(
+          {
+            error:
+              error instanceof Error
+                ? error.message
+                : "Failed to set original owner on forked game",
+          },
+          { status: 500 }
+        );
       }
     })();
 
@@ -125,7 +135,6 @@ export async function POST(request: NextRequest) {
       message: "Game forked and uploaded to IPFS successfully!",
     });
   } catch (error) {
-    console.error("Fork game error:", error);
     return NextResponse.json(
       { error: error instanceof Error ? error.message : "Failed to fork game" },
       { status: 500 }

@@ -42,12 +42,10 @@ export async function POST(request: NextRequest) {
       published: result,
       type,
     });
-  } catch (error) {
-    console.error("Publish game error:", error);
+  } catch {
     return NextResponse.json(
       {
-        error:
-          error instanceof Error ? error.message : "Failed to publish game",
+        error: "Failed to publish game",
       },
       { status: 500 }
     );
