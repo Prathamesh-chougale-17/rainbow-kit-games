@@ -1,19 +1,44 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { SANITIZED_TITLE_MAX_LENGTH } from "@/lib/constants";
+import {
+  HTTP_STATUS_FORBIDDEN,
+  HTTP_STATUS_PAYLOAD_TOO_LARGE,
+  HTTP_STATUS_TOO_MANY_REQUESTS,
+  HTTP_STATUS_UNAUTHORIZED,
+  IPFS_UPLOAD_TIMEOUT_MS,
+  MAX_FILENAME_LENGTH,
+  MAX_HTML_SIZE_BYTES,
+  PINATA_API_URL,
+} from "@/lib/constants";
 import { gameService } from "@/lib/game-service";
 
-// Upload forked game to IPFS
-async function uploadToIPFS(
+// Validate HTML content for fork uploads
+function validateHtmlContent(htmlContent: string) {
+  if (!htmlContent || htmlContent.length === 0) {
+    throw new Error("HTML content is empty");
+  }
+
+  if (htmlContent.length > MAX_HTML_SIZE_BYTES) {
+    throw new Error("HTML content too large (max 50MB)");
+  }
+}
+
+function sanitizeTitle(title: string) {
+  const safeTitle = title?.length ? title : `game_${Date.now()}`;
+  return safeTitle
+    .replace(/[^a-z0-9\-_]/gi, "_")
+    .substring(0, MAX_FILENAME_LENGTH);
+}
+
+function buildForkFormData(
   htmlContent: string,
   title: string,
   walletAddress: string,
   originalOwner: string
 ) {
+  const sanitizedTitle = sanitizeTitle(title);
+
   const formData = new FormData();
   const blob = new Blob([htmlContent], { type: "text/html" });
-  const sanitizedTitle = title
-    .replace(/[^a-z0-9\-_]/gi, "_")
-    .substring(0, SANITIZED_TITLE_MAX_LENGTH);
   formData.append("file", blob, `${sanitizedTitle}_fork.html`);
 
   const pinataMetadata = JSON.stringify({
@@ -34,19 +59,56 @@ async function uploadToIPFS(
   });
   formData.append("pinataOptions", pinataOptions);
 
-  const response = await fetch(
-    "https://api.pinata.cloud/pinning/pinFileToIPFS",
-    {
+  return formData;
+}
+
+async function postToPinata(formData: FormData) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(
+    () => controller.abort(),
+    IPFS_UPLOAD_TIMEOUT_MS
+  );
+
+  try {
+    const response = await fetch(PINATA_API_URL, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${process.env.PINATA_JWT}`,
       },
       body: formData,
-    }
-  );
+      signal: controller.signal,
+    });
 
+    return response;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+async function parsePinataResponse(response: Response) {
   if (!response.ok) {
-    throw new Error(`IPFS upload failed: ${response.status}`);
+    const errorText = await response.text();
+
+    if (response.status === HTTP_STATUS_UNAUTHORIZED) {
+      throw new Error("Pinata authentication failed - invalid JWT token");
+    }
+    if (response.status === HTTP_STATUS_FORBIDDEN) {
+      if (errorText.includes("NO_SCOPES_FOUND")) {
+        throw new Error(
+          "Pinata JWT token lacks required file upload permissions. Please update the token with proper scopes."
+        );
+      }
+      throw new Error("Pinata access forbidden - check token permissions");
+    }
+    if (response.status === HTTP_STATUS_TOO_MANY_REQUESTS) {
+      throw new Error("Pinata rate limit exceeded - please try again later");
+    }
+    if (response.status === HTTP_STATUS_PAYLOAD_TOO_LARGE) {
+      throw new Error("File too large for Pinata upload");
+    }
+    throw new Error(
+      `Pinata upload failed: ${response.status} ${response.statusText} - ${errorText}`
+    );
   }
 
   const result = await response.json();
@@ -58,6 +120,42 @@ async function uploadToIPFS(
     url: ipfsUrl,
     size: result.PinSize,
   };
+}
+
+// Upload forked game to IPFS with robust error handling
+async function uploadToIPFS(
+  htmlContent: string,
+  title: string,
+  walletAddress: string,
+  originalOwner: string
+) {
+  try {
+    validateHtmlContent(htmlContent);
+
+    const formData = buildForkFormData(
+      htmlContent,
+      title,
+      walletAddress,
+      originalOwner
+    );
+
+    const response = await postToPinata(formData);
+
+    return await parsePinataResponse(response);
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      (error.name === "AbortError" || error.name === "DOMException")
+    ) {
+      throw new Error("Upload timeout - please try again");
+    }
+
+    if (error instanceof Error) {
+      throw new Error(`Failed to upload fork to IPFS: ${error.message}`);
+    }
+
+    throw new Error("Failed to upload fork to IPFS: Unknown error");
+  }
 }
 
 export async function POST(request: NextRequest) {
@@ -97,6 +195,13 @@ export async function POST(request: NextRequest) {
       originalGame.walletAddress
     );
 
+    if (!ipfsResult?.cid) {
+      return NextResponse.json(
+        { error: "Failed to upload forked game to IPFS" },
+        { status: 500 }
+      );
+    }
+
     // Fork the game with new IPFS data
     // Store the original game's owner address in DB as originalOwner
     const originalOwner = originalGame.walletAddress;
@@ -107,6 +212,13 @@ export async function POST(request: NextRequest) {
       forkTitle,
       ipfsResult
     );
+
+    if (!forkedGame) {
+      return NextResponse.json(
+        { error: "Failed to create forked game in database" },
+        { status: 500 }
+      );
+    }
 
     // Also update the newly created forked game's originalOwner (createGame already accepts originalGameId, but ensure originalOwner is set)
     await (async () => {
