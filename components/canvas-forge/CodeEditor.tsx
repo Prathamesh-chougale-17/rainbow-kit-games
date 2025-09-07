@@ -8,11 +8,11 @@ const MonacoEditor = dynamic(() => import("@monaco-editor/react"), {
   loading: () => <Skeleton className="h-full w-full" />,
 });
 
-interface CodeEditorProps {
+type CodeEditorProps = {
   language: string;
   value: string;
   onChange: (value: string | undefined) => void;
-}
+};
 
 const languageColors: Record<string, string> = {
   html: "text-orange-400",

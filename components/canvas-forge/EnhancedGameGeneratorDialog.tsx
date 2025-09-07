@@ -50,6 +50,11 @@ import {
   refineGameAdvanced,
   refinePromptAction,
 } from "@/lib/actions-enhanced";
+import {
+  MAX_FEATURES_DISPLAY,
+  PROMPT_READY_THRESHOLD,
+  VARIATIONS_COUNT,
+} from "@/lib/constants";
 import type {
   GameGenerationResult,
   GameIdea,
@@ -69,12 +74,12 @@ const formSchema = z.object({
   creativity: z.number().min(0).max(1),
 });
 
-interface EnhancedGameGeneratorDialogProps {
+type EnhancedGameGeneratorDialogProps = {
   onGenerate: (output: GenerateGameCodeOutput) => void;
   children: React.ReactNode;
   html: string;
   isGameGenerated: boolean;
-}
+};
 
 export function EnhancedGameGeneratorDialog({
   onGenerate,
@@ -127,8 +132,7 @@ export function EnhancedGameGeneratorDialog({
       toast.success("Prompt Refined!", {
         description: "Your game idea has been enhanced with more detail.",
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Refinement Failed", {
         description:
           "There was an error refining the prompt. Please try again.",
@@ -163,8 +167,7 @@ export function EnhancedGameGeneratorDialog({
       toast.success("Game Idea Generated!", {
         description: `${result.title} - Ready to generate game code!`,
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Idea Generation Failed", {
         description:
           "There was an error generating the game idea. Please try again.",
@@ -183,13 +186,15 @@ export function EnhancedGameGeneratorDialog({
 
     setIsGeneratingVariations(true);
     try {
-      const result = await generateGameVariationsAction(currentPrompt, 3);
+      const result = await generateGameVariationsAction(
+        currentPrompt,
+        VARIATIONS_COUNT
+      );
       setGameVariations(result);
       toast.success("Game Variations Generated!", {
         description: `${result.length} unique variations created`,
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Variation Generation Failed", {
         description:
           "There was an error generating variations. Please try again.",
@@ -244,8 +249,7 @@ export function EnhancedGameGeneratorDialog({
       onGenerate(result);
       setIsOpen(false);
       form.reset();
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Generation Failed", {
         description:
           "There was an error generating the game. Please try again.",
@@ -280,8 +284,7 @@ export function EnhancedGameGeneratorDialog({
       toast.success(isGameGenerated ? "Game Refined!" : "Game Generated!", {
         description: `Completed in ${enhancedResult.metrics.duration}ms`,
       });
-    } catch (error) {
-      console.error(error);
+    } catch {
       toast.error("Generation Failed", {
         description:
           "There was an error generating the game. Please try again.",
@@ -350,7 +353,7 @@ export function EnhancedGameGeneratorDialog({
                 <TabsTrigger className="relative" value="generate">
                   Generate
                   {form.watch("prompt") &&
-                    form.watch("prompt").length > 100 && (
+                    form.watch("prompt").length > PROMPT_READY_THRESHOLD && (
                       <div className="-top-1 -right-1 absolute h-2 w-2 rounded-full bg-green-500" />
                     )}
                 </TabsTrigger>
@@ -368,7 +371,8 @@ export function EnhancedGameGeneratorDialog({
                         <FormLabel>
                           {isGameGenerated ? "Refinements" : "Game Concept"}
                           {form.watch("prompt") &&
-                            form.watch("prompt").length > 100 && (
+                            form.watch("prompt").length >
+                              PROMPT_READY_THRESHOLD && (
                               <Badge
                                 className="ml-2 text-xs"
                                 variant="secondary"
@@ -492,15 +496,17 @@ export function EnhancedGameGeneratorDialog({
                         <h3 className="font-bold">{idea.title}</h3>
                         <p className="text-sm">{idea.concept}</p>
                         <div className="flex flex-wrap gap-1">
-                          {idea.features.slice(0, 3).map((feature) => (
-                            <Badge
-                              className="text-xs"
-                              key={feature}
-                              variant="secondary"
-                            >
-                              {feature}
-                            </Badge>
-                          ))}
+                          {idea.features
+                            .slice(0, MAX_FEATURES_DISPLAY)
+                            .map((feature) => (
+                              <Badge
+                                className="text-xs"
+                                key={feature}
+                                variant="secondary"
+                              >
+                                {feature}
+                              </Badge>
+                            ))}
                         </div>
                         <p className="text-muted-foreground text-xs">
                           {idea.visualStyle}
@@ -641,7 +647,7 @@ export function EnhancedGameGeneratorDialog({
 
             <DialogFooter className="mt-6">
               {form.watch("prompt") &&
-                form.watch("prompt").length > 100 &&
+                form.watch("prompt").length > PROMPT_READY_THRESHOLD &&
                 activeTab !== "generate" && (
                   <div className="mb-4 w-full text-center">
                     <p className="rounded bg-accent/10 p-2 text-muted-foreground text-xs">

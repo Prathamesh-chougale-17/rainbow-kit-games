@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { GameCard } from "@/components/ui/game-card";
 
-interface Game {
+type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -37,7 +37,7 @@ interface Game {
   originalGameId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export default function EditorDashboard() {
   const [games, setGames] = React.useState<Game[]>([]);
@@ -81,7 +81,9 @@ export default function EditorDashboard() {
   };
 
   const performDelete = async (gameId: string | null) => {
-    if (!gameId) return;
+    if (!gameId) {
+      return;
+    }
     setDeleting(true);
     try {
       const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
@@ -106,8 +108,7 @@ export default function EditorDashboard() {
       closeDeleteDialog();
 
       // Note: if the user is currently editing this game, a redirect could be performed here.
-    } catch (error) {
-      console.error("Delete error:", error);
+    } catch {
       toast.error("Failed to delete game");
     } finally {
       setDeleting(false);
@@ -193,7 +194,9 @@ export default function EditorDashboard() {
       {/* Delete Confirmation Dialog */}
       <Dialog
         onOpenChange={(open) => {
-          if (!open) closeDeleteDialog();
+          if (!open) {
+            closeDeleteDialog();
+          }
           setDeleteDialogOpen(open);
         }}
         open={deleteDialogOpen}

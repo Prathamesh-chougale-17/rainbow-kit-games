@@ -27,7 +27,11 @@ import {
   generateGameIdeaAction,
   generateGameVariationsAction,
 } from "@/lib/actions-enhanced";
-import { VARIATIONS_COUNT } from "@/lib/constants";
+import {
+  GAME_IDEA_FEATURES_DISPLAY_LIMIT,
+  IDEATION_TEMPERATURE,
+  VARIATIONS_COUNT,
+} from "@/lib/constants";
 import type {
   GameGenerationResult,
   GameIdea,
@@ -44,7 +48,11 @@ export function AIFeaturesDemo() {
   const handleGenerateIdea = async () => {
     setIsLoading(true);
     try {
-      const idea = await generateGameIdeaAction("retro arcade", "medium", 0.8);
+      const idea = await generateGameIdeaAction(
+        "retro arcade",
+        "medium",
+        IDEATION_TEMPERATURE
+      );
       setGameIdea(idea);
       toast.success("Game Idea Generated!", {
         description: idea.title,
@@ -137,15 +145,17 @@ export function AIFeaturesDemo() {
                 <h3 className="font-bold">{gameIdea.title}</h3>
                 <p className="text-sm">{gameIdea.concept}</p>
                 <div className="flex flex-wrap gap-1">
-                  {gameIdea.features.slice(0, 4).map((feature) => (
-                    <Badge
-                      className="text-xs"
-                      key={feature}
-                      variant="secondary"
-                    >
-                      {feature}
-                    </Badge>
-                  ))}
+                  {gameIdea.features
+                    .slice(0, GAME_IDEA_FEATURES_DISPLAY_LIMIT)
+                    .map((feature) => (
+                      <Badge
+                        className="text-xs"
+                        key={feature}
+                        variant="secondary"
+                      >
+                        {feature}
+                      </Badge>
+                    ))}
                 </div>
                 <div className="space-y-1 text-muted-foreground text-xs">
                   <div>

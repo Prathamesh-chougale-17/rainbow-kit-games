@@ -42,44 +42,44 @@ export default function MarketplaceGamePage() {
   const params = useParams();
   const router = useRouter();
   const gameId = params.id as string;
-
+  const mountedRef = React.useRef(true);
   const [game, setGame] = React.useState<Game | null>(null);
   const [loading, setLoading] = React.useState(true);
 
-  React.useEffect(() => {
-    let mounted = true;
-    const load = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch("/api/marketplace");
-        const result = await response.json();
+  const load = React.useCallback(async () => {
+    setLoading(true);
+    try {
+      const response = await fetch("/api/marketplace");
+      const result = await response.json();
 
-        if (result.success) {
-          const foundGame = result.games.find((g: Game) => g.gameId === gameId);
-          if (foundGame) {
-            if (mounted) {
-              setGame(foundGame);
-            }
-          } else {
-            toast.error("Game not found");
-            router.push("/marketplace");
+      if (result.success) {
+        const foundGame = result.games.find((g: Game) => g.gameId === gameId);
+        if (foundGame) {
+          if (mountedRef.current) {
+            setGame(foundGame);
           }
+        } else {
+          toast.error("Game not found");
+          router.push("/marketplace");
         }
-      } catch (error) {
-        console.error("Load game error:", error);
-        toast.error("Failed to load game");
-        router.push("/marketplace");
-      } finally {
-        if (mounted) setLoading(false);
       }
-    };
+    } catch {
+      toast.error("Failed to load game");
+      router.push("/marketplace");
+    } finally {
+      if (mountedRef.current) {
+        setLoading(false);
+      }
+    }
+  }, [gameId, router]);
 
+  React.useEffect(() => {
     load();
 
     return () => {
-      mounted = false;
+      mountedRef.current = false;
     };
-  }, [gameId, router]);
+  }, [load]);
 
   // Hide the global navbar/header while on the full-screen marketplace game page
   React.useEffect(() => {
@@ -94,7 +94,7 @@ export default function MarketplaceGamePage() {
         header.style.display = prevDisplay || "";
       };
     }
-    return () => {};
+    // return () => {};
   }, []);
 
   const handleShare = () => {

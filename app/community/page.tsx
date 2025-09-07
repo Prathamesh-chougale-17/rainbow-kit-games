@@ -22,6 +22,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  MAX_TAGS_DISPLAY,
+  PAGE_SIZE,
+  WALLET_ADDRESS_PREFIX_LENGTH,
+  WALLET_ADDRESS_SUFFIX_LENGTH,
+} from "@/lib/constants";
 
 type Game = {
   _id?: string;
@@ -93,7 +99,16 @@ export default function CommunityPage() {
   };
 
   const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    // If the address is shorter than the combined prefix/suffix, return it as-is
+    if (
+      address.length <=
+      WALLET_ADDRESS_PREFIX_LENGTH + WALLET_ADDRESS_SUFFIX_LENGTH
+    ) {
+      return address;
+    }
+    return `${address.slice(0, WALLET_ADDRESS_PREFIX_LENGTH)}...${address.slice(
+      -WALLET_ADDRESS_SUFFIX_LENGTH
+    )}`;
   };
 
   if (loading) {
@@ -186,14 +201,14 @@ export default function CommunityPage() {
                 {/* Tags */}
                 {game.tags && game.tags.length > 0 && (
                   <div className="flex flex-wrap gap-1">
-                    {game.tags.slice(0, 3).map((tag) => (
+                    {game.tags.slice(0, MAX_TAGS_DISPLAY).map((tag) => (
                       <Badge className="text-xs" key={tag} variant="secondary">
                         {tag}
                       </Badge>
                     ))}
-                    {game.tags.length > 3 && (
+                    {game.tags.length > MAX_TAGS_DISPLAY && (
                       <Badge className="text-xs" variant="secondary">
-                        +{game.tags.length - 3}
+                        +{game.tags.length - MAX_TAGS_DISPLAY}
                       </Badge>
                     )}
                   </div>
@@ -238,7 +253,7 @@ export default function CommunityPage() {
       )}
 
       {/* Pagination */}
-      {games.length === 12 && (
+      {games.length === PAGE_SIZE && (
         <div className="flex justify-center gap-2 pt-6">
           <Button
             disabled={page === 1}

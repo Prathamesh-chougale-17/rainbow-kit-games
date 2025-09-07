@@ -7,8 +7,9 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { GameCard } from "@/components/ui/game-card";
 import { Input } from "@/components/ui/input";
+import { PAGE_SIZE } from "@/lib/constants";
 
-interface Game {
+type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -29,7 +30,7 @@ interface Game {
   originalGameId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
 export default function MarketplacePage() {
   const [games, setGames] = React.useState<Game[]>([]);
@@ -60,8 +61,7 @@ export default function MarketplacePage() {
           toast.error("Failed to load marketplace games");
           setGames([]);
         }
-      } catch (error) {
-        console.error("Load marketplace games error:", error);
+      } catch {
         toast.error("Failed to load marketplace games");
         setGames([]);
       } finally {
@@ -69,7 +69,7 @@ export default function MarketplacePage() {
       }
     };
 
-    void loadMarketplaceGames();
+    loadMarketplaceGames();
   }, [page, searchQuery]);
 
   const handleSearch = (e: React.FormEvent) => {
@@ -157,7 +157,7 @@ export default function MarketplacePage() {
       )}
 
       {/* Pagination */}
-      {games.length === 12 && (
+      {games.length === PAGE_SIZE && (
         <div className="flex justify-center gap-2 pt-6">
           <Button
             disabled={page === 1}

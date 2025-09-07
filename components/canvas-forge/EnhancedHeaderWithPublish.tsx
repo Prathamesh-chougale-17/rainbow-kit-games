@@ -28,40 +28,68 @@ export function EnhancedHeader({
 }: EnhancedHeaderProps) {
   const [isPublishing, setIsPublishing] = React.useState(false);
 
-  const handlePublish = async (type: "marketplace" | "community") => {
+  const validatePublishInputs = () => {
     if (!(gameId && title && html)) {
       toast.error("Please save your game first before publishing");
-      return;
+      return null;
     }
 
+    const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+    if (!walletAddress) {
+      toast.error("Wallet address not configured");
+      return null;
+    }
+
+    return {
+      walletAddress,
+      gameId,
+      title,
+      html,
+    };
+  };
+
+  const publishGame = async (payload: {
+    gameId: string;
+    type: "marketplace" | "community";
+    walletAddress: string;
+    version: number;
+  }) => {
+    const response = await fetch("/api/games/publish", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => null);
+      throw new Error(
+        errorBody?.error || response.statusText || "Failed to publish"
+      );
+    }
+
+    return response.json();
+  };
+
+  const publishAndNotify = async (
+    payload: {
+      gameId: string;
+      type: "marketplace" | "community";
+      walletAddress: string;
+      version: number;
+    },
+    gameTitle: string
+  ) => {
     setIsPublishing(true);
     try {
-      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
-      if (!walletAddress) {
-        toast.error("Wallet address not configured");
-        return;
-      }
-
-      const response = await fetch("/api/games/publish", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          gameId,
-          type,
-          walletAddress,
-          version: 1, // TODO: Get actual version
-        }),
-      });
-
-      const result = await response.json();
+      const result = await publishGame(payload);
 
       if (result.success) {
         toast.success(
-          `Successfully published to ${type === "marketplace" ? "Marketplace" : "Community"}!`,
+          `Successfully published to ${payload.type === "marketplace" ? "Marketplace" : "Community"}!`,
           {
-            description: `Your game "${title}" is now available for ${type === "marketplace" ? "players" : "the community to fork and improve"}.`,
+            description: `Your game "${gameTitle}" is now available for ${payload.type === "marketplace" ? "players" : "the community to fork and improve"}.`,
           }
         );
       } else {
@@ -75,6 +103,23 @@ export function EnhancedHeader({
     } finally {
       setIsPublishing(false);
     }
+  };
+
+  const handlePublish = async (type: "marketplace" | "community") => {
+    const validated = validatePublishInputs();
+    if (!validated) {
+      return;
+    }
+
+    await publishAndNotify(
+      {
+        gameId: validated.gameId,
+        type,
+        walletAddress: validated.walletAddress,
+        version: 1, // TODO: Get actual version
+      },
+      validated.title
+    );
   };
 
   const iconClass = "mr-2 h-4 w-4 drop-shadow-[0_0_2px_hsl(var(--accent))]";

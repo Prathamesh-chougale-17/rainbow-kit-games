@@ -21,8 +21,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import {
+  WALLET_ADDRESS_PREFIX_LENGTH,
+  WALLET_ADDRESS_SUFFIX_LENGTH,
+} from "@/lib/constants";
 
-interface Game {
+type Game = {
   _id?: string;
   gameId: string;
   walletAddress: string;
@@ -43,13 +47,13 @@ interface Game {
   originalGameId?: string;
   createdAt: Date;
   updatedAt: Date;
-}
+};
 
-interface CommunityGamePageProps {
+type CommunityGamePageProps = {
   params: {
     id: string;
   };
-}
+};
 
 export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   // Next.js may provide params as a Promise in newer versions.
@@ -74,8 +78,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
         toast.error("Game not found");
         router.push("/community");
       }
-    } catch (error) {
-      console.error("Load game error:", error);
+    } catch {
       toast.error("Failed to load game");
       router.push("/community");
     } finally {
@@ -109,8 +112,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
       } else {
         toast.error(result.error || "Failed to fork game");
       }
-    } catch (error) {
-      console.error("Fork game error:", error);
+    } catch {
       toast.error("Failed to fork game");
     } finally {
       setForking(false);
@@ -142,7 +144,7 @@ export default function CommunityGamePage({ params }: CommunityGamePageProps) {
   };
 
   const formatWalletAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+    return `${address.slice(0, WALLET_ADDRESS_PREFIX_LENGTH)}...${address.slice(-WALLET_ADDRESS_SUFFIX_LENGTH)}`;
   };
 
   const getGameUrl = () => {
