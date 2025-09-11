@@ -525,51 +525,53 @@ export default function QuickDrawGame() {
             <DialogTitle className="text-center font-mono text-2xl">
               💰 STAKE TO PLAY 💰
             </DialogTitle>
-            <DialogDescription className="space-y-4 text-center">
-              <div className="rounded-lg bg-blue-100 p-4 dark:bg-blue-900">
-                <p className="font-bold text-blue-800 dark:text-blue-200">
-                  Game Details:
-                </p>
-                <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • Your Stake: 2 GEM
-                </p>
-                <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • AI Bot Stake: 2 GEM (1 bot × 2 GEM each)
-                </p>
-                <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • Total Prize: 4 GEM
-                </p>
-                <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • Winner Takes All!
-                </p>
-              </div>
-
-              {contractState.gamePool > BigInt(0) && (
-                <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
-                  <p className="font-bold text-green-800 dark:text-green-200">
-                    Pool Balance: 10 $
+            <DialogDescription asChild>
+              <div className="space-y-4 text-center">
+                <div className="rounded-lg bg-blue-100 p-4 dark:bg-blue-900">
+                  <p className="font-bold text-blue-800 dark:text-blue-200">
+                    Game Details:
+                  </p>
+                  <p className="text-blue-600 text-sm dark:text-blue-300">
+                    • Your Stake: 2 GEM
+                  </p>
+                  <p className="text-blue-600 text-sm dark:text-blue-300">
+                    • AI Bot Stake: 2 GEM (1 bot × 2 GEM each)
+                  </p>
+                  <p className="text-blue-600 text-sm dark:text-blue-300">
+                    • Total Prize: 4 GEM
+                  </p>
+                  <p className="text-blue-600 text-sm dark:text-blue-300">
+                    • Winner Takes All!
                   </p>
                 </div>
-              )}
 
-              <div className="space-y-2">
-                <Button
-                  className="w-full bg-green-600 font-mono hover:bg-green-700"
-                  disabled={isLoading}
-                  onClick={stakeForGame}
-                  size="lg"
-                >
-                  {isLoading ? "STAKING..." : "STAKE 2 GEM & PLAY"}
-                </Button>
-                <Link className="w-full" href="/games">
+                {contractState.gamePool > BigInt(0) && (
+                  <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
+                    <p className="font-bold text-green-800 dark:text-green-200">
+                      Pool Balance: 10 $
+                    </p>
+                  </div>
+                )}
+
+                <div className="space-y-2">
                   <Button
-                    className="w-full font-mono"
+                    className="w-full bg-green-600 font-mono hover:bg-green-700"
+                    disabled={isLoading}
+                    onClick={stakeForGame}
                     size="lg"
-                    variant="outline"
                   >
-                    🏠 GO TO GAMES
+                    {isLoading ? "STAKING..." : "STAKE 2 GEM & PLAY"}
                   </Button>
-                </Link>
+                  <Link className="w-full" href="/games">
+                    <Button
+                      className="w-full font-mono"
+                      size="lg"
+                      variant="outline"
+                    >
+                      🏠 GO TO GAMES
+                    </Button>
+                  </Link>
+                </div>
               </div>
             </DialogDescription>
           </DialogHeader>
@@ -588,60 +590,62 @@ export default function QuickDrawGame() {
             <DialogTitle className="text-center font-mono text-2xl">
               {winner === "player" ? "🎉 VICTORY! 🎉" : "💀 DEFEAT 💀"}
             </DialogTitle>
-            <DialogDescription className="space-y-4 text-center">
-              <p className="font-semibold text-lg">{message}</p>
+            <DialogDescription asChild>
+              <div className="space-y-4 text-center">
+                <p className="font-semibold text-lg">{message}</p>
 
-              {winner === "player" && (
-                <div className="space-y-4">
-                  <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
-                    <p className="font-bold text-green-800 dark:text-green-200">
-                      You won the duel! 🏆
-                    </p>
-                    <p className="text-green-600 text-sm dark:text-green-300">
-                      Claim your reward of 4 GEMs (2 GEM stake + 2 GEM from 1 AI
-                      bot)
-                    </p>
+                {winner === "player" && (
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
+                      <p className="font-bold text-green-800 dark:text-green-200">
+                        You won the duel! 🏆
+                      </p>
+                      <p className="text-green-600 text-sm dark:text-green-300">
+                        Claim your reward of 4 GEMs (2 GEM stake + 2 GEM from 1
+                        AI bot)
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full bg-green-600 font-mono hover:bg-green-700"
+                      disabled={isLoading}
+                      onClick={claimReward}
+                      size="lg"
+                    >
+                      {isLoading ? "CLAIMING..." : "CLAIM 4 GEM 🎉"}
+                    </Button>
                   </div>
-                  <Button
-                    className="w-full bg-green-600 font-mono hover:bg-green-700"
-                    disabled={isLoading}
-                    onClick={claimReward}
-                    size="lg"
-                  >
-                    {isLoading ? "CLAIMING..." : "CLAIM 4 GEM 🎉"}
-                  </Button>
-                </div>
-              )}
+                )}
 
-              {winner === "ai" && (
-                <div className="space-y-4">
-                  <div className="rounded-lg bg-red-100 p-4 dark:bg-red-900">
-                    <p className="font-bold text-red-800 dark:text-red-200">
-                      The AI outgunned you! 💀
-                    </p>
-                    <p className="text-red-600 text-sm dark:text-red-300">
-                      Better luck next time, partner!
-                    </p>
+                {winner === "ai" && (
+                  <div className="space-y-4">
+                    <div className="rounded-lg bg-red-100 p-4 dark:bg-red-900">
+                      <p className="font-bold text-red-800 dark:text-red-200">
+                        The AI outgunned you! 💀
+                      </p>
+                      <p className="text-red-600 text-sm dark:text-red-300">
+                        Better luck next time, partner!
+                      </p>
+                    </div>
+                    <Button
+                      className="w-full bg-red-600 font-mono hover:bg-red-700"
+                      disabled={isLoading}
+                      onClick={claimReward}
+                      size="lg"
+                    >
+                      {isLoading ? "PROCESSING..." : "END GAME & PLAY AGAIN"}
+                    </Button>
                   </div>
-                  <Button
-                    className="w-full bg-red-600 font-mono hover:bg-red-700"
-                    disabled={isLoading}
-                    onClick={claimReward}
-                    size="lg"
-                  >
-                    {isLoading ? "PROCESSING..." : "END GAME & PLAY AGAIN"}
-                  </Button>
-                </div>
-              )}
+                )}
 
-              <div className="flex justify-center space-x-4 text-sm">
-                <span className="text-primary">
-                  Your Wins: {stats.playerWins}
-                </span>
-                <span className="text-muted-foreground">VS</span>
-                <span className="text-destructive">
-                  AI Wins: {stats.aiWins}
-                </span>
+                <div className="flex justify-center space-x-4 text-sm">
+                  <span className="text-primary">
+                    Your Wins: {stats.playerWins}
+                  </span>
+                  <span className="text-muted-foreground">VS</span>
+                  <span className="text-destructive">
+                    AI Wins: {stats.aiWins}
+                  </span>
+                </div>
               </div>
             </DialogDescription>
           </DialogHeader>
