@@ -36,8 +36,14 @@ export type Game = {
   marketplacePublishedAt?: Date;
   communityPublishedAt?: Date;
   forkCount: number;
+  playCount: number;
   originalGameId?: string; // For forked games
   originalOwner?: string; // wallet address from which this game was forked
+  isForSale?: boolean;
+  salePrice?: number;
+  listedForSaleAt?: Date;
+  purchasedAt?: Date;
+  previousOwner?: string;
   createdAt: Date;
   updatedAt: Date;
 };
@@ -72,6 +78,7 @@ class GameService {
     const game: Game = {
       ...gameData,
       gameId,
+      playCount: 0,
       currentVersion: 0,
       versions: [],
       forkCount: 0,

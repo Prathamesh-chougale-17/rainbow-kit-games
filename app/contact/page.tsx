@@ -1,4 +1,6 @@
+import { Heart, MessageCircle, Star } from "lucide-react";
 import { ContactForm } from "@/components/contact-form";
+import { Card, CardContent } from "@/components/ui/card";
 
 const ContactHtml = `
 <!DOCTYPE html>
@@ -232,33 +234,63 @@ const ContactHtml = `
 
 export default function ContactPage() {
   return (
-    <main className="py-16">
-      <div className="mx-auto max-w-6xl px-4">
-        <div className="grid grid-cols-1 items-stretch gap-10 md:grid-cols-2">
-          {/* Left: Illustration card */}
-          <div className="flex items-stretch justify-center">
-            <iframe
-              className="h-[540px] w-full rounded-xl border-0 shadow-lg"
-              srcDoc={ContactHtml}
-              title="Contact Us - Catch the Contact!"
-            />
-          </div>
-
-          {/* Right: Form panel */}
-          <div className="flex items-stretch justify-center">
-            <div className="flex h-[540px] w-full flex-col justify-center rounded-xl p-6 shadow-lg ring-1 ring-black/5">
-              <div className="mb-4">
-                <h1 className="font-semibold text-2xl">Contact Us</h1>
-                <p className="mt-2 text-muted-foreground text-sm">
-                  Have a question, feedback, or collaboration idea? Send us a
-                  message and we&apos;ll get back to you shortly.
-                </p>
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-blue-950/20 dark:via-indigo-950/20 dark:to-purple-950/20">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden">
+        <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+        <div className="relative mx-auto max-w-7xl px-4 py-16">
+          <div className="text-center">
+            <div className="mx-auto mb-6 w-fit rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 p-3">
+              <MessageCircle className="h-12 w-12 text-white" />
+            </div>
+            <h1 className="mb-4 font-bold text-5xl tracking-tight">
+              Get in{" "}
+              <span className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Touch
+              </span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-muted-foreground text-xl">
+              Have a question, feedback, or collaboration idea? We'd love to
+              hear from you! Send us a message and we'll get back to you
+              shortly.
+            </p>
+            <div className="mt-6 flex items-center justify-center gap-4">
+              <div className="flex items-center gap-2 rounded-full bg-white/50 px-4 py-2 text-sm dark:bg-black/20">
+                <Star className="h-4 w-4 text-yellow-500" />
+                <span className="font-medium">Quick Response</span>
               </div>
-
-              <div className="w-full">
-                <ContactForm />
+              <div className="flex items-center gap-2 rounded-full bg-white/50 px-4 py-2 text-sm dark:bg-black/20">
+                <Heart className="h-4 w-4 text-red-500" />
+                <span className="font-medium">Friendly Support</span>
+              </div>
+              <div className="flex items-center gap-2 rounded-full bg-white/50 px-4 py-2 text-sm dark:bg-black/20">
+                <Star className="h-4 w-4 text-purple-500" />
+                <span className="font-medium">Creative Solutions</span>
               </div>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="mx-auto max-w-7xl px-4 pb-16">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Game Section */}
+          <div className="flex items-center justify-center lg:col-span-2">
+            <Card className="w-full overflow-hidden border-0 bg-gradient-to-br from-emerald-50 to-teal-50 shadow-xl dark:from-emerald-950/20 dark:to-teal-950/20">
+              <CardContent className="p-0">
+                <iframe
+                  className="h-[600px] w-full border-0"
+                  srcDoc={ContactHtml}
+                  title="Contact Us - Catch the Contact!"
+                />
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Contact Form */}
+          <div className="flex items-center justify-center lg:col-span-1">
+            <ContactForm />
           </div>
         </div>
       </div>

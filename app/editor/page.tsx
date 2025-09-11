@@ -1,9 +1,10 @@
 "use client";
 
-import { Code, Plus, ShoppingCart, Users } from "lucide-react";
+import { Code, Plus, ShoppingCart, Star } from "lucide-react";
 import Link from "next/link";
 import React from "react";
 import { toast } from "sonner";
+import EditorGameCardSkeleton from "@/components/skeletons/editor-skeleton";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -15,6 +16,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { GameCard } from "@/components/ui/game-card";
+import { Skeleton } from "@/components/ui/skeleton";
 import type { Game } from "@/lib/game-service";
 export default function EditorDashboard() {
   const [games, setGames] = React.useState<Game[]>([]);
@@ -94,12 +96,31 @@ export default function EditorDashboard() {
 
   if (loading) {
     return (
-      <div className="container mx-auto p-6">
-        <div className="flex min-h-[400px] items-center justify-center">
-          <div className="text-center">
-            <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-primary border-b-2" />
-            <p className="text-muted-foreground">Loading your games...</p>
+      <div className="mx-auto space-y-8 p-6">
+        {/* Header Skeleton */}
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 p-8 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+          <div className="relative flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="flex items-center gap-3">
+                <Skeleton className="h-12 w-12 rounded-xl" />
+                <Skeleton className="h-10 w-48" />
+              </div>
+              <Skeleton className="h-6 w-80" />
+            </div>
+            <div className="flex gap-2">
+              <Skeleton className="h-10 w-32" />
+              <Skeleton className="h-10 w-28" />
+              <Skeleton className="h-10 w-28" />
+            </div>
           </div>
+        </div>
+
+        {/* Games Grid Skeleton */}
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, index) => (
+            <EditorGameCardSkeleton key={`editor-skeleton-${index}`} />
+          ))}
         </div>
       </div>
     );
@@ -107,53 +128,72 @@ export default function EditorDashboard() {
 
   return (
     <>
-      <div className="mx-auto space-y-6 p-6">
+      <div className="mx-auto space-y-8 p-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="flex items-center gap-2 font-bold text-3xl tracking-tight">
-              Game Studio
-            </h1>
-            <p className="text-muted-foreground">
-              Create, manage, and publish your games
-            </p>
-          </div>
-          <div className="flex gap-2">
-            <Link href="/marketplace">
-              <Button className="gap-2" variant="outline">
-                <ShoppingCart className="h-4 w-4" />
-                Marketplace
-              </Button>
-            </Link>
-            <Link href="/community">
-              <Button className="gap-2" variant="outline">
-                <Users className="h-4 w-4" />
-                Community
-              </Button>
-            </Link>
-            <Link href="/editor/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Game
-              </Button>
-            </Link>
+        <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-violet-50 via-purple-50 to-indigo-50 p-8 dark:from-violet-950/20 dark:via-purple-950/20 dark:to-indigo-950/20">
+          <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+          <div className="relative flex items-center justify-between">
+            <div className="space-y-2">
+              <h1 className="flex items-center gap-3 font-bold text-4xl tracking-tight">
+                <div className="rounded-xl bg-gradient-to-br from-violet-500 to-indigo-600 p-2">
+                  <Code className="h-8 w-8 text-white" />
+                </div>
+                Game Studio
+              </h1>
+              <p className="text-lg text-muted-foreground">
+                Create, manage, and publish your games
+              </p>
+              <div className="flex items-center gap-4 pt-2">
+                <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-sm dark:bg-black/20">
+                  <Star className="h-4 w-4 text-yellow-500" />
+                  <span className="font-medium">{games.length} Games</span>
+                </div>
+                <div className="flex items-center gap-2 rounded-full bg-white/50 px-3 py-1 text-sm dark:bg-black/20">
+                  <Code className="h-4 w-4 text-violet-500" />
+                  <span className="font-medium">Your Creations</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-2">
+              <Link href="/marketplace">
+                <Button
+                  className="gap-2 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700"
+                  variant="outline"
+                >
+                  <ShoppingCart className="h-4 w-4" />
+                  Marketplace
+                </Button>
+              </Link>
+              <Link href="/editor/new">
+                <Button className="gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-700 hover:to-indigo-700">
+                  <Plus className="h-4 w-4" />
+                  New Game
+                </Button>
+              </Link>
+            </div>
           </div>
         </div>
 
         {/* Games Grid */}
         {games.length === 0 ? (
-          <div className="py-12 text-center">
-            <Code className="mx-auto mb-4 h-16 w-16 text-muted-foreground" />
-            <h3 className="mb-2 font-semibold text-xl">No games yet</h3>
-            <p className="mb-6 text-muted-foreground">
-              Create your first game to get started!
-            </p>
-            <Link href="/editor/new">
-              <Button className="gap-2">
-                <Plus className="h-4 w-4" />
-                Create First Game
-              </Button>
-            </Link>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-50 to-gray-50 p-12 text-center dark:from-slate-900 dark:to-gray-800">
+            <div className="absolute inset-0 bg-grid-pattern opacity-5" />
+            <div className="relative">
+              <div className="mx-auto mb-6 w-fit rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 p-4">
+                <Code className="h-16 w-16 text-white" />
+              </div>
+              <h3 className="mb-3 font-bold text-2xl">No games yet</h3>
+              <p className="mb-8 text-lg text-muted-foreground">
+                Create your first game to get started on your journey as a game
+                developer!
+              </p>
+              <Link href="/editor/new">
+                <Button className="gap-2 bg-gradient-to-r from-violet-600 to-indigo-600 px-8 py-3 text-lg hover:from-violet-700 hover:to-indigo-700">
+                  <Plus className="h-5 w-5" />
+                  Create First Game
+                </Button>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">

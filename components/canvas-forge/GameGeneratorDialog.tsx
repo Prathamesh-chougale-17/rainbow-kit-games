@@ -112,38 +112,43 @@ export function GameGeneratorDialog({
   return (
     <Dialog onOpenChange={setIsOpen} open={isOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="border-slate-700 bg-gradient-to-br from-slate-800 to-slate-900 sm:max-w-[500px]">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>
-                {isGameGenerated ? "Refine Your Game" : "Game Generator"}
-              </DialogTitle>
-              <DialogDescription>
+              <div className="mb-2 flex items-center gap-3">
+                <div className="rounded-lg bg-gradient-to-br from-purple-500 to-blue-600 p-2">
+                  <Bot className="h-5 w-5 text-white" />
+                </div>
+                <DialogTitle className="font-bold text-white text-xl">
+                  {isGameGenerated ? "Refine Your Game" : "AI Game Generator"}
+                </DialogTitle>
+              </div>
+              <DialogDescription className="text-slate-300">
                 {isGameGenerated
-                  ? "Describe the changes or new features you want to add."
-                  : "Describe the game you want to create, and let AI build the code for you."}
+                  ? "Describe the changes or new features you want to add to your game."
+                  : "Describe the game you want to create, and let AI build the code for you. Be as detailed as possible for better results!"}
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-6 py-4">
               <FormField
                 control={form.control}
                 name="prompt"
                 render={({ field }) => (
                   <FormItem>
                     <div className="flex items-center justify-between">
-                      <FormLabel>
+                      <FormLabel className="font-medium text-white">
                         {isGameGenerated
                           ? "Feedback or Refinements"
                           : "Game Idea"}
                       </FormLabel>
                       <Button
-                        className="h-auto p-0 text-accent transition-all hover:text-primary"
+                        className="h-auto rounded p-0 px-2 py-1 text-blue-400 transition-all hover:bg-blue-500/10 hover:text-blue-300"
                         disabled={isRefining || isGenerating}
                         onClick={handleRefinePrompt}
                         size="sm"
                         type="button"
-                        variant="link"
+                        variant="ghost"
                       >
                         {isRefining ? (
                           <>
@@ -160,26 +165,32 @@ export function GameGeneratorDialog({
                     </div>
                     <FormControl>
                       <Textarea
-                        className="resize-none"
+                        className="min-h-[120px] resize-none border-slate-600 bg-slate-700/50 text-white placeholder:text-slate-400 focus:border-blue-500 focus:ring-blue-500/20"
                         placeholder={
                           isGameGenerated
-                            ? "e.g., Make the paddle smaller and the ball faster."
-                            : "e.g., A simple breakout-style game with a paddle and a ball."
+                            ? "e.g., Make the paddle smaller and the ball faster, add power-ups, or change the background color."
+                            : "e.g., A simple breakout-style game with a paddle and a ball. Include scoring, multiple levels, and colorful graphics."
                         }
                         {...field}
                       />
                     </FormControl>
-                    <FormMessage />
+                    <FormMessage className="text-red-400" />
                   </FormItem>
                 )}
               />
             </div>
-            <DialogFooter>
-              <Button disabled={isGenerating || isRefining} type="submit">
+            <DialogFooter className="gap-3">
+              <Button
+                className="flex-1 bg-gradient-to-r from-purple-600 to-blue-600 text-white shadow-lg transition-all duration-200 hover:from-purple-700 hover:to-blue-700 hover:shadow-xl"
+                disabled={isGenerating || isRefining}
+                type="submit"
+              >
                 {isGenerating ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Generating...
+                    {isGameGenerated
+                      ? "Refining Game..."
+                      : "Generating Game..."}
                   </>
                 ) : (
                   <>

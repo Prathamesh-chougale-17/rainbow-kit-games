@@ -24,3 +24,4 @@ export const HTTP_STATUS_TOO_MANY_REQUESTS = 429;
 export const HTTP_STATUS_PAYLOAD_TOO_LARGE = 413;
 export const MAX_FILENAME_LENGTH = 100;
 export const POPULAR_FORK_THRESHOLD = 5;
+export const MIN_SELL_PRICE = 0.1;

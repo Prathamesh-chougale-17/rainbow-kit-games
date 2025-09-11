@@ -1,6 +1,7 @@
 import {
   Calendar,
   Code,
+  CreditCard,
   Edit,
   Play,
   ShoppingCart,
@@ -14,6 +15,7 @@ import Link from "next/link";
 import { MagicCard } from "@/components/magicui/magic-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { BuyGameDialog } from "@/components/ui/buy-game-dialog";
 import { Card, CardDescription, CardTitle } from "@/components/ui/card";
 import QrShare from "@/components/ui/qr-share";
 import { POPULAR_FORK_THRESHOLD } from "@/lib/constants";
@@ -24,6 +26,8 @@ type GameCardProps = {
   variant?: "editor" | "marketplace";
   onDelete?: (gameId: string) => void;
   onShare?: (gameId: string) => void;
+  onBuy?: (gameId: string, price: number) => Promise<void>;
+  currentUserAddress?: string;
 };
 
 /* Helper utilities extracted to reduce complexity of the main component */
@@ -113,7 +117,7 @@ function StatsSection({
   if (variant === "editor") {
     return (
       <div className="px-6 py-4">
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-4 gap-4">
           <div className="flex flex-col space-y-1">
             <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
               Updated
@@ -123,6 +127,15 @@ function StatsSection({
               <span className="font-medium text-sm">
                 {formatDate(game.updatedAt)}
               </span>
+            </div>
+          </div>
+          <div className="flex flex-col space-y-1">
+            <span className="font-medium text-muted-foreground text-xs uppercase tracking-wide">
+              Plays
+            </span>
+            <div className="flex items-center gap-2 rounded-lg bg-slate-100/50 p-2 transition-colors hover:bg-slate-200/50 dark:bg-slate-800/50 dark:hover:bg-slate-700/50">
+              <Play className={`h-4 w-4 text-${glowColor}-500`} />
+              <span className="font-medium text-sm">{game.playCount || 0}</span>
             </div>
           </div>
           <div className="flex flex-col space-y-1">
@@ -152,11 +165,17 @@ function StatsSection({
 
   return (
     <div className="px-6 py-4">
-      <div className="flex items-center justify-between">
+      <div className="grid grid-cols-3 gap-4">
         <div className="flex items-center gap-2 rounded-lg bg-slate-100/50 p-2 dark:bg-slate-800/50">
           <User className="h-4 w-4 text-emerald-500" />
           <span className="font-medium text-sm">
             {formatWalletAddress(game.walletAddress)}
+          </span>
+        </div>
+        <div className="flex items-center gap-2 rounded-lg bg-slate-100/50 p-2 dark:bg-slate-800/50">
+          <Play className="h-4 w-4 text-emerald-500" />
+          <span className="font-medium text-sm">
+            {game.playCount || 0} plays
           </span>
         </div>
         <div className="flex items-center gap-2 rounded-lg bg-slate-100/50 p-2 dark:bg-slate-800/50">
@@ -175,11 +194,15 @@ function ActionsSection({
   game,
   onDelete,
   onShare,
+  onBuy,
+  currentUserAddress,
 }: {
   variant: GameCardProps["variant"];
   game: Game;
   onDelete?: (gameId: string) => void;
   onShare?: (gameId: string) => void;
+  onBuy?: (gameId: string, price: number) => Promise<void>;
+  currentUserAddress?: string;
 }) {
   if (variant === "editor") {
     return (
@@ -235,6 +258,26 @@ function ActionsSection({
           Play Game
         </Button>
       </Link>
+
+      {/* Buy Game Button - only show if game is for sale and user is not the owner */}
+      {game.isForSale && game.salePrice && onBuy && currentUserAddress && (
+        // game.walletAddress !== currentUserAddress &&
+        <BuyGameDialog
+          gameTitle={game.title}
+          onBuy={() => onBuy(game.gameId, game.salePrice ?? 0)}
+          price={game.salePrice}
+        >
+          <Button
+            className="gap-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white shadow-lg transition-all duration-200 hover:scale-105 hover:from-amber-600 hover:to-orange-700 hover:shadow-xl"
+            size="sm"
+            type="button"
+          >
+            <CreditCard className="h-4 w-4" />
+            Buy {game.salePrice} ALGO
+          </Button>
+        </BuyGameDialog>
+      )}
+
       {onShare && (
         <div className="flex items-center">
           <QrShare
@@ -252,6 +295,8 @@ export function GameCard({
   variant = "editor",
   onDelete,
   onShare,
+  onBuy,
+  currentUserAddress,
 }: GameCardProps) {
   // const glowColor = glowColorFromVariant(variant);
 
@@ -355,7 +400,9 @@ export function GameCard({
           <div className="border-slate-200/50 border-t bg-gradient-to-r from-slate-50/30 to-transparent dark:border-slate-700/50 dark:from-slate-800/30">
             <div className="flex gap-3 px-6 py-4">
               <ActionsSection
+                currentUserAddress={currentUserAddress}
                 game={game}
+                onBuy={onBuy}
                 onDelete={onDelete}
                 onShare={onShare}
                 variant={variant}
