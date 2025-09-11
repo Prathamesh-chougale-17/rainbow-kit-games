@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -11,7 +12,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-type GameState = "waiting" | "ready" | "countdown" | "fire" | "result";
+type GameState =
+  | "waiting"
+  | "ready"
+  | "countdown"
+  | "fire"
+  | "result"
+  | "staking"
+  | "contract_ready";
 type Winner = "player" | "ai" | "none";
 
 type GameStats = {
@@ -19,12 +27,24 @@ type GameStats = {
   aiWins: number;
 };
 
+type ContractState = {
+  isConnected: boolean;
+  isStaked: boolean;
+  stakeAmount: bigint;
+  gamePool: bigint;
+  humanStake: bigint;
+  botCount: bigint;
+  gameStatus: bigint;
+};
+
 export default function QuickDrawGame() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
+  const activeAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS || null;
+
   const [gameState, setGameState] = useState<GameState>("waiting");
   const [winner, setWinner] = useState<Winner>("none");
-  const [message, setMessage] = useState("Press START to begin the duel!");
+  const [message, setMessage] = useState("Connect wallet to start staking!");
   const [stats, setStats] = useState<GameStats>({ playerWins: 0, aiWins: 0 });
   const [playerShot, setPlayerShot] = useState(false);
   const [aiShot, setAiShot] = useState(false);
@@ -33,58 +53,59 @@ export default function QuickDrawGame() {
   const [showInstructions, setShowInstructions] = useState(true);
   const [showResultDialog, setShowResultDialog] = useState(false);
   const [showReadyIndicator, setShowReadyIndicator] = useState(false);
+  const [showStakeDialog, setShowStakeDialog] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPostClaimDialog, setShowPostClaimDialog] = useState(false);
+
+  const [contractState, setContractState] = useState<ContractState>({
+    isConnected: false,
+    isStaked: false,
+    stakeAmount: BigInt(0),
+    gamePool: BigInt(0),
+    humanStake: BigInt(0),
+    botCount: BigInt(0),
+    gameStatus: BigInt(0),
+  });
 
   const gameTimerRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const aiReactionRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const animationRef = useRef<number | undefined>(undefined);
 
-  // Game timing constants
-  const MIN_DELAY = 2000;
-  const MAX_DELAY = 5000;
-  const AI_MIN_REACTION = 200;
-  const AI_MAX_REACTION = 800;
+  // Contract constants
+  const STAKE_AMOUNT = BigInt(2_000_000); // 2 $
+  const BOT_COUNT = BigInt(1); // 1 AI bot (minimum required by contract)
+  const REWARD = Number(BOT_COUNT * STAKE_AMOUNT + STAKE_AMOUNT) / 1_000_000; // Reward is stake * number of bots
 
-  // Start a new game
-  const startGame = useCallback(() => {
-    setGameState("ready");
-    setMessage("Get Ready...");
-    setPlayerShot(false);
-    setAiShot(false);
-    setPlayerFell(false);
-    setAiFell(false);
-    setWinner("none");
-    setShowReadyIndicator(true);
+  const endGameWithResult = (humanWon: boolean) => {
+    setIsLoading(true);
+    try {
+      if (humanWon) {
+        toast.success(`You won ${REWARD} ALGO! 🎉`, {
+          description:
+            "Congratulations! Your winnings have been sent to your wallet.",
+        });
+      } else {
+        toast.info("Better luck next time!", {
+          description: "Your stake has been returned to the pool.",
+        });
+      }
+    } catch {
+      toast.error("Failed to process game result. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-    // Random delay between 2-5 seconds before showing "FIRE!"
-    const delay = Math.random() * (MAX_DELAY - MIN_DELAY) + MIN_DELAY;
-
-    gameTimerRef.current = setTimeout(() => {
-      setGameState("fire");
-      setMessage("FIRE!");
-      setShowReadyIndicator(false);
-
-      // AI reaction time (200-800ms after FIRE appears)
-      const aiDelay =
-        Math.random() * (AI_MAX_REACTION - AI_MIN_REACTION) + AI_MIN_REACTION;
-      aiReactionRef.current = setTimeout(() => {
-        // Only AI wins if player hasn't shot yet
-        if (!playerShot) {
-          setAiShot(true);
-          setPlayerFell(true);
-          setWinner("ai");
-          setGameState("result");
-          setMessage("AI wins! You were too slow!");
-          setStats((prev) => ({ ...prev, aiWins: prev.aiWins + 1 }));
-
-          // Show result dialog after a short delay
-          setTimeout(() => {
-            setShowResultDialog(true);
-          }, 1000);
-        }
-      }, aiDelay);
-    }, delay);
-  }, [playerShot]);
-
+  const resetContractGame = () => {
+    setIsLoading(true);
+    try {
+      toast.success("Game reset! Ready for next round.");
+    } catch {
+      toast.error("Failed to reset game. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
   // Drawing functions
   const drawCactus = (
     ctx: CanvasRenderingContext2D,
@@ -303,23 +324,19 @@ export default function QuickDrawGame() {
   const playerShoot = useCallback(() => {
     if (gameState === "fire" && !playerShot) {
       setPlayerShot(true);
-      // Player wins if they shoot first or at the same time as AI
-      endGame("player");
-
-      // Clear AI timer since player has already won
-      if (aiReactionRef.current) {
-        clearTimeout(aiReactionRef.current);
+      if (!aiShot) {
+        endGame("player");
       }
     } else if (gameState === "ready" || gameState === "countdown") {
       // Shot too early - player loses
       setPlayerShot(true);
       endGame("ai", "You shot too early!");
     }
-  }, [gameState, playerShot, endGame]);
+  }, [gameState, playerShot, aiShot, endGame]);
 
   const resetGame = useCallback(() => {
-    setGameState("waiting");
-    setMessage("Press START to begin the duel!");
+    setGameState("staking"); // Set to staking so user can stake again
+    setMessage("Stake 2 ALGO to play against 2 AI bots!");
     setWinner("none");
     setPlayerShot(false);
     setAiShot(false);
@@ -327,6 +344,7 @@ export default function QuickDrawGame() {
     setAiFell(false);
     setShowReadyIndicator(false);
     setShowResultDialog(false);
+    setShowInstructions(false); // Don't show instructions again
 
     if (gameTimerRef.current) {
       clearTimeout(gameTimerRef.current);
@@ -336,9 +354,24 @@ export default function QuickDrawGame() {
     }
   }, []);
 
-  const handlePlayAgain = useCallback(() => {
+  const claimReward = () => {
+    if (winner === "player") {
+      endGameWithResult(true);
+    } else {
+      // If AI won, just end the game (money stays in pool)
+      endGameWithResult(false);
+    }
+
+    // Reset the contract game state so user can play again
+    resetContractGame();
+
+    // Reset the UI to allow staking again
     resetGame();
-  }, [resetGame]);
+    setShowResultDialog(false);
+
+    // Show post-claim dialog with options to stake again or go home
+    setShowPostClaimDialog(true);
+  };
 
   // Keyboard controls
   useEffect(() => {
@@ -383,70 +416,99 @@ export default function QuickDrawGame() {
     };
   }, []);
 
+  const stakeForGame = () => {
+    setIsLoading(true);
+    try {
+      // Simulate successful staking
+      setTimeout(() => {
+        setContractState((prev) => ({
+          ...prev,
+          isConnected: true,
+          isStaked: true,
+          stakeAmount: STAKE_AMOUNT,
+          botCount: BOT_COUNT,
+          gameStatus: BigInt(1), // Game ready
+        }));
+        setGameState("ready");
+        setMessage("Get ready...");
+
+        // Show "READY" indicator for 2 seconds
+        setShowReadyIndicator(true);
+        gameTimerRef.current = setTimeout(() => {
+          setShowReadyIndicator(false);
+          setGameState("countdown");
+          setMessage("Wait for it...");
+
+          // After random delay, switch to "FIRE!" state
+
+          const delay = Math.random() * 2000 + 1000; // 1-3 seconds
+          gameTimerRef.current = setTimeout(() => {
+            setGameState("fire");
+            setMessage("FIRE!");
+
+            // AI reaction time
+            const aiReactionTime = Math.random() * 800 + 200; // 200-1000 ms
+            aiReactionRef.current = setTimeout(() => {
+              if (!playerShot) {
+                setAiShot(true);
+                endGame("ai");
+              }
+            }, aiReactionTime);
+          }, delay);
+        }, 2000);
+        setShowStakeDialog(false);
+        setIsLoading(false);
+      }, 1000);
+    } catch {
+      toast.error("Staking failed. Please try again.");
+      setIsLoading(false);
+    }
+  };
+
   return (
     <>
-      {/* Instructions Dialog */}
+      {/* Instruction Dialog */}
       <Dialog open={showInstructions}>
-        <DialogContent className="max-w-md font-mono text-center bg-gradient-to-br from-orange-100 to-yellow-50 border-4 border-orange-800">
+        <DialogContent
+          className="max-w-md"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
           <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-orange-900 text-center">
-              🤠 SHOWDOWN RULES 🤠
+            <DialogTitle className="text-center font-mono text-2xl">
+              🤠 QUICK DRAW SHOWDOWN 🤠
             </DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="space-y-6 text-orange-800">
-            <div className="text-center space-y-3">
-              <p className="text-lg font-semibold">FASTEST DRAW WINS!</p>
-              <div className="space-y-2">
-                <p>⚡ Wait for the bell to ring</p>
-                <p>🔫 Click SHOOT to draw</p>
-                <p>🚫 Shoot too early and you're disqualified!</p>
-                <p>🏆 Beat the AI cowboy to win!</p>
+            <DialogDescription className="space-y-4 text-center">
+              <p className="font-semibold text-lg">How to Play:</p>
+              <div className="space-y-2 text-left">
+                <p>• Stake 2 ALGO to play against 1 AI bots</p>
+                <p>• Click START to begin the duel</p>
+                <p>• Wait for the "FIRE!" command</p>
+                <p>
+                  • Press{" "}
+                  <kbd className="rounded bg-muted px-2 py-1 font-mono text-xs">
+                    A
+                  </kbd>{" "}
+                  to shoot as fast as you can!
+                </p>
+                <p>• Winner takes all 4 ALGO!</p>
               </div>
-            </div>
-
-            <Button
-              className="w-full font-mono"
-              onClick={() => {
-                setShowInstructions(false);
-                startGame();
-              }}
-              size="lg"
-            >
-              START DUEL
-            </Button>
-            <Link className="w-full" href="/games">
-              <Button className="w-full font-mono" size="lg" variant="outline">
-                🏠 GO TO GAMES
-              </Button>
-            </Link>
-          </DialogDescription>
-        </DialogContent>
-      </Dialog>
-
-      {/* Result Dialog */}
-      <Dialog open={showResultDialog}>
-        <DialogContent className="max-w-md font-mono text-center bg-gradient-to-br from-orange-100 to-yellow-50 border-4 border-orange-800">
-          <DialogHeader>
-            <DialogTitle className="text-2xl font-bold text-orange-900">
-              {winner === "player" ? "🏆 VICTORY! 🏆" : "💀 DEFEATED �"}
-            </DialogTitle>
-          </DialogHeader>
-          <DialogDescription className="space-y-4 text-orange-800">
-            <p className="text-lg">
-              {winner === "player"
-                ? "You're the fastest gun in the west!"
-                : "The AI was quicker on the draw!"}
-            </p>
-
-            <div className="space-y-3">
+              <div className="rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">
+                <p className="font-bold text-yellow-800 dark:text-yellow-200">
+                  💰 Stake: 2 ALGO | Prize: 4 ALGO | Bots: 1
+                </p>
+              </div>
               <Button
                 className="w-full font-mono"
-                onClick={handlePlayAgain}
+                onClick={() => {
+                  setShowInstructions(false);
+                  setShowStakeDialog(true);
+                }}
                 size="lg"
               >
-                🔄 PLAY AGAIN
+                {"START DUEL"}
               </Button>
-
               <Link className="w-full" href="/games">
                 <Button
                   className="w-full font-mono"
@@ -456,12 +518,183 @@ export default function QuickDrawGame() {
                   🏠 GO TO GAMES
                 </Button>
               </Link>
-            </div>
-          </DialogDescription>
+            </DialogDescription>
+          </DialogHeader>
         </DialogContent>
       </Dialog>
 
-      {/* Game */}
+      {/* Staking Dialog */}
+      <Dialog open={showStakeDialog}>
+        <DialogContent
+          className="max-w-md"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-center font-mono text-2xl">
+              💰 STAKE TO PLAY 💰
+            </DialogTitle>
+            <DialogDescription className="space-y-4 text-center">
+              <div className="rounded-lg bg-blue-100 p-4 dark:bg-blue-900">
+                <p className="font-bold text-blue-800 dark:text-blue-200">
+                  Game Details:
+                </p>
+                <p className="text-blue-600 text-sm dark:text-blue-300">
+                  • Your Stake: 2 ALGO
+                </p>
+                <p className="text-blue-600 text-sm dark:text-blue-300">
+                  • AI Bot Stake: 2 ALGO (1 bot × 2 ALGO each)
+                </p>
+                <p className="text-blue-600 text-sm dark:text-blue-300">
+                  • Total Prize: 4 ALGO
+                </p>
+                <p className="text-blue-600 text-sm dark:text-blue-300">
+                  • Winner Takes All!
+                </p>
+              </div>
+
+              {contractState.gamePool > BigInt(0) && (
+                <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
+                  <p className="font-bold text-green-800 dark:text-green-200">
+                    Pool Balance: 10 $
+                  </p>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                <Button
+                  className="w-full bg-green-600 font-mono hover:bg-green-700"
+                  disabled={isLoading}
+                  onClick={stakeForGame}
+                  size="lg"
+                >
+                  {isLoading ? "STAKING..." : "STAKE 2 ALGO & PLAY"}
+                </Button>
+                <Link className="w-full" href="/games">
+                  <Button
+                    className="w-full font-mono"
+                    size="lg"
+                    variant="outline"
+                  >
+                    🏠 GO TO GAMES
+                  </Button>
+                </Link>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Result Dialog */}
+      <Dialog open={showResultDialog}>
+        <DialogContent
+          className="max-w-md"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-center font-mono text-2xl">
+              {winner === "player" ? "🎉 VICTORY! 🎉" : "💀 DEFEAT 💀"}
+            </DialogTitle>
+            <DialogDescription className="space-y-4 text-center">
+              <p className="font-semibold text-lg">{message}</p>
+
+              {winner === "player" && (
+                <div className="space-y-4">
+                  <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
+                    <p className="font-bold text-green-800 dark:text-green-200">
+                      You won the duel! 🏆
+                    </p>
+                    <p className="text-green-600 text-sm dark:text-green-300">
+                      Claim your reward of 4 ALGOs (2 ALGO stake + 2 ALGO from 1
+                      AI bot)
+                    </p>
+                  </div>
+                  <Button
+                    className="w-full bg-green-600 font-mono hover:bg-green-700"
+                    disabled={isLoading}
+                    onClick={claimReward}
+                    size="lg"
+                  >
+                    {isLoading ? "CLAIMING..." : "CLAIM 4 ALGO 🎉"}
+                  </Button>
+                </div>
+              )}
+
+              {winner === "ai" && (
+                <div className="space-y-4">
+                  <div className="rounded-lg bg-red-100 p-4 dark:bg-red-900">
+                    <p className="font-bold text-red-800 dark:text-red-200">
+                      The AI outgunned you! 💀
+                    </p>
+                    <p className="text-red-600 text-sm dark:text-red-300">
+                      Better luck next time, partner!
+                    </p>
+                  </div>
+                  <Button
+                    className="w-full bg-red-600 font-mono hover:bg-red-700"
+                    disabled={isLoading}
+                    onClick={claimReward}
+                    size="lg"
+                  >
+                    {isLoading ? "PROCESSING..." : "END GAME & PLAY AGAIN"}
+                  </Button>
+                </div>
+              )}
+
+              <div className="flex justify-center space-x-4 text-sm">
+                <span className="text-primary">
+                  Your Wins: {stats.playerWins}
+                </span>
+                <span className="text-muted-foreground">VS</span>
+                <span className="text-destructive">
+                  AI Wins: {stats.aiWins}
+                </span>
+              </div>
+            </DialogDescription>
+          </DialogHeader>
+        </DialogContent>
+      </Dialog>
+
+      {/* Post-Claim Dialog */}
+      <Dialog open={showPostClaimDialog}>
+        <DialogContent
+          className="max-w-md"
+          onEscapeKeyDown={(e) => e.preventDefault()}
+          onInteractOutside={(e) => e.preventDefault()}
+          onPointerDownOutside={(e) => e.preventDefault()}
+        >
+          <DialogHeader>
+            <DialogTitle className="text-center font-mono">
+              🎉 GAME COMPLETE! 🎉
+            </DialogTitle>
+            <DialogDescription className="text-center">
+              What would you like to do next?
+            </DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4">
+            <Button
+              className="w-full font-mono"
+              onClick={() => {
+                setShowPostClaimDialog(false);
+                setShowStakeDialog(true);
+              }}
+              size="lg"
+            >
+              🎮 STAKE AGAIN & PLAY
+            </Button>
+            <Link className="w-full" href="/games">
+              <Button className="w-full font-mono" size="lg" variant="outline">
+                🏠 GO TO HOME
+              </Button>
+            </Link>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Fullscreen Game */}
       <div className="fixed inset-0 z-40 flex h-full flex-col bg-background">
         {/* Title Bar */}
         <div className="flex items-center justify-between border-b bg-background p-4">
@@ -474,52 +707,46 @@ export default function QuickDrawGame() {
               <span className="text-muted-foreground">VS</span>
               <span className="text-destructive">AI: {stats.aiWins}</span>
             </div>
+            <div className="h-4 w-px bg-border" />
+            <div className="flex items-center space-x-2">
+              <div
+                className={`h-2 w-2 rounded-full ${activeAddress ? "bg-green-500" : "bg-red-500"}`}
+              />
+              <span className="text-muted-foreground text-xs">
+                {activeAddress ? "Connected" : "Disconnected"}
+              </span>
+            </div>
+            {contractState.gamePool > BigInt(0) && (
+              <>
+                <div className="h-4 w-px bg-border" />
+                <span className="text-muted-foreground text-xs">
+                  Pool: 80 $
+                </span>
+              </>
+            )}
           </div>
         </div>
 
-        {/* Game Canvas */}
+        {/* Game Canvas - Fullscreen */}
         <div className="flex flex-1 items-center justify-center p-4">
           <canvas
             className="max-h-full max-w-full rounded-lg border border-border bg-gradient-to-b from-amber-200 to-orange-300"
             height={600}
             ref={canvasRef}
             width={1000}
-            onClick={playerShoot}
           />
         </div>
 
-        {/* Game Controls */}
+        {/* Game Message - Fullscreen */}
         <div className="border-t bg-background p-6 text-center">
           <h2 className="mb-4 font-bold font-mono text-2xl text-foreground">
             {message}
           </h2>
 
-          {gameState === "waiting" && (
-            <Button
-              size="lg"
-              className="px-8 py-4 text-lg font-bold"
-              onClick={startGame}
-            >
-              START DUEL
-            </Button>
-          )}
-
-          {(gameState === "ready" ||
-            gameState === "countdown" ||
-            gameState === "fire") && (
-            <div className="space-y-4">
-              <Button
-                size="lg"
-                className="px-8 py-4 text-lg font-bold bg-red-600 hover:bg-red-700"
-                onClick={playerShoot}
-                disabled={playerShot}
-              >
-                SHOOT!
-              </Button>
-              <p className="text-muted-foreground text-sm">
-                Click SHOOT when you see "FIRE!"
-              </p>
-            </div>
+          {(gameState === "ready" || gameState === "fire") && (
+            <p className="text-muted-foreground text-sm">
+              Press A to shoot when you see "FIRE!"
+            </p>
           )}
         </div>
       </div>
