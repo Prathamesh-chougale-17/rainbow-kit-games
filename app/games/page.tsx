@@ -16,35 +16,35 @@ const games = [
   {
     title: "Quick Draw Showdown",
     description:
-      "Stake 2 ALGO and duel an AI in a lightning-fast shootout. Earn 4 ALGOs if you win!",
+      "Stake 2 GEM and duel an AI in a lightning-fast shootout. Earn 4 GEMs if you win!",
     href: "/games/showdown",
     image: "/games/showdown.png",
     badge: "New",
     tags: ["PvP vs AI", "Staking", "Reflex"],
-    stake: "2 ALGO",
-    reward: "4 ALGO",
+    stake: "2 GEM",
+    reward: "4 GEM",
   },
   {
     title: "Rock Paper Scissor",
     description:
-      "Test your luck and reflexes in this classic game. Play rock paper scissor with an AI. Stake 1 ALGO to play against 1 AI bot!",
+      "Test your luck and reflexes in this classic game. Play rock paper scissor with an AI. Stake 1 GEM to play against 1 AI bot!",
     href: "/games/rock-paper-scissor",
     badge: "New",
     tags: ["PvP vs AI", "Staking", "Luck"],
-    stake: "1 ALGO",
-    reward: "2 ALGO",
+    stake: "1 GEM",
+    reward: "2 GEM",
     image: "/games/rock-paper-scissor.png",
   },
   {
-    title: "Algo Racing Championship",
+    title: "GEM Racing Championship",
     description:
-      "Compete in high-speed races with customizable cars. Stake 5 ALGO to enter the championship!",
+      "Compete in high-speed races with customizable cars. Stake 5 GEM to enter the championship!",
     href: "/games/racing",
     image: "/games/racing.png",
     badge: "Upcoming",
     tags: ["Racing", "Strategy", "Multiplayer"],
-    stake: "5 ALGO",
-    reward: "15 ALGO",
+    stake: "5 GEM",
+    reward: "15 GEM",
   },
   {
     title: "Crypto Casino Royale",
@@ -54,8 +54,8 @@ const games = [
     image: "/games/casino.png",
     badge: "Upcoming",
     tags: ["Casino", "Luck", "Classic"],
-    stake: "1 ALGO",
-    reward: "10 ALGO",
+    stake: "1 GEM",
+    reward: "10 GEM",
   },
   {
     title: "DeFi Farming Simulator",
@@ -65,8 +65,8 @@ const games = [
     image: "/games/farming.png",
     badge: "Upcoming",
     tags: ["Farming", "Strategy", "DeFi"],
-    stake: "3 ALGO",
-    reward: "8 ALGO",
+    stake: "3 GEM",
+    reward: "8 GEM",
   },
 ];
 

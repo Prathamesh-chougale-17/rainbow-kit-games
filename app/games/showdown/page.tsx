@@ -80,7 +80,7 @@ export default function QuickDrawGame() {
     setIsLoading(true);
     try {
       if (humanWon) {
-        toast.success(`You won ${REWARD} ALGO! 🎉`, {
+        toast.success(`You won ${REWARD} GEM! 🎉`, {
           description:
             "Congratulations! Your winnings have been sent to your wallet.",
         });
@@ -336,7 +336,7 @@ export default function QuickDrawGame() {
 
   const resetGame = useCallback(() => {
     setGameState("staking"); // Set to staking so user can stake again
-    setMessage("Stake 2 ALGO to play against 2 AI bots!");
+    setMessage("Stake 2 GEM to play against 2 AI bots!");
     setWinner("none");
     setPlayerShot(false);
     setAiShot(false);
@@ -482,7 +482,7 @@ export default function QuickDrawGame() {
             <DialogDescription className="space-y-4 text-center">
               <p className="font-semibold text-lg">How to Play:</p>
               <div className="space-y-2 text-left">
-                <p>• Stake 2 ALGO to play against 1 AI bots</p>
+                <p>• Stake 2 GEM to play against 1 AI bots</p>
                 <p>• Click START to begin the duel</p>
                 <p>• Wait for the "FIRE!" command</p>
                 <p>
@@ -492,11 +492,11 @@ export default function QuickDrawGame() {
                   </kbd>{" "}
                   to shoot as fast as you can!
                 </p>
-                <p>• Winner takes all 4 ALGO!</p>
+                <p>• Winner takes all 4 GEM!</p>
               </div>
               <div className="rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">
                 <p className="font-bold text-yellow-800 dark:text-yellow-200">
-                  💰 Stake: 2 ALGO | Prize: 4 ALGO | Bots: 1
+                  💰 Stake: 2 GEM | Prize: 4 GEM | Bots: 1
                 </p>
               </div>
               <Button
@@ -541,13 +541,13 @@ export default function QuickDrawGame() {
                   Game Details:
                 </p>
                 <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • Your Stake: 2 ALGO
+                  • Your Stake: 2 GEM
                 </p>
                 <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • AI Bot Stake: 2 ALGO (1 bot × 2 ALGO each)
+                  • AI Bot Stake: 2 GEM (1 bot × 2 GEM each)
                 </p>
                 <p className="text-blue-600 text-sm dark:text-blue-300">
-                  • Total Prize: 4 ALGO
+                  • Total Prize: 4 GEM
                 </p>
                 <p className="text-blue-600 text-sm dark:text-blue-300">
                   • Winner Takes All!
@@ -569,7 +569,7 @@ export default function QuickDrawGame() {
                   onClick={stakeForGame}
                   size="lg"
                 >
-                  {isLoading ? "STAKING..." : "STAKE 2 ALGO & PLAY"}
+                  {isLoading ? "STAKING..." : "STAKE 2 GEM & PLAY"}
                 </Button>
                 <Link className="w-full" href="/games">
                   <Button
@@ -608,8 +608,8 @@ export default function QuickDrawGame() {
                       You won the duel! 🏆
                     </p>
                     <p className="text-green-600 text-sm dark:text-green-300">
-                      Claim your reward of 4 ALGOs (2 ALGO stake + 2 ALGO from 1
-                      AI bot)
+                      Claim your reward of 4 GEMs (2 GEM stake + 2 GEM from 1 AI
+                      bot)
                     </p>
                   </div>
                   <Button
@@ -618,7 +618,7 @@ export default function QuickDrawGame() {
                     onClick={claimReward}
                     size="lg"
                   >
-                    {isLoading ? "CLAIMING..." : "CLAIM 4 ALGO 🎉"}
+                    {isLoading ? "CLAIMING..." : "CLAIM 4 GEM 🎉"}
                   </Button>
                 </div>
               )}

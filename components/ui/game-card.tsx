@@ -273,7 +273,7 @@ function ActionsSection({
             type="button"
           >
             <CreditCard className="h-4 w-4" />
-            Buy {game.salePrice} ALGO
+            Buy {game.salePrice} GEM
           </Button>
         </BuyGameDialog>
       )}

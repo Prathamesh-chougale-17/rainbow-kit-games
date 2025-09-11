@@ -64,7 +64,7 @@ export function BuyGameDialog({
             <div className="mt-2 flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
               <span className="font-bold text-emerald-800 text-lg dark:text-emerald-200">
-                {price} ALGO
+                {price} GEM
               </span>
             </div>
           </div>
@@ -84,7 +84,7 @@ export function BuyGameDialog({
           <div className="rounded-lg bg-amber-50 p-3 dark:bg-amber-950/20">
             <p className="text-amber-800 text-xs dark:text-amber-200">
               <strong>Note:</strong> This purchase will transfer ownership of
-              the game to you. The transaction will be processed on the Algorand
+              the game to you. The transaction will be processed on the GEMrand
               blockchain.
             </p>
           </div>
@@ -103,7 +103,7 @@ export function BuyGameDialog({
             onClick={handleBuy}
           >
             <CreditCard className="mr-2 h-4 w-4" />
-            {isBuying ? "Processing..." : `Buy for ${price} ALGO`}
+            {isBuying ? "Processing..." : `Buy for ${price} GEM`}
           </Button>
         </DialogFooter>
       </DialogContent>

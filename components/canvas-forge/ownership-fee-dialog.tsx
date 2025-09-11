@@ -36,11 +36,11 @@ export function OwnershipFeeDialog({
             <Coins className="mt-0.5 h-5 w-5 text-amber-600 dark:text-amber-400" />
             <div className="space-y-2">
               <p className="font-medium text-amber-800 text-sm dark:text-amber-200">
-                Ownership Fee: 1 ALGO
+                Ownership Fee: 1 GEM
               </p>
               <p className="text-amber-700 text-sm dark:text-amber-300">
                 To save your game and establish ownership on the blockchain, you
-                need to pay a 1 ALGO fee. This ensures your ownership rights and
+                need to pay a 1 GEM fee. This ensures your ownership rights and
                 allows you to sell your game in the future.
               </p>
             </div>
@@ -54,7 +54,7 @@ export function OwnershipFeeDialog({
           </div>
           <p className="text-slate-600 text-sm dark:text-slate-400">
             By proceeding, you agree to pay the ownership fee and register your
-            game on the Algorand blockchain.
+            game on the GEMrand blockchain.
           </p>
         </div>
         <DialogFooter className="mt-4">
@@ -64,7 +64,7 @@ export function OwnershipFeeDialog({
             onClick={onSave}
           >
             <Save className="mr-2 h-4 w-4" />
-            {isSaving ? "Processing..." : "Pay 1 ALGO & Save"}
+            {isSaving ? "Processing..." : "Pay 1 GEM & Save"}
           </Button>
         </DialogFooter>
       </DialogContent>

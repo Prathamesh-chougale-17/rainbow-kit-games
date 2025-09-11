@@ -48,7 +48,7 @@ export function SellGameDialog({
 
     const MIN_PRICE = 0.1;
     if (priceValue < MIN_PRICE) {
-      toast.error(`Minimum price is ${MIN_PRICE} ALGO`);
+      toast.error(`Minimum price is ${MIN_PRICE} GEM`);
       return;
     }
 
@@ -118,18 +118,18 @@ export function SellGameDialog({
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="price">Price (ALGO)</Label>
+            <Label htmlFor="price">Price (GEM)</Label>
             <Input
               id="price"
               min={MIN_SELL_PRICE}
               onChange={(e) => setPrice(e.target.value)}
-              placeholder="Enter price in ALGO"
+              placeholder="Enter price in GEM"
               step="0.1"
               type="number"
               value={price}
             />
             <p className="text-slate-600 text-xs dark:text-slate-400">
-              Minimum price: {MIN_SELL_PRICE} ALGO
+              Minimum price: {MIN_SELL_PRICE} GEM
             </p>
           </div>
 
