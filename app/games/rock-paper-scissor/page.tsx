@@ -49,7 +49,7 @@ const PaperIcon = () => (
   <svg id="svg4883" version="1.1" viewBox="0 0 765 990">
     <title>Paper Icon</title>
     <defs id="defs4885">
-      <filter color-interpolation-filters="sRGB" id="filter12589">
+      <filter id="filter12589">
         <feGaussianBlur id="feGaussianBlur12591" stdDeviation="2.6717241" />
       </filter>
     </defs>
@@ -59,14 +59,14 @@ const PaperIcon = () => (
         fill="#fff"
         id="path8098"
         stroke="#979797"
-        stroke-width="3.5504"
+        strokeWidth="3.5504"
       />
       <path
         d="m10.143 182.56h750.64"
         fill="#00f"
         id="path5538"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
         style={{ color: "#000000" }}
       />
       <path
@@ -74,119 +74,119 @@ const PaperIcon = () => (
         fill="#00f"
         id="path5540"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 277.12h750.64"
         fill="#00f"
         id="path5542"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 324.91h750.64"
         fill="#00f"
         id="path5544"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 372.7h750.64"
         fill="#00f"
         id="path5546"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 420.49h750.64"
         fill="#00f"
         id="path5548"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 468.28h750.64"
         fill="#00f"
         id="path5550"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 516.07h750.64"
         fill="#00f"
         id="path5552"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 563.86h750.64"
         fill="#00f"
         id="path5554"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 611.65h750.64"
         fill="#00f"
         id="path5556"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 659.45h750.64"
         fill="#00f"
         id="path5592"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 707.24h750.64"
         fill="#00f"
         id="path5594"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 755.03h750.64"
         fill="#00f"
         id="path5596"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 802.82h750.64"
         fill="#00f"
         id="path5598"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 850.61h750.64"
         fill="#00f"
         id="path5600"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 898.4h750.64"
         fill="#00f"
         id="path5602"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 946.19h750.64"
         fill="#00f"
         id="path5604"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
       <path
         d="m10.143 993.98h750.64"
         fill="#00f"
         id="path5606"
         stroke="#01f"
-        stroke-width="1.6689px"
+        strokeWidth="1.6689px"
       />
     </g>
   </svg>
@@ -537,32 +537,38 @@ export default function RockPaperScissorsGame() {
             <DialogTitle className="text-center font-mono text-2xl">
               🪨📄✂️ ROCK PAPER SCISSORS ✂️📄🪨
             </DialogTitle>
-            <DialogDescription className="space-y-4 text-center">
-              <p className="font-semibold text-lg">How to Play:</p>
-              <div className="space-y-2 text-left">
-                <p>• Choose Rock, Paper, or Scissors</p>
-                <p>• Rock beats Scissors</p>
-                <p>• Paper beats Rock</p>
-                <p>• Scissors beats Paper</p>
-                <p>• Play against the AI and track your wins!</p>
-              </div>
-              <Button
-                className="w-full font-mono"
-                onClick={() => setShowInstructions(false)}
-                size="lg"
-              >
-                START GAME
-              </Button>
-              <Link className="w-full" href="/games">
+            <DialogDescription asChild>
+              <div className="space-y-4 text-center">
+                <p className="font-semibold text-lg">How to Play:</p>
+
+                <div className="space-y-2 text-left">
+                  <p>• Choose Rock, Paper, or Scissors</p>
+                  <p>• Rock beats Scissors</p>
+                  <p>• Paper beats Rock</p>
+                  <p>• Scissors beats Paper</p>
+                  <p>• Play against the AI and track your wins!</p>
+                </div>
+
                 <Button
                   className="w-full font-mono"
+                  onClick={() => setShowInstructions(false)}
                   size="lg"
-                  variant="outline"
                 >
-                  🏠 GO TO GAMES
+                  START GAME
                 </Button>
-              </Link>
+
+                <Link className="w-full" href="/games">
+                  <Button
+                    className="w-full font-mono"
+                    size="lg"
+                    variant="outline"
+                  >
+                    🏠 GO TO GAMES
+                  </Button>
+                </Link>
+              </div>
             </DialogDescription>
+            s
           </DialogHeader>
         </DialogContent>
       </Dialog>
@@ -581,54 +587,56 @@ export default function RockPaperScissorsGame() {
               {result === "lose" && "💀 DEFEAT 💀"}
               {result === "tie" && "🤝 TIE! 🤝"}
             </DialogTitle>
-            <DialogDescription className="space-y-4 text-center">
-              <p className="font-semibold text-lg">{getResultMessage()}</p>
+            <DialogDescription asChild>
+              <div className="space-y-4 text-center">
+                <p className="font-semibold text-lg">{getResultMessage()}</p>
 
-              {result === "win" && (
-                <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
-                  <p className="font-bold text-green-800 dark:text-green-200">
-                    Congratulations! You won! 🎉
-                  </p>
+                {result === "win" && (
+                  <div className="rounded-lg bg-green-100 p-4 dark:bg-green-900">
+                    <p className="font-bold text-green-800 dark:text-green-200">
+                      Congratulations! You won! 🎉
+                    </p>
+                  </div>
+                )}
+
+                {result === "lose" && (
+                  <div className="rounded-lg bg-red-100 p-4 dark:bg-red-900">
+                    <p className="font-bold text-red-800 dark:text-red-200">
+                      The AI won this round! 💀
+                    </p>
+                  </div>
+                )}
+
+                {result === "tie" && (
+                  <div className="rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">
+                    <p className="font-bold text-yellow-800 dark:text-yellow-200">
+                      It's a tie! Great minds think alike! 🤝
+                    </p>
+                  </div>
+                )}
+
+                <Button
+                  className="w-full font-mono"
+                  onClick={() => {
+                    resetGame();
+                    setShowResultDialog(false);
+                  }}
+                  size="lg"
+                >
+                  PLAY AGAIN
+                </Button>
+
+                <div className="flex justify-center space-x-4 text-sm">
+                  <span className="text-primary">
+                    Your Wins: {stats.playerWins}
+                  </span>
+                  <span className="text-muted-foreground">VS</span>
+                  <span className="text-destructive">
+                    AI Wins: {stats.aiWins}
+                  </span>
+                  <span className="text-muted-foreground">|</span>
+                  <span className="text-yellow-600">Ties: {stats.ties}</span>
                 </div>
-              )}
-
-              {result === "lose" && (
-                <div className="rounded-lg bg-red-100 p-4 dark:bg-red-900">
-                  <p className="font-bold text-red-800 dark:text-red-200">
-                    The AI won this round! 💀
-                  </p>
-                </div>
-              )}
-
-              {result === "tie" && (
-                <div className="rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">
-                  <p className="font-bold text-yellow-800 dark:text-yellow-200">
-                    It's a tie! Great minds think alike! 🤝
-                  </p>
-                </div>
-              )}
-
-              <Button
-                className="w-full font-mono"
-                onClick={() => {
-                  resetGame();
-                  setShowResultDialog(false);
-                }}
-                size="lg"
-              >
-                PLAY AGAIN
-              </Button>
-
-              <div className="flex justify-center space-x-4 text-sm">
-                <span className="text-primary">
-                  Your Wins: {stats.playerWins}
-                </span>
-                <span className="text-muted-foreground">VS</span>
-                <span className="text-destructive">
-                  AI Wins: {stats.aiWins}
-                </span>
-                <span className="text-muted-foreground">|</span>
-                <span className="text-yellow-600">Ties: {stats.ties}</span>
               </div>
             </DialogDescription>
           </DialogHeader>
