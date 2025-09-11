@@ -272,50 +272,50 @@ export default function GameEditor() {
     }
   };
 
-  const handlePublishToCommunity = async () => {
-    if (!currentGameId) {
-      toast.error("Please save your game first");
-      return;
-    }
+  // const handlePublishToCommunity = async () => {
+  //   if (!currentGameId) {
+  //     toast.error("Please save your game first");
+  //     return;
+  //   }
 
-    try {
-      const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
-      const currentVersion = currentGame?.currentVersion || 1;
+  //   try {
+  //     const walletAddress = process.env.NEXT_PUBLIC_WALLET_ADDRESS;
+  //     const currentVersion = currentGame?.currentVersion || 1;
 
-      const response = await fetch("/api/games/publish", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          gameId: currentGameId,
-          type: "community",
-          walletAddress,
-          version: currentVersion,
-        }),
-      });
+  //     const response = await fetch("/api/games/publish", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({
+  //         gameId: currentGameId,
+  //         type: "community",
+  //         walletAddress,
+  //         version: currentVersion,
+  //       }),
+  //     });
 
-      const result = await response.json();
+  //     const result = await response.json();
 
-      if (result.success) {
-        toast.success("Published to Community!", {
-          description:
-            "Your game is now available for developers to fork and improve.",
-        });
-        // Reload game data to update publish status
-        if (currentGameId) {
-          loadGame(currentGameId);
-        }
-      } else {
-        throw new Error(result.error || "Failed to publish");
-      }
-    } catch (error) {
-      toast.error("Failed to publish to community", {
-        description:
-          error instanceof Error ? error.message : "Please try again later.",
-      });
-    }
-  };
+  //     if (result.success) {
+  //       toast.success("Published to Community!", {
+  //         description:
+  //           "Your game is now available for developers to fork and improve.",
+  //       });
+  //       // Reload game data to update publish status
+  //       if (currentGameId) {
+  //         loadGame(currentGameId);
+  //       }
+  //     } else {
+  //       throw new Error(result.error || "Failed to publish");
+  //     }
+  //   } catch (error) {
+  //     toast.error("Failed to publish to community", {
+  //       description:
+  //         error instanceof Error ? error.message : "Please try again later.",
+  //     });
+  //   }
+  // };
 
   const srcDoc = React.useMemo(() => {
     return html;
@@ -362,13 +362,11 @@ export default function GameEditor() {
                 <Header
                   html={html}
                   isGameGenerated={isGameGenerated}
-                  isPublishedToCommunity={currentGame?.isPublishedToCommunity}
                   isPublishedToMarketplace={
                     currentGame?.isPublishedToMarketplace
                   }
                   isSaving={isSaving}
                   onGenerate={handleGenerate}
-                  onPublishCommunity={handlePublishToCommunity}
                   onPublishMarketplace={handlePublishToMarketplace}
                   onSave={handleSave}
                   onTitleChange={(t) => setTitle(t)}
