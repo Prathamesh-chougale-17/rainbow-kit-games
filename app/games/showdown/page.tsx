@@ -480,25 +480,15 @@ export default function QuickDrawGame() {
               🤠 QUICK DRAW SHOWDOWN 🤠
             </DialogTitle>
             <DialogDescription className="space-y-4 text-center">
-              <p className="font-semibold text-lg">How to Play:</p>
-              <div className="space-y-2 text-left">
-                <p>• Stake 2 GEM to play against 1 AI bots</p>
-                <p>• Click START to begin the duel</p>
-                <p>• Wait for the "FIRE!" command</p>
-                <p>
-                  • Press{" "}
-                  <kbd className="rounded bg-muted px-2 py-1 font-mono text-xs">
-                    A
-                  </kbd>{" "}
-                  to shoot as fast as you can!
-                </p>
-                <p>• Winner takes all 4 GEM!</p>
-              </div>
-              <div className="rounded-lg bg-yellow-100 p-4 dark:bg-yellow-900">
-                <p className="font-bold text-yellow-800 dark:text-yellow-200">
-                  💰 Stake: 2 GEM | Prize: 4 GEM | Bots: 1
-                </p>
-              </div>
+              <span className="block font-semibold text-lg">How to Play:</span>
+              <span className="block">
+                • Stake 2 GEM to play against 1 AI bot
+              </span>
+              <span className="block">• Click START to begin the duel</span>
+              <span className="block">• Wait for the "FIRE!" command</span>
+              <span className="block rounded-lg bg-yellow-100 p-4 font-bold text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                💰 Stake: 2 GEM | Prize: 4 GEM | Bots: 1
+              </span>
               <Button
                 className="w-full font-mono"
                 onClick={() => {
