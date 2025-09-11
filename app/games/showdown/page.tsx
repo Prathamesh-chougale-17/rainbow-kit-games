@@ -64,7 +64,8 @@ export default function QuickDrawGame() {
       setShowReadyIndicator(false);
 
       // AI reaction time (200-800ms after FIRE appears)
-      const aiDelay = Math.random() * (AI_MAX_REACTION - AI_MIN_REACTION) + AI_MIN_REACTION;
+      const aiDelay =
+        Math.random() * (AI_MAX_REACTION - AI_MIN_REACTION) + AI_MIN_REACTION;
       aiReactionRef.current = setTimeout(() => {
         // Only AI wins if player hasn't shot yet
         if (!playerShot) {
@@ -304,7 +305,7 @@ export default function QuickDrawGame() {
       setPlayerShot(true);
       // Player wins if they shoot first or at the same time as AI
       endGame("player");
-      
+
       // Clear AI timer since player has already won
       if (aiReactionRef.current) {
         clearTimeout(aiReactionRef.current);
@@ -402,7 +403,7 @@ export default function QuickDrawGame() {
                 <p>🏆 Beat the AI cowboy to win!</p>
               </div>
             </div>
-            
+
             <Button
               className="w-full font-mono"
               onClick={() => {
@@ -414,11 +415,7 @@ export default function QuickDrawGame() {
               START DUEL
             </Button>
             <Link className="w-full" href="/games">
-              <Button
-                className="w-full font-mono"
-                size="lg"
-                variant="outline"
-              >
+              <Button className="w-full font-mono" size="lg" variant="outline">
                 🏠 GO TO GAMES
               </Button>
             </Link>
@@ -436,12 +433,11 @@ export default function QuickDrawGame() {
           </DialogHeader>
           <DialogDescription className="space-y-4 text-orange-800">
             <p className="text-lg">
-              {winner === "player" 
-                ? "You're the fastest gun in the west!" 
-                : "The AI was quicker on the draw!"
-              }
+              {winner === "player"
+                ? "You're the fastest gun in the west!"
+                : "The AI was quicker on the draw!"}
             </p>
-            
+
             <div className="space-y-3">
               <Button
                 className="w-full font-mono"
@@ -450,7 +446,7 @@ export default function QuickDrawGame() {
               >
                 🔄 PLAY AGAIN
               </Button>
-              
+
               <Link className="w-full" href="/games">
                 <Button
                   className="w-full font-mono"
@@ -499,8 +495,8 @@ export default function QuickDrawGame() {
           </h2>
 
           {gameState === "waiting" && (
-            <Button 
-              size="lg" 
+            <Button
+              size="lg"
               className="px-8 py-4 text-lg font-bold"
               onClick={startGame}
             >
@@ -508,10 +504,12 @@ export default function QuickDrawGame() {
             </Button>
           )}
 
-          {(gameState === "ready" || gameState === "countdown" || gameState === "fire") && (
+          {(gameState === "ready" ||
+            gameState === "countdown" ||
+            gameState === "fire") && (
             <div className="space-y-4">
-              <Button 
-                size="lg" 
+              <Button
+                size="lg"
                 className="px-8 py-4 text-lg font-bold bg-red-600 hover:bg-red-700"
                 onClick={playerShoot}
                 disabled={playerShot}
