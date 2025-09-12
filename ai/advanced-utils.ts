@@ -12,8 +12,8 @@ import { z } from "zod";
 import { aiModel } from "@/ai/config";
 
 // Streaming version for real-time game generation
-export async function generateGameCodeStream(prompt: string) {
-  const result = await streamText({
+export function generateGameCodeStream(prompt: string) {
+  const result = streamText({
     model: aiModel,
     prompt: `Generate a complete HTML5 game based on this prompt: ${prompt}
     
