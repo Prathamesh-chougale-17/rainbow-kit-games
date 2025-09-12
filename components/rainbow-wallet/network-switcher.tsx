@@ -9,6 +9,13 @@ import { Button } from "@/components/ui/button";
 const networkConfigs = {
   1: { name: "Ethereum", color: "#627EEA", icon: "🔷", rpc: "mainnet" },
   137: { name: "Polygon", color: "#8247E5", icon: "💜", rpc: "polygon" },
+  43114: { name: "Avalanche", color: "#E84142", icon: "🔺", rpc: "avalanche" },
+  43113: {
+    name: "Avalanche Fuji",
+    color: "#E84142",
+    icon: "🔻",
+    rpc: "avalanche-fuji",
+  },
   4158: {
     name: "CrossFi Mainnet",
     color: "#FF0420",

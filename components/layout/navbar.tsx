@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { MobileNav } from "@/components/layout/mobile-nav";
+import { ConnectWalletButton } from "@/components/rainbow-wallet/connect-wallet-button";
+import { NetworkSwitcher } from "@/components/rainbow-wallet/network-switcher";
 
 // Navigation items
 
@@ -32,8 +34,17 @@ export function Navbar({
         </nav>
 
         {/* Theme toggle and mobile nav - Right */}
-        <div className="flex items-center justify-end gap-2 md:hidden">
-          <MobileNav navItems={navItems} />
+        <div className="flex items-center justify-end gap-2">
+          {/* Desktop wallet controls */}
+          <div className="hidden items-center gap-2 md:flex">
+            <NetworkSwitcher />
+            <ConnectWalletButton size="sm" variant="outline" />
+          </div>
+
+          {/* Mobile navigation */}
+          <div className="md:hidden">
+            <MobileNav navItems={navItems} />
+          </div>
         </div>
       </div>
     </header>

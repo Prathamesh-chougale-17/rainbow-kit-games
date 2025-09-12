@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Background from "@/components/background";
 import { Navbar } from "@/components/layout/navbar";
+import { Providers } from "@/components/rainbow-wallet/providers";
 import { Toaster } from "@/components/ui/sonner";
 
 const geistSans = Geist({
@@ -30,21 +31,23 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <Background>
-          <Navbar
-            navItems={[
-              { title: "Home", href: "/" },
-              { title: "About", href: "/about" },
-              { title: "Contact", href: "/contact" },
-              { title: "Games", href: "/games" },
-              { title: "Editor", href: "/editor" },
-              { title: "Market Place", href: "/marketplace" },
-              { title: "Community", href: "/community" },
-            ]}
-          />
-          {children}
-          <Toaster />
-        </Background>
+        <Providers>
+          <Background>
+            <Navbar
+              navItems={[
+                { title: "Home", href: "/" },
+                { title: "About", href: "/about" },
+                { title: "Contact", href: "/contact" },
+                { title: "Games", href: "/games" },
+                { title: "Editor", href: "/editor" },
+                { title: "Market Place", href: "/marketplace" },
+                { title: "Community", href: "/community" },
+              ]}
+            />
+            {children}
+            <Toaster />
+          </Background>
+        </Providers>
       </body>
     </html>
   );

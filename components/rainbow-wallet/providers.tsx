@@ -6,6 +6,8 @@ import type { ReactNode } from "react";
 import { WagmiProvider } from "wagmi";
 import {
   arbitrum,
+  avalanche,
+  avalancheFuji,
   base,
   mainnet,
   optimism,
@@ -22,15 +24,18 @@ type ProvidersProps = {
 };
 
 const config = getDefaultConfig({
-  appName: "MediChainX",
+  appName: "Ava Games",
   projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || "default",
   chains: [
+    avalanche,
     mainnet,
     polygon,
     optimism,
     arbitrum,
     base,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [sepolia] : []),
+    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true"
+      ? [avalancheFuji, sepolia]
+      : []),
   ],
   ssr: true, // If your dApp uses server side rendering (SSR)
 });
